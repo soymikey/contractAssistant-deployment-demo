@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合同助手 - App界面设计</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            font-size: 32px;
+        }
+
+        .screens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .phone-frame {
+            background: white;
+            border-radius: 40px;
+            padding: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 390px;
+            margin: 0 auto;
+            width: 100%;
+            aspect-ratio: 9/16;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .phone-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 28px;
+            background: black;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+
+        .screen {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #f8f9fa;
+            border-radius: 30px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .status-bar {
+            background: #fff;
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .screen-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .screen-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .screen-header .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .screen-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .screen-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .screen-content::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 2px;
+        }
+
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 0;
+            border-top: 1px solid #eee;
+            background: white;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #999;
+            text-decoration: none;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: #667eea;
+        }
+
+        .nav-item-icon {
+            font-size: 24px;
+        }
+
+        /* 首页 */
+        .home-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .upload-area {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border: 2px dashed #667eea;
+            border-radius: 12px;
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: linear-gradient(135deg, #667eea25 0%, #764ba225 100%);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .upload-text {
+            color: #333;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .upload-subtext {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9ff;
+        }
+
+        .history-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .contract-item {
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .contract-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .contract-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .contract-info {
+            flex: 1;
+        }
+
+        .contract-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .contract-meta {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .contract-status {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        /* 分析结果页 */
+        .result-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .result-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .result-badge {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .badge-overview {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-risk {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .badge-warning {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .result-content {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .risk-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .risk-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffebee;
+            color: #d32f2f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .risk-content {
+            flex: 1;
+        }
+
+        .risk-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .risk-description {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .loading-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e0e0e0;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-text {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 16px 0 8px 0;
+        }
+
+        /* 详情页 */
+        .detail-section {
+            margin-bottom: 16px;
+        }
+
+        .detail-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 10px 0;
+            font-size: 13px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .detail-label {
+            color: #999;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            color: #333;
+            font-weight: 600;
+            text-align: right;
+            flex: 1;
+            margin-left: 12px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .screens-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .annotation {
+            text-align: center;
+            color: #999;
+            margin-top: 20px;
+            font-size: 12px;
+            padding: 0 20px;
+        }
+
+        .screen-label {
+            text-align: center;
+            color: white;
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .frame-container {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 合同助手 App - 界面设计</h1>
+
+        <div class="screens-grid">
+            <!-- 屏幕1: 首页 -->
+            <div class="frame-container">
+                <div class="phone-frame">
+                    <div class="screen">
+                        <div class="status-bar">
+                            <span>9:41</span>
+                            <span>●●●●●</span>
+                        </div>
+                        <div class="screen-header">
+                            <h2>合同助手</h2>
+                            <button class="icon-btn">⚙️</button>
+                        </div>
+                        <div class="screen-content">
+                            <div class="upload-area">
+                                <div class="upload-icon">📄</div>
+                                <div class="upload-text">点击上传或拍照</div>
+                                <div class="upload-subtext">支持合同照片、PDF、Word文件</div>
+                            </div>
+
+                            <div class="action-buttons">
+                                <button class="btn btn-primary">
+                                    <span>📷</span> 拍照
+                                </button>
+                                <button class="btn btn-secondary">
+                                    <span>📁</span> 选择文件
+                                </button>
+                            </div>
+
+                            <div class="section-label">最近分析</div>
+                            <div class="contract-item">
+                                <div class="contract-icon">📋</div>
+                                <div class="contract-info">
+                                    <div class="contract-name">劳动合同_2025.pdf</div>
+                                    <div class="contract-meta">2小时前</div>
+                                </div>
+                                <div class="contract-status">已分析</div>
+                            </div>
+                            <div class="contract-item">
+                                <div class="contract-icon">📋</div>
+                                <div class="contract-info">
+                                    <div class="contract-name">购销合同_001.png</div>
+                                    <div class="contract-meta">1天前</div>
+                                </div>
+                                <div class="contract-status">已分析</div>
+                            </div>
+                            <div class="contract-item">
+                                <div class="contract-icon">📋</div>
+                                <div class="contract-info">
+                                    <div class="contract-name">租赁协议.docx</div>
+                                    <div class="contract-meta">3天前</div>
+                                </div>
+                                <div class="contract-status">已分析</div>
+                            </div>
+                        </div>
+                        <div class="bottom-nav">
+                            <div class="nav-item active">
+                                <div class="nav-item-icon">🏠</div>
+                                <span>首页</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-item-icon">📊</div>
+                                <span>分析</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-item-icon">❤️</div>
+                                <span>收藏</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-item-icon">👤</div>
+                                <span>我的</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-label">屏幕1: 首页</div>
+            </div>
+
+            <!-- 屏幕2: 分析中 -->
+            <div class="frame-container">
+                <div class="phone-frame">
+                    <div class="screen">
+                        <div class="status-bar">
+                            <span>9:42</span>
+                            <span>●●●●●</span>
+                        </div>
+                        <div class="screen-header">
+                            <h2>分析中...</h2>
+                        </div>
+                        <div class="screen-content loading-screen">
+                            <div class="loading-spinner"></div>
+                            <div class="loading-text">正在分析合同内容</div>
+                            <div class="loading-text" style="margin-top: 8px; font-size: 12px; color: #ccc;">请稍候...</div>
+                        </div>
+                        <div class="bottom-nav">
+                            <div class="nav-item active">
+                                <div class="nav-item-icon">🏠</div>
+                                <span>首页</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-item-icon">📊</div>
+                                <span>分析</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-item-icon">❤️</div>
+                                <span>收藏</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-item-icon">👤</div>
+                                <span>我的</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-label">屏幕2: 分析中</div>
+            </div>
+
+            <!-- 屏幕3: 分析结果 -->
+            <div class="frame-container">
+                <div class="phone-frame">
+                    <div class="screen">
+                        <div class="status-bar">
+                            <span>9:43</span>
+                            <span>●●●●●</span>
+                        </div>
+                        <div class="screen-header">
+                            <h2>分析结果</h2>
+                            <button class="icon-btn">⋯</button>
+                        </div>
+                        <div class="screen-content">
+                            <div class="result-card">
+                                <div class="result-header">
+                                    <div class="result-title">合同概览</div>
+                                    <div class="result-badge badge-overview">概览</div>
+                                </div>
+                                <div class="result-content">
+                                    <strong>合同类型:</strong> 劳动合同<br/>
+                                    <strong>当事人:</strong> 甲方(公司)、乙方(员工)<br/>
+                                    <strong>合同期限:</strong> 2025年1月1日 - 2027年12月31日<br/>
+                                    <strong>页数:</strong> 5页
+                                </div>
+                            </div>
+
+                            <div class="result-card">
+                                <div class="result-header">
+                                    <div class="result-title">潜在风险</div>
+                                    <div class="result-badge badge-risk">3项</div>
+                                </div>
+                                <div class="result-content">
+                                    <div class="risk-item">
+                                        <div class="risk-icon">⚠️</div>
+                                        <div class="risk-content">
+                                            <div class="risk-title">离职补偿条款模糊</div>
+                                            <div class="risk-description">未明确约定离职补偿标准，可能引发纠纷</div>
+                                        </div>
+                                    </div>
+                                    <div class="risk-item">
+                                        <div class="risk-icon">⚠️</div>
+                                        <div class="risk-content">
+                                            <div class="risk-title">保密期限过长</div>
+                                            <div class="risk-description">商业秘密保密期限为10年，超出法律规定</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="section-label">查看更多详情</div>
+                        </div>
+                        <div class="bottom-nav">
+                            <div class="nav-item active">
+                                <div class="nav-item-icon">🏠</div>
+                                <span>首页</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-item-icon">📊</div>
+                                <span>分析</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-item-icon">❤️</div>
+                                <span>收藏</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-item-icon">👤</div>
+                                <span>我的</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-label">屏幕3: 分析结果(汇总)</div>
+            </div>
+
+            <!-- 屏幕4: 详细分析 -->
+            <div class="frame-container">
+                <div class="phone-frame">
+                    <div class="screen">
+                        <div class="status-bar">
+                            <span>9:44</span>
+                            <span>●●●●●</span>
+                        </div>
+                        <div class="screen-header">
+                            <h2>📋 详细分析</h2>
+                            <button class="icon-btn">↓</button>
+                        </div>
+                        <div class="screen-content">
+                            <div class="result-card">
+                                <div class="detail-section">
+                                    <div class="detail-section-title">基本信息</div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">合同类型</span>
+                                        <span class="detail-value">劳动合同</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">签署日期</span>
+                                        <span class="detail-value">2025-01-15</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">有效期</span>
+                                        <span class="detail-value">24个月</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-section">
+                                    <div class="detail-section-title">甲方信息</div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">名称</span>
+                                        <span class="detail-value">XX有限公司</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">地址</span>
+                                        <span class="detail-value">北京市朝阳区...</span>
+                                    </div>
+                                </div>
+
+                                <div class="detail-section">
+                                    <div class="detail-section-title">关键条款</div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">薪资</span>
+                                        <span class="detail-value">15,000元/月</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">保险</span>
+                                        <span class="detail-value">五险一金</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="detail-label">工作地点</span>
+                                        <span class="detail-value">北京总部</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bottom-nav">
+                            <div class="nav-item active">
+                                <div class="nav-item-icon">🏠</div>
+                                <span>首页</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-item-icon">📊</div>
+                                <span>分析</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-item-icon">❤️</div>
+                                <span>收藏</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-item-icon">👤</div>
+                                <span>我的</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-label">屏幕4: 详细分析</div>
+            </div>
+
+            <!-- 屏幕5: 风险详情 -->
+            <div class="frame-container">
+                <div class="phone-frame">
+                    <div class="screen">
+                        <div class="status-bar">
+                            <span>9:45</span>
+                            <span>●●●●●</span>
+                        </div>
+                        <div class="screen-header">
+                            <h2>⚠️ 风险分析</h2>
+                        </div>
+                        <div class="screen-content">
+                            <div class="result-card">
+                                <div class="result-header">
+                                    <div class="result-title">风险等级：高</div>
+                                    <div class="result-badge badge-risk">3项</div>
+                                </div>
+                            </div>
+
+                            <div class="result-card">
+                                <div class="result-header">
+                                    <div class="result-title">高风险项</div>
+                                </div>
+                                <div class="result-content">
+                                    <div class="risk-item">
+                                        <div class="risk-icon">🔴</div>
+                                        <div class="risk-content">
+                                            <div class="risk-title">离职补偿条款模糊</div>
+                                            <div class="risk-description">未明确约定离职补偿标准。建议按照《劳动法》第47条补充完善。</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="result-card">
+                                <div class="result-header">
+                                    <div class="result-title">中风险项</div>
+                                </div>
+                                <div class="result-content">
+                                    <div class="risk-item">
+                                        <div class="risk-icon">🟡</div>
+                                        <div class="risk-content">
+                                            <div class="risk-title">保密期限过长</div>
+                                            <div class="risk-description">商业秘密保密期10年超标。建议改为3-5年。</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="result-card">
+                                <div class="result-header">
+                                    <div class="result-title">建议</div>
+                                </div>
+                                <div class="result-content">
+                                    <div style="margin-bottom: 10px;">
+                                        <strong>✓ 补充条款</strong><br>
+                                        <small>添加仲裁条款和管辖权约定</small>
+                                    </div>
+                                    <div>
+                                        <strong>✓ 修改条款</strong><br>
+                                        <small>调整保密期限为法律规定范围内</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bottom-nav">
+                            <div class="nav-item active">
+                                <div class="nav-item-icon">🏠</div>
+                                <span>首页</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-item-icon">📊</div>
+                                <span>分析</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-item-icon">❤️</div>
+                                <span>收藏</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-item-icon">👤</div>
+                                <span>我的</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-label">屏幕5: 风险详情</div>
+            </div>
+
+            <!-- 屏幕6: 我的页面 -->
+            <div class="frame-container">
+                <div class="phone-frame">
+                    <div class="screen">
+                        <div class="status-bar">
+                            <span>9:46</span>
+                            <span>●●●●●</span>
+                        </div>
+                        <div class="screen-header">
+                            <h2>个人中心</h2>
+                        </div>
+                        <div class="screen-content">
+                            <div style="text-align: center; padding: 20px 0;">
+                                <div style="width: 80px; height: 80px; border-radius: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">👤</div>
+                                <div style="font-size: 16px; font-weight: 600; color: #333; margin-bottom: 4px;">用户名</div>
+                                <div style="font-size: 12px; color: #999;">user@example.com</div>
+                            </div>
+
+                            <div class="section-label" style="margin-top: 24px;">账户统计</div>
+                            <div class="result-card" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                <div style="text-align: center; padding: 12px 0;">
+                                    <div style="font-size: 24px; font-weight: 600; color: #667eea;">12</div>
+                                    <div style="font-size: 12px; color: #999; margin-top: 4px;">已分析合同</div>
+                                </div>
+                                <div style="text-align: center; padding: 12px 0;">
+                                    <div style="font-size: 24px; font-weight: 600; color: #667eea;">5</div>
+                                    <div style="font-size: 12px; color: #999; margin-top: 4px;">已收藏</div>
+                                </div>
+                            </div>
+
+                            <div class="section-label">设置</div>
+                            <div class="contract-item">
+                                <span style="font-size: 18px;">🔔</span>
+                                <div style="flex: 1;">
+                                    <div class="contract-name">通知设置</div>
+                                </div>
+                                <span style="color: #999;">›</span>
+                            </div>
+                            <div class="contract-item">
+                                <span style="font-size: 18px;">🛡️</span>
+                                <div style="flex: 1;">
+                                    <div class="contract-name">隐私与安全</div>
+                                </div>
+                                <span style="color: #999;">›</span>
+                            </div>
+                            <div class="contract-item">
+                                <span style="font-size: 18px;">❓</span>
+                                <div style="flex: 1;">
+                                    <div class="contract-name">帮助与反馈</div>
+                                </div>
+                                <span style="color: #999;">›</span>
+                            </div>
+                            <div class="contract-item">
+                                <span style="font-size: 18px;">ℹ️</span>
+                                <div style="flex: 1;">
+                                    <div class="contract-name">关于我们</div>
+                                </div>
+                                <span style="color: #999;">›</span>
+                            </div>
+
+                            <button class="btn btn-secondary" style="margin-top: 20px;">
+                                退出登录
+                            </button>
+                        </div>
+                        <div class="bottom-nav">
+                            <div class="nav-item">
+                                <div class="nav-item-icon">🏠</div>
+                                <span>首页</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-item-icon">📊</div>
+                                <span>分析</span>
+                            </div>
+                            <div class="nav-item">
+                                <div class="nav-item-icon">❤️</div>
+                                <span>收藏</span>
+                            </div>
+                            <div class="nav-item active">
+                                <div class="nav-item-icon">👤</div>
+                                <span>我的</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="screen-label">屏幕6: 个人中心</div>
+            </div>
+        </div>
+
+        <div style="background: white; border-radius: 12px; padding: 30px; margin-top: 40px;">
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px; color: #333;">📱 功能模块说明</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #667eea; margin-bottom: 10px;">📄 文件上传</h3>
+                    <ul style="font-size: 13px; color: #666; line-height: 1.8;">
+                        <li>✓ 拍照识别(OCR)</li>
+                        <li>✓ 文件选择(PDF、Word、图片)</li>
+                        <li>✓ 批量上传</li>
+                        <li>✓ 历史记录管理</li>
+                    </ul>
+                </div>
+
+                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #764ba2; margin-bottom: 10px;">🤖 AI分析</h3>
+                    <ul style="font-size: 13px; color: #666; line-height: 1.8;">
+                        <li>✓ 合同内容识别与提取</li>
+                        <li>✓ 关键条款提取</li>
+                        <li>✓ 法律风险识别</li>
+                        <li>✓ 实时分析进度</li>
+                    </ul>
+                </div>
+
+                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #667eea; margin-bottom: 10px;">📊 结果展示</h3>
+                    <ul style="font-size: 13px; color: #666; line-height: 1.8;">
+                        <li>✓ 合同概览</li>
+                        <li>✓ 风险等级评估</li>
+                        <li>✓ 详细条款分析</li>
+                        <li>✓ 改进建议</li>
+                    </ul>
+                </div>
+
+                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #764ba2; margin-bottom: 10px;">💾 数据管理</h3>
+                    <ul style="font-size: 13px; color: #666; line-height: 1.8;">
+                        <li>✓ 分析历史记录</li>
+                        <li>✓ 收藏重要合同</li>
+                        <li>✓ 导出分析报告</li>
+                        <li>✓ 云端同步</li>
+                    </ul>
+                </div>
+
+                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #667eea; margin-bottom: 10px;">⚙️ 用户中心</h3>
+                    <ul style="font-size: 13px; color: #666; line-height: 1.8;">
+                        <li>✓ 账户管理</li>
+                        <li>✓ 通知设置</li>
+                        <li>✓ 隐私与安全</li>
+                        <li>✓ 帮助反馈</li>
+                    </ul>
+                </div>
+
+                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px;">
+                    <h3 style="color: #764ba2; margin-bottom: 10px;">🔐 安全特性</h3>
+                    <ul style="font-size: 13px; color: #666; line-height: 1.8;">
+                        <li>✓ 端到端加密</li>
+                        <li>✓ 隐私保护</li>
+                        <li>✓ 数据备份</li>
+                        <li>✓ 合规处理</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: white; border-radius: 12px; padding: 30px; margin-top: 20px;">
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px; color: #333;">🎨 设计系统</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                <div>
+                    <h3 style="font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px;">色彩系统</h3>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 6px;"></div>
+                            <span style="font-size: 13px; color: #666;">主色(紫蓝渐变)</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 40px; height: 40px; background: #ffebee; border-radius: 6px;"></div>
+                            <span style="font-size: 13px; color: #666;">风险(浅红)</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 40px; height: 40px; background: #fff3e0; border-radius: 6px;"></div>
+                            <span style="font-size: 13px; color: #666;">警告(浅橙)</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 40px; height: 40px; background: #f8f9fa; border-radius: 6px; border: 1px solid #eee;"></div>
+                            <span style="font-size: 13px; color: #666;">背景(浅灰)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px;">排版系统</h3>
+                    <div style="font-size: 13px; color: #666; line-height: 1.8;">
+                        <p style="margin-bottom: 8px;"><strong>标题:</strong> 18px, 600weight</p>
+                        <p style="margin-bottom: 8px;"><strong>副标题:</strong> 14px, 600weight</p>
+                        <p style="margin-bottom: 8px;"><strong>正文:</strong> 13px, 400weight</p>
+                        <p><strong>辅助:</strong> 12px, 400weight</p>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px;">组件规范</h3>
+                    <div style="font-size: 13px; color: #666; line-height: 1.8;">
+                        <p style="margin-bottom: 8px;">• 圆角: 8px(小), 12px(中), 30px(大)</p>
+                        <p style="margin-bottom: 8px;">• 间距: 8px, 12px, 16px, 20px</p>
+                        <p style="margin-bottom: 8px;">• 阴影: 0 2px 8px rgba(0,0,0,0.08)</p>
+                        <p>• 过渡: 0.3s all ease</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border-radius: 12px; padding: 30px; margin-top: 20px; text-align: center; border: 1px solid #667eea30;">
+            <h2 style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 12px;">🚀 技术栈建议</h2>
+            <p style="color: #666; margin-bottom: 20px; line-height: 1.8;">
+                <strong>前端框架:</strong> React Native / Flutter<br>
+                <strong>AI服务:</strong> OpenAI API / Claude API / 本地部署LLM<br>
+                <strong>OCR:</strong> Google Vision / Tesseract / Paddleocr<br>
+                <strong>后端:</strong> Node.js/Express 或 Python/FastAPI<br>
+                <strong>数据库:</strong> PostgreSQL + Redis<br>
+                <strong>存储:</strong> AWS S3 / 阿里云 OSS<br>
+            </p>
+        </div>
+
+    </div>
+</body>
+</html>
