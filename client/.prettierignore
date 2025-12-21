@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+.expo/
+android/
+ios/
+
+# Generated files
+*.log
+.DS_Store
+
+# Package manager files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
