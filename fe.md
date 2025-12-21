@@ -2,9 +2,10 @@
 
 ## 项目概述
 
-基于 Expo + React Native 的跨平台移动应用前端开发，包括 UI 组件开发、页面开发、状态管理、API 集成等。
+基于 Expo + React Native 的跨平台移动应用前端开发,包括 UI 组件开发、页面开发、状态管理、API 集成等。
 
 **框架**: React Native (Expo)  
+**包管理器**: pnpm (Monorepo 工作区)  
 **状态管理**: Zustand  
 **路由**: Expo Router  
 **UI库**: React Native Paper  
@@ -17,6 +18,7 @@
 
 - **核心框架**: React Native 0.73+
 - **开发框架**: Expo 51+
+- **包管理器**: pnpm (支持 Monorepo 工作区)
 - **路由**: Expo Router (内置)
 - **状态管理**: Zustand
 - **HTTP客户端**: Axios
@@ -87,18 +89,18 @@ TODO List - 项目初始化
 ```
 TODO List - 依赖配置
 - [ ] 1.2.1 安装核心依赖
-  - [ ] npm install zustand axios @react-navigation/native
-  - [ ] npm install react-native-paper react-native-vector-icons
-  - [ ] npm install react-hook-form date-fns
-  - [ ] npm install expo-camera expo-image-picker expo-document-picker
-  - [ ] npm install expo-file-system @react-native-async-storage/async-storage
-  - [ ] npm install @react-native-community/netinfo expo-notifications
+  - [ ] pnpm add zustand axios @react-navigation/native
+  - [ ] pnpm add react-native-paper react-native-vector-icons
+  - [ ] pnpm add react-hook-form date-fns
+  - [ ] pnpm add expo-camera expo-image-picker expo-document-picker
+  - [ ] pnpm add expo-file-system @react-native-async-storage/async-storage
+  - [ ] pnpm add @react-native-community/netinfo expo-notifications
 
 - [ ] 1.2.2 安装开发依赖
-  - [ ] npm install --save-dev @types/react-native @types/node
-  - [ ] npm install --save-dev jest @testing-library/react-native
-  - [ ] npm install --save-dev typescript
-  - [ ] npm install --save-dev eslint prettier eslint-config-prettier
+  - [ ] pnpm add -D @types/react-native @types/node
+  - [ ] pnpm add -D jest @testing-library/react-native
+  - [ ] pnpm add -D typescript
+  - [ ] pnpm add -D eslint prettier eslint-config-prettier
 
 - [ ] 1.2.3 环境变量配置
   - [ ] 创建 .env 文件 (开发环境)
@@ -107,7 +109,7 @@ TODO List - 依赖配置
   - [ ] 配置 .gitignore 排除 .env 文件
 
 - [ ] 1.2.4 验证依赖安装
-  - [ ] 运行 npm start 验证
+  - [ ] 运行 pnpm start 验证
   - [ ] 在 iOS 模拟器上测试
   - [ ] 在 Android 模拟器上测试
   - [ ] 确保没有依赖冲突
@@ -902,7 +904,7 @@ TODO List - 单元测试
   - [ ] 目标覆盖率: 90%+
 
 - [ ] 7.1.4 运行测试并生成覆盖率报告
-  - [ ] npm test 运行所有测试
+  - [ ] pnpm test 运行所有测试
   - [ ] 生成覆盖率报告
   - [ ] 确保覆盖率达标
 ```
@@ -1017,7 +1019,7 @@ TODO List - 安全加固
   - [ ] 实现敏感数据脱敏
 
 - [ ] 7.5.3 依赖安全扫描
-  - [ ] npm audit 扫描
+  - [ ] pnpm audit 扫描
   - [ ] 更新已知漏洞依赖
   - [ ] 检查过期依赖
 
@@ -1118,7 +1120,7 @@ TODO List - 构建发布
     - [ ] 提交审核
     - [ ] 等待审核通过
   - [ ] Web 版发布
-    - [ ] npm run build 生成构建
+    - [ ] pnpm run build 生成构建
     - [ ] 部署到服务器
     - [ ] 配置域名
     - [ ] 验证访问
@@ -1132,86 +1134,114 @@ TODO List - 构建发布
 
 ---
 
+## Monorepo 工作区结构
+
+本项目使用 pnpm workspace 管理 Monorepo:
+
+```yaml
+# pnpm-workspace.yaml
+packages:
+  - 'client'  # React Native 前端
+  - 'server'  # NestJS 后端
+```
+
+**包管理命令**:
+- 在根目录安装所有依赖: `pnpm install`
+- 在 client 目录工作: `cd client && pnpm <command>`
+- 在 server 目录工作: `cd server && pnpm <command>`
+- 运行 client 开发服务器: `cd client && pnpm start`
+- 运行 server 开发服务器: `cd server && pnpm start:dev`
+
+---
+
 ## 前端文件结构参考
 
 ```
-contract-assistant/
-├── app/
-│   ├── _layout.tsx                    # 根布局
-│   ├── (auth)/
-│   │   ├── _layout.tsx
-│   │   ├── login.tsx
-│   │   ├── register.tsx
-│   │   ├── forgot-password.tsx
-│   │   └── reset-password.tsx
-│   └── (tabs)/
-│       ├── _layout.tsx
-│       ├── index.tsx                  # 首页
-│       ├── analyze.tsx
-│       ├── favorites.tsx
-│       └── profile.tsx
-├── src/
-│   ├── components/
-│   │   ├── ui/
-│   │   │   ├── Button.tsx
-│   │   │   ├── Input.tsx
-│   │   │   ├── Card.tsx
-│   │   │   ├── Modal.tsx
+contract-assistant/                    # Monorepo 根目录
+├── pnpm-workspace.yaml                # pnpm 工作区配置
+├── pnpm-lock.yaml                     # pnpm 锁定文件
+├── package.json                       # 根 package.json
+├── client/                            # 前端应用目录
+│   ├── app/
+│   │   ├── _layout.tsx                # 根布局
+│   │   ├── (auth)/
+│   │   │   ├── _layout.tsx
+│   │   │   ├── login.tsx
+│   │   │   ├── register.tsx
+│   │   │   ├── forgot-password.tsx
+│   │   │   └── reset-password.tsx
+│   │   └── (tabs)/
+│   │       ├── _layout.tsx
+│   │       ├── index.tsx              # 首页
+│   │       ├── analyze.tsx
+│   │       ├── favorites.tsx
+│   │       └── profile.tsx
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── ui/
+│   │   │   │   ├── Button.tsx
+│   │   │   │   ├── Input.tsx
+│   │   │   │   ├── Card.tsx
+│   │   │   │   ├── Modal.tsx
+│   │   │   │   └── ...
+│   │   │   ├── form/
+│   │   │   ├── UploadArea.tsx
+│   │   │   ├── ContractList.tsx
 │   │   │   └── ...
-│   │   ├── form/
-│   │   ├── UploadArea.tsx
-│   │   ├── ContractList.tsx
+│   │   ├── screens/
+│   │   │   ├── LoginScreen.tsx
+│   │   │   ├── HomeScreen.tsx
+│   │   │   ├── AnalysisResultScreen.tsx
+│   │   │   └── ...
+│   │   ├── hooks/
+│   │   │   ├── useAuth.ts
+│   │   │   ├── useUpload.ts
+│   │   │   ├── useAnalysis.ts
+│   │   │   └── ...
+│   │   ├── stores/
+│   │   │   ├── authStore.ts
+│   │   │   ├── contractStore.ts
+│   │   │   ├── uiStore.ts
+│   │   │   └── uploadStore.ts
+│   │   ├── services/
+│   │   │   ├── api.ts
+│   │   │   ├── authService.ts
+│   │   │   ├── contractService.ts
+│   │   │   ├── uploadService.ts
+│   │   │   └── analysisService.ts
+│   │   ├── utils/
+│   │   │   ├── validators.ts
+│   │   │   ├── formatters.ts
+│   │   │   ├── storage.ts
+│   │   │   └── ...
+│   │   ├── constants/
+│   │   │   ├── colors.ts
+│   │   │   ├── sizes.ts
+│   │   │   ├── endpoints.ts
+│   │   │   └── ...
+│   │   ├── types/
+│   │   │   ├── models.ts
+│   │   │   ├── api.ts
+│   │   │   ├── store.ts
+│   │   │   └── ...
+│   │   └── assets/
+│   │       ├── images/
+│   │       └── icons/
+│   ├── __tests__/
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   ├── services/
 │   │   └── ...
-│   ├── screens/
-│   │   ├── LoginScreen.tsx
-│   │   ├── HomeScreen.tsx
-│   │   ├── AnalysisResultScreen.tsx
-│   │   └── ...
-│   ├── hooks/
-│   │   ├── useAuth.ts
-│   │   ├── useUpload.ts
-│   │   ├── useAnalysis.ts
-│   │   └── ...
-│   ├── stores/
-│   │   ├── authStore.ts
-│   │   ├── contractStore.ts
-│   │   ├── uiStore.ts
-│   │   └── uploadStore.ts
-│   ├── services/
-│   │   ├── api.ts
-│   │   ├── authService.ts
-│   │   ├── contractService.ts
-│   │   ├── uploadService.ts
-│   │   └── analysisService.ts
-│   ├── utils/
-│   │   ├── validators.ts
-│   │   ├── formatters.ts
-│   │   ├── storage.ts
-│   │   └── ...
-│   ├── constants/
-│   │   ├── colors.ts
-│   │   ├── sizes.ts
-│   │   ├── endpoints.ts
-│   │   └── ...
-│   ├── types/
-│   │   ├── models.ts
-│   │   ├── api.ts
-│   │   ├── store.ts
-│   │   └── ...
-│   └── assets/
-│       ├── images/
-│       └── icons/
-├── __tests__/
-│   ├── components/
-│   ├── hooks/
-│   ├── services/
-│   └── ...
-├── .env
-├── .env.production
-├── app.json
-├── tsconfig.json
-├── package.json
-└── README.md
+│   ├── .env
+│   ├── .env.production
+│   ├── .prettierrc
+│   ├── .prettierignore
+│   ├── app.json
+│   ├── tsconfig.json
+│   ├── package.json
+│   └── README.md
+└── server/                            # 后端应用目录
+    └── ...
 ```
 
 ---
