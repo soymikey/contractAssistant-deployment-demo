@@ -30,7 +30,7 @@ export type {
   UploadFile,
   Toast,
   ToastType,
-} from '@/types/store';
+} from '../types/store';
 
 /**
  * Initialize all stores

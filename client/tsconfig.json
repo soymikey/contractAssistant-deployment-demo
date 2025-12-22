@@ -15,6 +15,7 @@
       "@/components/*": ["./components/*", "./src/components/*"],
       "@/screens/*": ["./src/screens/*"],
       "@/hooks/*": ["./hooks/*", "./src/hooks/*"],
+      "@/stores": ["./src/stores/index.ts"],
       "@/stores/*": ["./src/stores/*"],
       "@/services/*": ["./src/services/*"],
       "@/utils/*": ["./src/utils/*"],

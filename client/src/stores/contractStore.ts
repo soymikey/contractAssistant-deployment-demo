@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { ContractStore, Contract, ContractAnalysis } from '@/types/store';
+import type { ContractStore, Contract, ContractAnalysis } from '../types/store';
 
 const STORAGE_KEYS = {
   FAVORITES: '@contractAssistant:favorites',

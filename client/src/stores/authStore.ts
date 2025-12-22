@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { AuthStore, User } from '@/types/store';
+import type { AuthStore, User } from '../types/store';
 
 const STORAGE_KEYS = {
   USER: '@contractAssistant:user',
