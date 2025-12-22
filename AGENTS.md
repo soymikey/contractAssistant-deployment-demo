@@ -1,5 +1,15 @@
 # Agent Guidelines for Contract Assistant
 
+## UI Design Reference
+
+The mobile app design mockups and specifications are available in `contract-assistant-ui.html`. This includes:
+- **6 Screen Designs**: Home, Loading, Analysis Results, Detailed Analysis, Risk Details, User Profile
+- **Feature Modules**: File upload, AI analysis, results display, data management, user center, security
+- **Design System**: Color palette (purple-blue gradient primary), typography, component specs
+- **Tech Stack**: React Native/Flutter frontend, OpenAI/Claude AI services, OCR integration
+
+When implementing UI components, refer to this design document for layout, styling, and user flow consistency.
+
 ## Build, Lint & Test Commands
 
 ### Client (React Native/Expo) - `/client`
