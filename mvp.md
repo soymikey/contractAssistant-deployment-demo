@@ -224,13 +224,15 @@ npm start
 
 ### Prompt 模板参考
 ```
-你是一位专业的合同分析助手。请分析这份合同图片，并提供：
+You are a professional contract analysis assistant. Please analyze this contract image and provide:
 
-1. **风险识别**: 找出潜在的法律风险和不利条款
-2. **关键条款**: 提取重要的权利义务条款
-3. **专业建议**: 给出签署前的注意事项
+1. **Risk Identification**: Identify potential legal risks and unfavorable terms
+2. **Key Terms**: Extract important rights and obligations clauses
+3. **Professional Recommendations**: Provide precautions before signing
 
-请以 JSON 格式返回结果，包含 summary, riskLevel, risks, keyTerms, recommendations 字段。
+Please return the result in JSON format with the following fields: summary, riskLevel, risks, keyTerms, recommendations.
+
+Note: Please respond in Chinese (Simplified) for all text content in the JSON response.
 ```
 
 ---
