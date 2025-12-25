@@ -12,22 +12,30 @@ When implementing UI components, refer to this design document for layout, styli
 
 ## Build, Lint & Test Commands
 
+**Package Manager**: This project uses `pnpm` (not npm/yarn)
+
 ### Client (React Native/Expo) - `/client`
-- **Lint**: `npm run lint` - ESLint with Expo config
-- **Start**: `npm start` - Expo dev server
-- **Platform**: `npm run android|ios|web` - Platform-specific
-- **Reset**: `npm run reset-project` - Move starter code to app-example/
+- **Install**: `pnpm install` - Install dependencies
+- **Lint**: `pnpm lint` - ESLint with Expo config
+- **Start**: `pnpm start` - Expo dev server
+- **Platform**: `pnpm android|ios|web` - Platform-specific
+- **Reset**: `pnpm reset-project` - Move starter code to app-example/
 
 ### Server (NestJS) - `/server`
-- **Build**: `npm run build` - Compile TypeScript
-- **Lint**: `npm run lint` - ESLint with auto-fix
-- **Format**: `npm run format` - Prettier formatting
-- **Start Dev**: `npm start:dev` - Watch mode
-- **Test**: `npm test` - Run all tests
-- **Test Single**: `npm test -- app.service.spec.ts` - Run specific test file
-- **Test Watch**: `npm test:watch` - Watch mode
-- **Test Coverage**: `npm test:cov` - With coverage
-- **E2E Tests**: `npm test:e2e` - End-to-end tests
+- **Install**: `pnpm install` - Install dependencies
+- **Build**: `pnpm build` - Compile TypeScript
+- **Lint**: `pnpm lint` - ESLint with auto-fix
+- **Format**: `pnpm format` - Prettier formatting
+- **Start Dev**: `pnpm start:dev` - Watch mode
+- **Test**: `pnpm test` - Run all tests
+- **Test Single**: `pnpm test -- app.service.spec.ts` - Run specific test file
+- **Test Watch**: `pnpm test:watch` - Watch mode
+- **Test Coverage**: `pnpm test:cov` - With coverage
+- **E2E Tests**: `pnpm test:e2e` - End-to-end tests
+
+### Root (Workspace) - `/`
+- **Install All**: `pnpm install` - Install all workspace dependencies
+- **Clean**: `pnpm store prune` - Clean pnpm store
 
 ## Code Style & Conventions
 
