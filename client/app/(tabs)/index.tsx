@@ -1,8 +1,26 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Platform,
+  Alert,
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useCameraPermissions } from 'expo-camera';
+import * as ImagePicker from 'expo-image-picker';
+import { useRouter } from 'expo-router';
+import { useAnalysisStore } from '@/src/stores/analysisStore';
+// import { compressImage } from '@/src/utils/imageUtils'; // Available for future use
 
 export default function HomeScreen() {
+  const router = useRouter();
+  const { analyzeImage } = useAnalysisStore();
+  const [cameraPermission, requestCameraPermission] = useCameraPermissions();
+  const [isLoading, setIsLoading] = useState(false);
+
   // Mock data for recent analysis
   const recentContracts = [
     {
@@ -25,10 +43,103 @@ export default function HomeScreen() {
     },
   ];
 
+  const handleTakePhoto = async () => {
+    try {
+      // Check camera permission
+      if (!cameraPermission) {
+        const { status } = await requestCameraPermission();
+        if (status !== 'granted') {
+          Alert.alert('Permission Denied', 'Camera permission is required to take photos');
+          return;
+        }
+      }
+
+      if (!cameraPermission?.granted) {
+        const { status } = await requestCameraPermission();
+        if (status !== 'granted') {
+          Alert.alert('Permission Denied', 'Camera permission is required to take photos');
+          return;
+        }
+      }
+
+      // Launch camera
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        quality: 1, // Reduce quality to 50% for smaller file size
+        base64: false,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        const imageUri = result.assets[0].uri;
+        setIsLoading(true);
+
+        // Navigate to analysis page
+        router.push('/analysis');
+
+        // Use original image without compression for best AI accuracy
+        // To enable compression, uncomment the line below:
+        // const compressedUri = await compressImage(imageUri, 1536, 0.8);
+        // await analyzeImage(compressedUri);
+
+        // Start analysis with original image
+        await analyzeImage(imageUri);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to take photo');
+    }
+  };
+
+  const handleChooseFile = async () => {
+    try {
+      // Request media library permission
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Media library permission is required');
+        return;
+      }
+
+      // Launch image picker
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        quality: 0.5, // Reduce quality to 50% for smaller file size
+        base64: false,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        const imageUri = result.assets[0].uri;
+        setIsLoading(true);
+
+        // Navigate to analysis page
+        router.push('/analysis');
+
+        // Use original image without compression for best AI accuracy
+        // To enable compression, uncomment the line below:
+        // const compressedUri = await compressImage(imageUri, 1536, 0.8);
+        // await analyzeImage(compressedUri);
+
+        // Start analysis with original image
+        await analyzeImage(imageUri);
+        setIsLoading(false);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to choose image');
+    }
+  };
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       {/* Upload Area */}
-      <TouchableOpacity style={styles.uploadArea} activeOpacity={0.7}>
+      <TouchableOpacity
+        style={styles.uploadArea}
+        activeOpacity={0.7}
+        onPress={handleTakePhoto}
+        disabled={isLoading}
+      >
         <LinearGradient
           colors={['#667eea15', '#764ba215']}
           style={styles.uploadGradient}
@@ -36,14 +147,21 @@ export default function HomeScreen() {
           end={{ x: 1, y: 1 }}
         >
           <Text style={styles.uploadIcon}>📄</Text>
-          <Text style={styles.uploadText}>Tap to Upload or Take Photo</Text>
+          <Text style={styles.uploadText}>
+            {isLoading ? 'Processing...' : 'Tap to Upload or Take Photo'}
+          </Text>
           <Text style={styles.uploadSubtext}>Supports contract photos, PDF, Word files</Text>
         </LinearGradient>
       </TouchableOpacity>
 
       {/* Action Buttons */}
       <View style={styles.actionButtons}>
-        <TouchableOpacity style={styles.btnPrimary} activeOpacity={0.8}>
+        <TouchableOpacity
+          style={styles.btnPrimary}
+          activeOpacity={0.8}
+          onPress={handleTakePhoto}
+          disabled={isLoading}
+        >
           <LinearGradient
             colors={['#667eea', '#764ba2']}
             style={styles.btnGradient}
@@ -51,11 +169,16 @@ export default function HomeScreen() {
             end={{ x: 1, y: 1 }}
           >
             <Text style={styles.btnIcon}>📷</Text>
-            <Text style={styles.btnTextPrimary}>Take Photo</Text>
+            <Text style={styles.btnTextPrimary}>{isLoading ? 'Processing...' : 'Take Photo'}</Text>
           </LinearGradient>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.btnSecondary} activeOpacity={0.8}>
+        <TouchableOpacity
+          style={styles.btnSecondary}
+          activeOpacity={0.8}
+          onPress={handleChooseFile}
+          disabled={isLoading}
+        >
           <Text style={styles.btnIcon}>📁</Text>
           <Text style={styles.btnTextSecondary}>Choose File</Text>
         </TouchableOpacity>

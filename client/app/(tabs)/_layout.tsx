@@ -10,7 +10,6 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
  * Aligned with Contract Assistant UI design
  */
 export default function TabLayout() {
-
   return (
     <Tabs
       screenOptions={{

@@ -39,6 +39,12 @@ When implementing UI components, refer to this design document for layout, styli
 
 ## Code Style & Conventions
 
+### Language
+- **Primary Language**: English - All code, comments, UI text, documentation, and commit messages must be in English
+- **User-Facing Text**: Use clear, professional English; avoid slang or regional expressions
+- **Variable/Function Names**: English only (e.g., `analyzeContract`, not `分析合同`)
+- **Localization**: If i18n is added later, English remains the default/fallback language
+
 ### Client (React Native/Expo)
 - **Imports**: Use `@/*` path alias; organize React/Native → components → hooks/utils
 - **Types**: Strict mode enabled; export prop types as `export type ComponentNameProps`

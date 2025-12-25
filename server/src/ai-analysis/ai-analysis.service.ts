@@ -11,14 +11,18 @@ export class AiAnalysisService {
 
   constructor() {
     const apiKey = process.env.GOOGLE_AI_API_KEY;
-    
+
     if (!apiKey || apiKey === 'your_api_key_here') {
       this.logger.warn('GOOGLE_AI_API_KEY is not configured properly');
-      throw new Error('GOOGLE_AI_API_KEY is not configured. Please add it to your .env file');
+      throw new Error(
+        'GOOGLE_AI_API_KEY is not configured. Please add it to your .env file',
+      );
     }
 
     this.genAI = new GoogleGenerativeAI(apiKey);
-    this.model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    this.model = this.genAI.getGenerativeModel({
+      model: 'gemini-3-flash-preview',
+    });
     this.logger.log('Google Gemini AI initialized successfully');
   }
 
@@ -61,10 +65,7 @@ IMPORTANT: Please respond in Chinese (Simplified) for all text content in the JS
 Return ONLY the JSON object, no additional text or markdown formatting.`;
 
       // Call Gemini API
-      const result = await this.model.generateContent([
-        prompt,
-        imageData,
-      ]);
+      const result = await this.model.generateContent([prompt, imageData]);
 
       const response = await result.response;
       const text = response.text();
@@ -82,15 +83,16 @@ Return ONLY the JSON object, no additional text or markdown formatting.`;
 
       this.logger.log('Contract analysis completed successfully');
       return analysisResult;
-
     } catch (error) {
       this.logger.error('Error analyzing contract:', error.message);
-      
+
       if (error.message?.includes('API key')) {
         throw new BadRequestException('Invalid API key configuration');
       }
-      
-      throw new BadRequestException(`Failed to analyze contract: ${error.message}`);
+
+      throw new BadRequestException(
+        `Failed to analyze contract: ${error.message}`,
+      );
     }
   }
 
@@ -118,12 +120,16 @@ Return ONLY the JSON object, no additional text or markdown formatting.`;
     };
   }
 
-  private parseAnalysisResponse(text: string): Omit<AnalysisResult, 'analyzedAt'> {
+  private parseAnalysisResponse(
+    text: string,
+  ): Omit<AnalysisResult, 'analyzedAt'> {
     try {
       // Remove markdown code blocks if present
       let cleanText = text.trim();
       if (cleanText.startsWith('```json')) {
-        cleanText = cleanText.replace(/```json\n?/g, '').replace(/```\n?$/g, '');
+        cleanText = cleanText
+          .replace(/```json\n?/g, '')
+          .replace(/```\n?$/g, '');
       } else if (cleanText.startsWith('```')) {
         cleanText = cleanText.replace(/```\n?/g, '');
       }
@@ -131,7 +137,11 @@ Return ONLY the JSON object, no additional text or markdown formatting.`;
       const parsed = JSON.parse(cleanText);
 
       // Validate required fields
-      if (!parsed.summary || !parsed.riskLevel || !Array.isArray(parsed.risks)) {
+      if (
+        !parsed.summary ||
+        !parsed.riskLevel ||
+        !Array.isArray(parsed.risks)
+      ) {
         throw new Error('Invalid response format from AI');
       }
 
@@ -142,7 +152,6 @@ Return ONLY the JSON object, no additional text or markdown formatting.`;
         keyTerms: parsed.keyTerms || [],
         recommendations: parsed.recommendations || [],
       };
-
     } catch (error) {
       this.logger.error('Failed to parse AI response:', error.message);
       this.logger.debug('Raw response:', text);
