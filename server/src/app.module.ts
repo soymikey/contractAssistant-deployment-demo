@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AiAnalysisModule } from './ai-analysis/ai-analysis.module';
+import { PrismaModule } from './prisma/prisma.module';
 
 @Module({
   imports: [
@@ -10,6 +11,7 @@ import { AiAnalysisModule } from './ai-analysis/ai-analysis.module';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    PrismaModule,
     AiAnalysisModule,
   ],
   controllers: [AppController],

@@ -1,0 +1,153 @@
+// Contract Assistant - Database Schema
+// This schema defines all database models for the contract management system
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model - stores user account information
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  avatar    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  contracts    Contract[]
+  favorites    Favorite[]
+  analysisLogs AnalysisLog[]
+  preferences  UserPreferences?
+
+  @@index([email])
+  @@map("users")
+}
+
+// Contract model - stores uploaded contract files
+model Contract {
+  id        String   @id @default(uuid())
+  userId    String
+  fileName  String
+  fileUrl   String
+  fileType  String
+  fileSize  Int?
+  status    String   @default("pending") // pending, processing, completed, failed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  analyses     ContractAnalysis[]
+  favorites    Favorite[]
+  analysisLogs AnalysisLog[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("contracts")
+}
+
+// Contract Analysis model - stores AI analysis results
+model ContractAnalysis {
+  id         String @id @default(uuid())
+  contractId String
+  type       String @default("full") // full, quick, custom
+
+  // Analysis data stored as JSON
+  overviewData    Json?
+  suggestionsData Json?
+
+  createdAt DateTime @default(now())
+
+  // Relations
+  contract Contract   @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  risks    RiskItem[]
+
+  @@index([contractId])
+  @@index([createdAt])
+  @@map("contract_analyses")
+}
+
+// Risk Item model - stores individual risk items from analysis
+model RiskItem {
+  id          String  @id @default(uuid())
+  analysisId  String
+  title       String
+  description String  @db.Text
+  level       String // high, medium, low
+  category    String? // legal, financial, operational, etc.
+  suggestion  String? @db.Text
+  clauseRef   String? // reference to specific clause
+
+  createdAt DateTime @default(now())
+
+  // Relations
+  analysis ContractAnalysis @relation(fields: [analysisId], references: [id], onDelete: Cascade)
+
+  @@index([analysisId])
+  @@index([level])
+  @@map("risk_items")
+}
+
+// Favorite model - stores user's favorited contracts
+model Favorite {
+  id         String   @id @default(uuid())
+  userId     String
+  contractId String
+  createdAt  DateTime @default(now())
+
+  // Relations
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, contractId])
+  @@index([userId])
+  @@map("favorites")
+}
+
+// Analysis Log model - tracks analysis progress and status
+model AnalysisLog {
+  id          String    @id @default(uuid())
+  userId      String
+  contractId  String
+  status      String    @default("pending") // pending, processing, completed, failed
+  progress    Int       @default(0)
+  error       String?   @db.Text
+  metadata    Json?
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  // Relations
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([contractId])
+  @@index([status])
+  @@map("analysis_logs")
+}
+
+// User Preferences model - stores user settings and preferences
+model UserPreferences {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  theme              String   @default("light") // light, dark, auto
+  language           String   @default("en") // en, zh, etc.
+  notifications      Json? // notification preferences
+  emailNotifications Boolean  @default(true)
+  analysisDefaults   Json? // default analysis settings
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}
