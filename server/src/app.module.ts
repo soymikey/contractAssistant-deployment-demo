@@ -4,12 +4,19 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AiAnalysisModule } from './ai-analysis/ai-analysis.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { validationSchema } from './config/validation.schema';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: [`.env.${process.env.NODE_ENV || 'development'}`, '.env'],
+      cache: true, // Cache environment variables for better performance
+      validationSchema, // Validate environment variables on startup
+      validationOptions: {
+        abortEarly: false, // Show all validation errors at once
+        allowUnknown: true, // Allow extra environment variables
+      },
     }),
     PrismaModule,
     AiAnalysisModule,

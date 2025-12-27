@@ -1,4 +1,11 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, Logger } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
 import { AiAnalysisService } from './ai-analysis.service';
 import { AnalyzeContractDto } from './dto/analyze-contract.dto';
 import { AnalysisResponse } from './interfaces/analysis-result.interface';
@@ -17,7 +24,8 @@ export class AiAnalysisController {
     try {
       this.logger.log('Received contract analysis request');
 
-      const result = await this.aiAnalysisService.analyzeContract(analyzeContractDto);
+      const result =
+        await this.aiAnalysisService.analyzeContract(analyzeContractDto);
 
       return {
         success: true,
