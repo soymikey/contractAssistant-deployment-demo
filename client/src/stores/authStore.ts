@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { AuthStore, User } from '../types/store';
+import { authService } from '../services';
 
 const STORAGE_KEYS = {
   USER: '@contractAssistant:user',
@@ -22,27 +23,18 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   error: null,
 
   // Actions
-  login: async (email: string, _password: string) => {
+  login: async (email: string, password: string) => {
     set({ isLoading: true, error: null });
 
     try {
-      // TODO: Replace with actual API call
-      // const response = await authService.login(email, _password);
-
-      // Mock implementation for now
-      const mockUser: User = {
-        id: '1',
-        email,
-        name: email.split('@')[0],
-      };
-      const mockToken = 'mock-jwt-token';
-      const mockRefreshToken = 'mock-refresh-token';
+      // Call auth service API
+      const response = await authService.login(email, password);
 
       // Save to state
       set({
-        user: mockUser,
-        token: mockToken,
-        refreshToken: mockRefreshToken,
+        user: response.user,
+        token: response.token,
+        refreshToken: response.refreshToken,
         isAuthenticated: true,
         isLoading: false,
         error: null,
@@ -50,9 +42,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
       // Persist to AsyncStorage
       await AsyncStorage.multiSet([
-        [STORAGE_KEYS.USER, JSON.stringify(mockUser)],
-        [STORAGE_KEYS.TOKEN, mockToken],
-        [STORAGE_KEYS.REFRESH_TOKEN, mockRefreshToken],
+        [STORAGE_KEYS.USER, JSON.stringify(response.user)],
+        [STORAGE_KEYS.TOKEN, response.token],
+        [STORAGE_KEYS.REFRESH_TOKEN, response.refreshToken],
       ]);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Login failed';
@@ -61,35 +53,28 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     }
   },
 
-  register: async (email: string, _password: string, name?: string) => {
+  register: async (email: string, password: string, name?: string) => {
     set({ isLoading: true, error: null });
 
     try {
-      // TODO: Replace with actual API call
-      // const response = await authService.register(email, _password, name);
+      // Call auth service API
+      const response = await authService.register(email, password, name);
 
-      // Mock implementation
-      const mockUser: User = {
-        id: '1',
-        email,
-        name: name || email.split('@')[0],
-      };
-      const mockToken = 'mock-jwt-token';
-      const mockRefreshToken = 'mock-refresh-token';
-
+      // Save to state
       set({
-        user: mockUser,
-        token: mockToken,
-        refreshToken: mockRefreshToken,
+        user: response.user,
+        token: response.token,
+        refreshToken: response.refreshToken,
         isAuthenticated: true,
         isLoading: false,
         error: null,
       });
 
+      // Persist to AsyncStorage
       await AsyncStorage.multiSet([
-        [STORAGE_KEYS.USER, JSON.stringify(mockUser)],
-        [STORAGE_KEYS.TOKEN, mockToken],
-        [STORAGE_KEYS.REFRESH_TOKEN, mockRefreshToken],
+        [STORAGE_KEYS.USER, JSON.stringify(response.user)],
+        [STORAGE_KEYS.TOKEN, response.token],
+        [STORAGE_KEYS.REFRESH_TOKEN, response.refreshToken],
       ]);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Registration failed';
@@ -100,8 +85,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   logout: async () => {
     try {
-      // TODO: Call logout API if needed
-      // await authService.logout();
+      // Call logout API
+      await authService.logout();
 
       // Clear state
       set({
@@ -133,18 +118,21 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // TODO: Replace with actual API call
-      // const response = await authService.refreshToken(refreshToken);
+      // Call auth service API to refresh token
+      const response = await authService.refreshToken(refreshToken);
 
-      // Mock implementation
-      const newToken = 'new-mock-jwt-token';
-
+      // Update tokens in state
       set({
-        token: newToken,
+        token: response.token,
+        refreshToken: response.refreshToken,
         isLoading: false,
       });
 
-      await AsyncStorage.setItem(STORAGE_KEYS.TOKEN, newToken);
+      // Persist to AsyncStorage
+      await AsyncStorage.multiSet([
+        [STORAGE_KEYS.TOKEN, response.token],
+        [STORAGE_KEYS.REFRESH_TOKEN, response.refreshToken],
+      ]);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Token refresh failed';
       set({ isLoading: false, error: errorMessage });
