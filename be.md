@@ -67,39 +67,39 @@
 
 ```
 TODO List - 项目初始化
-- [ ] 1.1.1 使用 NestJS CLI 创建项目 (5分钟)
-  - [ ] 安装 NestJS CLI: pnpm add -g @nestjs/cli
-  - [ ] 创建项目: nest new contract-assistant-api
-  - [ ] 选择包管理器: pnpm
-  - [ ] 自动生成完整项目结构
+- [x] 1.1.1 使用 NestJS CLI 创建项目 (5分钟)
+  - [x] 安装 NestJS CLI: pnpm add -g @nestjs/cli
+  - [x] 创建项目: nest new contract-assistant-api
+  - [x] 选择包管理器: pnpm
+  - [x] 自动生成完整项目结构
 
-- [ ] 1.1.2 验证项目结构 (自动生成)
-  - [ ] src/ 目录结构已创建
-  - [ ] src/app.module.ts - 根模块
-  - [ ] src/app.controller.ts - 根控制器
-  - [ ] src/app.service.ts - 根服务
-  - [ ] src/main.ts - 应用入口
-  - [ ] test/ - 测试目录
-  - [ ] TypeScript 已配置
-  - [ ] ESLint + Prettier 已配置
+- [x] 1.1.2 验证项目结构 (自动生成)
+  - [x] src/ 目录结构已创建
+  - [x] src/app.module.ts - 根模块
+  - [x] src/app.controller.ts - 根控制器
+  - [x] src/app.service.ts - 根服务
+  - [x] src/main.ts - 应用入口
+  - [x] test/ - 测试目录
+  - [x] TypeScript 已配置
+  - [x] ESLint + Prettier 已配置
 
-- [ ] 1.1.3 安装额外依赖
-  - [ ] pnpm add @nestjs/config - 配置管理
-  - [ ] pnpm add @nestjs/swagger - API 文档
-  - [ ] pnpm add class-validator class-transformer - 验证
-  - [ ] pnpm add helmet - 安全
+- [x] 1.1.3 安装额外依赖
+  - [x] pnpm add @nestjs/config - 配置管理
+  - [x] pnpm add @nestjs/swagger - API 文档
+  - [x] pnpm add class-validator class-transformer - 验证
+  - [x] pnpm add helmet - 安全
 
-- [ ] 1.1.4 配置环境变量
-  - [ ] 创建 .env (开发环境)
-  - [ ] 创建 .env.production (生产环境)
-  - [ ] 创建 .env.test (测试环境)
-  - [ ] 创建 .env.example (示例)
-  - [ ] 在 app.module.ts 中集成 ConfigModule
+- [x] 1.1.4 配置环境变量
+  - [x] 创建 .env (开发环境)
+  - [x] 创建 .env.production (生产环境)
+  - [x] 创建 .env.test (测试环境)
+  - [x] 创建 .env.example (示例)
+  - [x] 在 app.module.ts 中集成 ConfigModule
 
-- [ ] 1.1.5 Git 初始化
-  - [ ] git init (如果未初始化)
-  - [ ] 验证 .gitignore (NestJS 已生成)
-  - [ ] 创建初始提交
+- [x] 1.1.5 Git 初始化
+  - [x] git init (如果未初始化)
+  - [x] 验证 .gitignore (NestJS 已生成)
+  - [x] 创建初始提交
 ```
 
 ### 1.2 NestJS 应用配置
