@@ -68,9 +68,9 @@
 ```
 TODO List - 项目初始化
 - [ ] 1.1.1 使用 NestJS CLI 创建项目 (5分钟)
-  - [ ] 安装 NestJS CLI: npm i -g @nestjs/cli
+  - [ ] 安装 NestJS CLI: pnpm add -g @nestjs/cli
   - [ ] 创建项目: nest new contract-assistant-api
-  - [ ] 选择包管理器: npm
+  - [ ] 选择包管理器: pnpm
   - [ ] 自动生成完整项目结构
 
 - [ ] 1.1.2 验证项目结构 (自动生成)
@@ -84,10 +84,10 @@ TODO List - 项目初始化
   - [ ] ESLint + Prettier 已配置
 
 - [ ] 1.1.3 安装额外依赖
-  - [ ] npm install @nestjs/config - 配置管理
-  - [ ] npm install @nestjs/swagger - API 文档
-  - [ ] npm install class-validator class-transformer - 验证
-  - [ ] npm install helmet - 安全
+  - [ ] pnpm add @nestjs/config - 配置管理
+  - [ ] pnpm add @nestjs/swagger - API 文档
+  - [ ] pnpm add class-validator class-transformer - 验证
+  - [ ] pnpm add helmet - 安全
 
 - [ ] 1.1.4 配置环境变量
   - [ ] 创建 .env (开发环境)
@@ -140,7 +140,7 @@ TODO List - NestJS 核心配置
   - [ ] 处理未知错误
 
 - [ ] 1.2.5 配置健康检查
-  - [ ] npm install @nestjs/terminus
+  - [ ] pnpm add @nestjs/terminus
   - [ ] 创建 HealthModule
   - [ ] 创建 /health 端点
   - [ ] 检查数据库连接
@@ -152,8 +152,8 @@ TODO List - NestJS 核心配置
 ```
 TODO List - 数据库设置
 - [ ] 1.3.1 安装和配置 Prisma
-  - [ ] npm install @prisma/client
-  - [ ] npm install --save-dev prisma
+  - [ ] pnpm add @prisma/client
+  - [ ] pnpm add --save-dev prisma
   - [ ] npx prisma init
   - [ ] 配置 .env DATABASE_URL
 
@@ -189,8 +189,8 @@ TODO List - 数据库设置
 ```
 TODO List - Redis 和 Bull 队列
 - [ ] 1.4.1 安装 NestJS Bull 依赖
-  - [ ] npm install @nestjs/bull bull
-  - [ ] npm install --save-dev @types/bull
+  - [ ] pnpm add @nestjs/bull bull
+  - [ ] pnpm add --save-dev @types/bull
 
 - [ ] 1.4.2 配置 Bull 模块
   - [ ] 在 app.module.ts 中导入 BullModule
@@ -291,11 +291,11 @@ TODO List - 用户模块
 ```
 TODO List - 认证模块
 - [ ] 2.2.1 安装认证依赖
-  - [ ] npm install @nestjs/passport passport
-  - [ ] npm install @nestjs/jwt passport-jwt
-  - [ ] npm install passport-local
-  - [ ] npm install bcryptjs
-  - [ ] npm install --save-dev @types/passport-jwt @types/passport-local @types/bcryptjs
+  - [ ] pnpm add @nestjs/passport passport
+  - [ ] pnpm add @nestjs/jwt passport-jwt
+  - [ ] pnpm add passport-local
+  - [ ] pnpm add bcryptjs
+  - [ ] pnpm add --save-dev @types/passport-jwt @types/passport-local @types/bcryptjs
 
 - [ ] 2.2.2 生成认证模块
   - [ ] nest g module auth
@@ -488,7 +488,7 @@ TODO List - 文件上传模块
 - [ ] 3.1.2 配置文件存储
   - [ ] 选择存储方案 (AWS S3 或本地存储)
   - [ ] 如果使用 S3:
-    - [ ] npm install aws-sdk
+    - [ ] pnpm add aws-sdk
     - [ ] 配置 AWS 凭证 (.env)
     - [ ] 创建 S3Service
   - [ ] 如果使用本地存储:
@@ -580,9 +580,9 @@ TODO List - OCR 服务
 - [ ] 3.2.2 选择并配置 OCR 方案
   - [ ] 评测 Tesseract, PaddleOCR, Google Vision
   - [ ] 如果使用 Tesseract:
-    - [ ] npm install tesseract.js
+    - [ ] pnpm add tesseract.js
   - [ ] 如果使用 Google Vision:
-    - [ ] npm install @google-cloud/vision
+    - [ ] pnpm add @google-cloud/vision
     - [ ] 配置 Google Cloud 凭证
 
 - [ ] 3.2.3 实现 OCR 服务
@@ -640,8 +640,8 @@ TODO List - 文档处理
   - [ ] nest g service document
 
 - [ ] 3.3.2 安装文档处理依赖
-  - [ ] npm install pdf-parse pdfjs-dist
-  - [ ] npm install docx (用于 docx 处理)
+  - [ ] pnpm add pdf-parse pdfjs-dist
+  - [ ] pnpm add docx (用于 docx 处理)
 
 - [ ] 3.3.3 实现 PDF 处理服务
   - [ ] 创建 PdfService
@@ -781,7 +781,7 @@ TODO List - AI 分析模块
 
 - [ ] 4.2.2 选择并配置 AI 服务
   - [ ] 如果使用 OpenAI:
-    - [ ] npm install openai
+    - [ ] pnpm add openai
     - [ ] 配置 API key (.env)
     - [ ] 使用 ConfigModule 管理配置
 
@@ -1080,8 +1080,8 @@ TODO List - 用户偏好
 ```
 TODO List - 邮件通知
 - [ ] 6.1.1 安装 NestJS 邮件模块
-  - [ ] npm install @nestjs/mailer nodemailer
-  - [ ] npm install --save-dev @types/nodemailer
+  - [ ] pnpm add @nestjs/mailer nodemailer
+  - [ ] pnpm add --save-dev @types/nodemailer
 
 - [ ] 6.1.2 配置邮件模块
   - [ ] 在 app.module.ts 中配置 MailerModule
@@ -1153,7 +1153,7 @@ TODO List - 邮件通知
 TODO List - 推送通知
 - [ ] 6.2.1 配置推送服务
   - [ ] 选择推送服务 (Firebase Cloud Messaging)
-  - [ ] npm install firebase-admin
+  - [ ] pnpm add firebase-admin
   - [ ] 配置 Firebase 凭证
   - [ ] 创建 src/config/firebase.ts
 
@@ -1177,9 +1177,9 @@ TODO List - 报告导出
   - [ ] nest g controller report
 
 - [ ] 6.3.2 安装报告生成依赖
-  - [ ] npm install pdfkit (PDF)
-  - [ ] npm install exceljs (Excel)
-  - [ ] npm install docx (Word)
+  - [ ] pnpm add pdfkit (PDF)
+  - [ ] pnpm add exceljs (Excel)
+  - [ ] pnpm add docx (Word)
 
 - [ ] 6.3.3 实现报告生成服务
   - [ ] 文件: src/report/report.service.ts
@@ -1243,7 +1243,7 @@ TODO List - 报告导出
 ```
 TODO List - 安全加固
 - [ ] 7.1.1 实现速率限制
-  - [ ] npm install @nestjs/throttler
+  - [ ] pnpm add @nestjs/throttler
   - [ ] 在 app.module.ts 中配置 ThrottlerModule
     ```typescript
     ThrottlerModule.forRoot({
@@ -1353,7 +1353,7 @@ TODO List - 日志监控
   - [ ] 可选: 集成 winston 进行高级日志管理
 
 - [ ] 7.3.2 实现错误跟踪
-  - [ ] npm install @sentry/node
+  - [ ] pnpm add @sentry/node
   - [ ] 创建 Sentry 过滤器
     ```typescript
     @Catch()
@@ -1436,8 +1436,8 @@ TODO List - 单元测试
   - [ ] 目标覆盖率: 90%+
 
 - [ ] 8.1.5 运行测试并生成覆盖率
-  - [ ] npm test 运行所有测试
-  - [ ] npm run test:cov 生成覆盖率报告
+  - [ ] pnpm test 运行所有测试
+  - [ ] pnpm test:cov 生成覆盖率报告
   - [ ] 确保覆盖率达标
 ```
 
@@ -1518,13 +1518,13 @@ TODO List - 数据库测试
 TODO List - 代码质量
 - [ ] 9.1.1 代码审查
   - [ ] 全代码库审查
-  - [ ] 运行 npm run lint 检查
-  - [ ] 运行 npm run format 格式化
+  - [ ] 运行 pnpm lint 检查
+  - [ ] 运行 pnpm format 格式化
   - [ ] 修复所有警告
 
 - [ ] 9.1.2 依赖安全扫描
-  - [ ] npm audit 扫描
-  - [ ] npm audit fix 修复漏洞
+  - [ ] pnpm audit 扫描
+  - [ ] pnpm audit fix 修复漏洞
   - [ ] 更新已知漏洞依赖
   - [ ] 检查过期依赖
 
@@ -1573,26 +1573,26 @@ TODO List - 构建打包
   - [ ] 配置生产日志级别
 
 - [ ] 9.3.2 构建应用
-  - [ ] npm run build
+  - [ ] pnpm build
   - [ ] 验证 dist/ 目录
   - [ ] 测试生产构建: node dist/main
 
 - [ ] 9.3.3 创建 Docker 镜像
-  - [ ] 创建 Dockerfile
-    ```dockerfile
-    FROM node:18-alpine AS builder
-    WORKDIR /app
-    COPY package*.json ./
-    RUN npm ci
-    COPY . .
-    RUN npm run build
-    
-    FROM node:18-alpine
-    WORKDIR /app
-    COPY --from=builder /app/dist ./dist
-    COPY --from=builder /app/node_modules ./node_modules
-    COPY package*.json ./
-    CMD ["node", "dist/main"]
+   - [ ] 创建 Dockerfile
+     ```dockerfile
+     FROM node:18-alpine AS builder
+     WORKDIR /app
+     COPY package*.json pnpm-lock.yaml ./
+     RUN pnpm install --frozen-lockfile
+     COPY . .
+     RUN pnpm build
+     
+     FROM node:18-alpine
+     WORKDIR /app
+     COPY --from=builder /app/dist ./dist
+     COPY --from=builder /app/node_modules ./node_modules
+     COPY package*.json pnpm-lock.yaml ./
+     CMD ["node", "dist/main"]
     ```
   - [ ] 创建 .dockerignore
   - [ ] 构建镜像: docker build -t contract-assistant-api .

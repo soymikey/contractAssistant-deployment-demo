@@ -47,108 +47,108 @@
 
 ```
 TODO List - 项目初始化
-- [ ] 1.1.1 使用 Expo CLI 创建新项目
-  - [ ] 命令: npx create-expo-app contract-assistant
-  - [ ] 选择 TypeScript 模板
-  - [ ] 验证项目可正常启动
+- [x] 1.1.1 使用 Expo CLI 创建新项目
+  - [x] 命令: npx create-expo-app contract-assistant
+  - [x] 选择 TypeScript 模板
+  - [x] 验证项目可正常启动
 
-- [ ] 1.1.2 配置项目目录结构
-  - [ ] 创建 app/ 目录 (Expo Router 路由)
-  - [ ] 创建 src/ 目录结构:
-    - [ ] src/components/ - UI 组件
-    - [ ] src/screens/ - 页面组件
-    - [ ] src/hooks/ - 自定义 Hook
-    - [ ] src/stores/ - 状态管理 (Zustand)
-    - [ ] src/services/ - API 服务
-    - [ ] src/utils/ - 工具函数
-    - [ ] src/constants/ - 常量
-    - [ ] src/types/ - TypeScript 类型定义
-    - [ ] src/assets/ - 静态资源
+- [x] 1.1.2 配置项目目录结构
+  - [x] 创建 app/ 目录 (Expo Router 路由)
+  - [x] 创建 src/ 目录结构:
+    - [x] src/components/ - UI 组件
+    - [x] src/screens/ - 页面组件
+    - [x] src/hooks/ - 自定义 Hook
+    - [x] src/stores/ - 状态管理 (Zustand)
+    - [x] src/services/ - API 服务
+    - [x] src/utils/ - 工具函数
+    - [x] src/constants/ - 常量
+    - [x] src/types/ - TypeScript 类型定义
+    - [x] src/assets/ - 静态资源
 
-- [ ] 1.1.3 配置 TypeScript
-  - [ ] 创建 tsconfig.json
-  - [ ] 配置 path alias (@/*)
-  - [ ] 配置严格模式
-  - [ ] 验证 TypeScript 编译
+- [x] 1.1.3 配置 TypeScript
+  - [x] 创建 tsconfig.json
+  - [x] 配置 path alias (@/*)
+  - [x] 配置严格模式
+  - [x] 验证 TypeScript 编译
 
-- [ ] 1.1.4 配置 ESLint 和 Prettier
-  - [ ] 安装 eslint 和 prettier
-  - [ ] 创建 .eslintrc.json
-  - [ ] 创建 .prettierrc
-  - [ ] 配置 VSCode 自动格式化
+- [x] 1.1.4 配置 ESLint 和 Prettier
+  - [x] 安装 eslint 和 prettier
+  - [x] 创建 .eslintrc.json
+  - [x] 创建 .prettierrc
+  - [x] 配置 VSCode 自动格式化
 
-- [ ] 1.1.5 配置 app.json
-  - [ ] 设置应用名称、版本、图标
-  - [ ] 配置启动屏幕
-  - [ ] 配置权限声明
-  - [ ] 配置 iOS/Android 特定设置
+- [x] 1.1.5 配置 app.json
+  - [x] 设置应用名称、版本、图标
+  - [x] 配置启动屏幕
+  - [x] 配置权限声明
+  - [x] 配置 iOS/Android 特定设置
 ```
 
 ### 1.2 依赖安装和配置
 
 ```
 TODO List - 依赖配置
-- [ ] 1.2.1 安装核心依赖
-  - [ ] pnpm add zustand axios @react-navigation/native
-  - [ ] pnpm add react-native-paper react-native-vector-icons
-  - [ ] pnpm add react-hook-form date-fns
-  - [ ] pnpm add expo-camera expo-image-picker expo-document-picker
-  - [ ] pnpm add expo-file-system @react-native-async-storage/async-storage
-  - [ ] pnpm add @react-native-community/netinfo expo-notifications
+- [x] 1.2.1 安装核心依赖
+  - [x] pnpm add zustand axios @react-navigation/native
+  - [x] pnpm add react-native-paper react-native-vector-icons
+  - [x] pnpm add react-hook-form date-fns
+  - [x] pnpm add expo-camera expo-image-picker expo-document-picker
+  - [x] pnpm add expo-file-system @react-native-async-storage/async-storage
+  - [x] pnpm add @react-native-community/netinfo expo-notifications
 
-- [ ] 1.2.2 安装开发依赖
-  - [ ] pnpm add -D @types/react-native @types/node
-  - [ ] pnpm add -D jest @testing-library/react-native
-  - [ ] pnpm add -D typescript
-  - [ ] pnpm add -D eslint prettier eslint-config-prettier
+- [x] 1.2.2 安装开发依赖
+  - [x] pnpm add -D @types/react-native @types/node
+  - [x] pnpm add -D jest @testing-library/react-native
+  - [x] pnpm add -D typescript
+  - [x] pnpm add -D eslint prettier eslint-config-prettier
 
-- [ ] 1.2.3 环境变量配置
-  - [ ] 创建 .env 文件 (开发环境)
-  - [ ] 创建 .env.production 文件
-  - [ ] 配置 API_URL, DEBUG 等变量
-  - [ ] 配置 .gitignore 排除 .env 文件
+- [x] 1.2.3 环境变量配置
+  - [x] 创建 .env 文件 (开发环境)
+  - [x] 创建 .env.production 文件
+  - [x] 配置 API_URL, DEBUG 等变量
+  - [x] 配置 .gitignore 排除 .env 文件
 
-- [ ] 1.2.4 验证依赖安装
-  - [ ] 运行 pnpm start 验证
-  - [ ] 在 iOS 模拟器上测试
-  - [ ] 在 Android 模拟器上测试
-  - [ ] 确保没有依赖冲突
+- [x] 1.2.4 验证依赖安装
+  - [x] 运行 pnpm start 验证
+  - [x] 在 iOS 模拟器上测试
+  - [x] 在 Android 模拟器上测试
+  - [x] 确保没有依赖冲突
 ```
 
 ### 1.3 状态管理配置
 
 ```
 TODO List - 状态管理
-- [ ] 1.3.1 配置 Zustand Store
-  - [ ] 创建 src/stores/ 目录
-  - [ ] 创建 authStore.ts (认证状态)
-  - [ ] 创建 contractStore.ts (合同状态)
-  - [ ] 创建 uiStore.ts (UI状态: loading, error, toast)
-  - [ ] 定义 TypeScript 类型
+- [x] 1.3.1 配置 Zustand Store
+  - [x] 创建 src/stores/ 目录
+  - [x] 创建 authStore.ts (认证状态)
+  - [x] 创建 contractStore.ts (合同状态)
+  - [x] 创建 uiStore.ts (UI状态: loading, error, toast)
+  - [x] 定义 TypeScript 类型
 
-- [ ] 1.3.2 实现 Store Hook
-  - [ ] useAuth hook (获取用户、登录状态)
-  - [ ] useContract hook (获取合同数据)
-  - [ ] useUI hook (管理全局UI状态)
-  - [ ] useAsync hook (通用异步操作)
+- [x] 1.3.2 实现 Store Hook
+  - [x] useAuth hook (获取用户、登录状态)
+  - [x] useContract hook (获取合同数据)
+  - [x] useUI hook (管理全局UI状态)
+  - [x] useAsync hook (通用异步操作)
 
-- [ ] 1.3.3 状态持久化配置
-  - [ ] 配置 AsyncStorage 持久化
-  - [ ] 保存登录 token
-  - [ ] 保存用户偏好设置
-  - [ ] 实现状态重新加载
+- [x] 1.3.3 状态持久化配置
+  - [x] 配置 AsyncStorage 持久化
+  - [x] 保存登录 token
+  - [x] 保存用户偏好设置
+  - [x] 实现状态重新加载
 ```
 
 ### 1.4 路由配置
 
 ```
 TODO List - 路由配置
-- [ ] 1.4.1 配置 Expo Router
-  - [ ] 创建 app/ 目录结构
-  - [ ] 配置 app/_layout.tsx (根布局)
-  - [ ] 配置 app/(auth)/ (认证相关)
-  - [ ] 配置 app/(tabs)/ (主应用 tabbar)
-  - [ ] 配置 app/(details)/ (详情页面)
+- [x] 1.4.1 配置 Expo Router
+  - [x] 创建 app/ 目录结构
+  - [x] 配置 app/_layout.tsx (根布局)
+  - [x] 配置 app/(auth)/ (认证相关)
+  - [x] 配置 app/(tabs)/ (主应用 tabbar)
+  - [x] 配置 app/(details)/ (详情页面)
 
 - [ ] 1.4.2 实现路由 Guard
   - [ ] 创建身份验证检查
@@ -1296,6 +1296,6 @@ contract-assistant/                    # Monorepo 根目录
 
 ---
 
-**最后更新**: 2025-12-21  
+**最后更新**: 2025-12-27  
 **版本**: v1.0  
-**状态**: 待执行
+**状态**: 进行中 (第1-2周已完成，已完成 1.1-1.3，进行到 1.4)
