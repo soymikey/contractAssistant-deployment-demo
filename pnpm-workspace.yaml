@@ -1,4 +1,10 @@
 packages:
-  - "client"
-  - "server"
-  - "offcial-website"
+  - client
+  - server
+  - offcial-website
+
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - '@scarf/scarf'
+  - prisma

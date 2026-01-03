@@ -1,5 +1,14 @@
 {
   "name": "contract-assistant",
   "version": "1.0.0",
-  "private": true
+  "private": true,
+  "workspaces": [
+    "client",
+    "server",
+    "official-website"
+  ],
+  "scripts": {
+    "dev:server": "pnpm --filter=server run start:dev",
+    "dev:client": "pnpm --filter=client run start"
+  }
 }

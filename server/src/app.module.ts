@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { AiAnalysisModule } from './ai-analysis/ai-analysis.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { validationSchema } from './config/validation.schema';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { validationSchema } from './config/validation.schema';
     }),
     PrismaModule,
     AiAnalysisModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
