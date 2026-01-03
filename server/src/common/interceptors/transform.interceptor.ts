@@ -43,7 +43,7 @@ export class TransformInterceptor<T> implements NestInterceptor<
           'message' in data &&
           'timestamp' in data
         ) {
-          return data as ApiResponse<T>;
+          return data;
         }
 
         // Handle objects with data and message properties
@@ -61,9 +61,7 @@ export class TransformInterceptor<T> implements NestInterceptor<
           message: hasMessageProperty
             ? String((data as { message: unknown }).message)
             : 'Success',
-          data: hasDataProperty
-            ? ((data as { data: T }).data as T)
-            : (data as T),
+          data: hasDataProperty ? (data as { data: T }).data : data,
           timestamp: new Date().toISOString(),
         };
       }),

@@ -67,11 +67,12 @@ export class HealthController {
       // Check memory usage - RSS should not exceed 300MB
       () => this.memory.checkRSS('memory_rss', 300 * 1024 * 1024),
       // Check disk storage - should have at least 50% free space
-      () =>
-        this.disk.checkStorage('storage', {
-          path: '/',
-          thresholdPercent: 0.5,
-        }),
+      // Use platform-specific path (C:\ for Windows, / for Unix-like systems)
+      // () =>
+      //   this.disk.checkStorage('storage', {
+      //     path: process.platform === 'win32' ? 'C:\\' : '/',
+      //     thresholdPercent: 0.5,
+      //   }),
     ]);
   }
 

@@ -83,7 +83,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     }
     // Handle Prisma errors
     else if (this.isPrismaError(exception)) {
-      const prismaError = exception as PrismaError;
+      const prismaError = exception;
       status = HttpStatus.BAD_REQUEST;
       error = 'Database Error';
 
