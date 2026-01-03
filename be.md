@@ -216,39 +216,70 @@ TODO List - 数据库设置
 
 **注意**: 实际的数据库迁移执行需要 PostgreSQL 服务运行。运行 `pnpm exec prisma migrate dev --name init` 来创建数据库表。
 
-### 1.4 Redis 和任务队列设置
+### 1.4 Redis 和任务队列设置 ✅
 
 ```
 TODO List - Redis 和 Bull 队列
-- [ ] 1.4.1 安装 NestJS Bull 依赖
-  - [ ] pnpm add @nestjs/bull bull
-  - [ ] pnpm add --save-dev @types/bull
+- [x] 1.4.1 安装 NestJS Bull 依赖
+  - [x] pnpm add @nestjs/bull bull
+  - [x] pnpm add --save-dev @types/bull
 
-- [ ] 1.4.2 配置 Bull 模块
-  - [ ] 在 app.module.ts 中导入 BullModule
-  - [ ] 配置 Redis 连接
+- [x] 1.4.2 配置 Bull 模块
+  - [x] 在 app.module.ts 中导入 BullModule
+  - [x] 配置 Redis 连接（支持环境变量，动态密码配置）
     ```typescript
-    BullModule.forRoot({
-      redis: {
-        host: 'localhost',
-        port: 6379,
+    BullModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const password = configService.get<string>('REDIS_PASSWORD');
+        return {
+          redis: {
+            host: configService.get<string>('REDIS_HOST', 'localhost'),
+            port: configService.get<number>('REDIS_PORT', 6379),
+            ...(password && password.trim() ? { password } : {}),
+          },
+          defaultJobOptions: {
+            removeOnComplete: 100,
+            removeOnFail: 50,
+          },
+        };
       },
     })
     ```
 
-- [ ] 1.4.3 创建队列模块
-  - [ ] nest g module queues
-  - [ ] 创建分析队列配置
-  - [ ] 创建上传处理队列配置
-  - [ ] 配置重试策略
-  - [ ] 配置并发处理
+- [x] 1.4.3 创建队列模块
+  - [x] nest g module queues
+  - [x] 创建 4 个队列配置 (analysis, upload, ocr, notification)
+  - [x] 配置重试策略（exponential/fixed backoff）
+  - [x] 配置并发处理和任务保留策略
 
-- [ ] 1.4.4 实现队列处理器
-  - [ ] 使用 @Processor 装饰器创建处理器
-  - [ ] 使用 @Process 装饰器处理任务
-  - [ ] 实现任务监听 (completed, failed, progress)
-  - [ ] 记录队列日志
+- [x] 1.4.4 实现队列处理器
+  - [x] 使用 @Processor 装饰器创建处理器
+  - [x] 使用 @Process 装饰器处理任务
+  - [x] 实现任务监听 (@OnQueueActive, @OnQueueCompleted, @OnQueueFailed)
+  - [x] 记录队列日志
+  - [x] 创建 QueuesService 提供队列管理方法
 ```
+
+**完成时间**: 2026-01-03  
+**关键成果**:
+- ✅ Bull Queue 完整配置（4 个队列：analysis, upload, ocr, notification）
+- ✅ Redis 连接配置（支持环境变量配置，解决 NOAUTH 错误）
+- ✅ QueuesService 实现（提供队列管理和统计）
+- ✅ 4 个队列处理器框架（AnalysisProcessor, UploadProcessor, OcrProcessor, NotificationProcessor）
+- ✅ 重试策略配置（exponential/fixed backoff，自动重试机制）
+- ✅ 任务监听和日志记录（@OnQueueActive, @OnQueueCompleted, @OnQueueFailed）
+- ✅ 队列文档（server/src/queues/README.md）
+- ✅ Redis 连接故障排查文档（REDIS_CONNECTION_TROUBLESHOOTING.md）
+- ✅ 应用构建成功，类型安全
+
+**队列配置总览**:
+- **analysis-queue**: AI 合同分析（3 次重试，指数退避）
+- **upload-queue**: 文件上传处理（2 次重试，固定退避）
+- **ocr-queue**: OCR 文本提取（2 次重试，指数退避）
+- **notification-queue**: 通知发送（5 次重试，指数退避）
+
+**注意**: 队列处理器当前为框架实现（stub），将在各自模块开发时完成（Week 3-6）。需要 Redis 服务运行才能使用队列功能。
 
 ### 1.5 API 文档配置 (Swagger 自动生成)
 
