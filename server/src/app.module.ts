@@ -9,6 +9,7 @@ import { validationSchema } from './config/validation.schema';
 import { HealthModule } from './health/health.module';
 import { QueuesModule } from './queues/queues.module';
 import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { UserModule } from './user/user.module';
     HealthModule,
     QueuesModule,
     UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

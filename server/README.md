@@ -23,14 +23,15 @@ The Swagger documentation provides:
 ## Description
 
 Enterprise-grade backend API for contract analysis and management, featuring:
-- 🔐 JWT authentication and authorization
+- 🔐 JWT authentication and authorization ✅
+- 👤 User management with password security ✅
 - 📄 AI-powered contract analysis (Gemini/OpenAI/Claude)
 - 📁 File upload and storage management
 - 🔍 OCR text extraction
 - 📊 Contract risk assessment
 - ⚡ Redis-based job queues for async processing
 - 💾 PostgreSQL database with Prisma ORM
-- 🏥 Health check endpoints
+- 🏥 Health check endpoints with database verification ✅
 - 📖 Auto-generated Swagger API documentation
 
 ## 🚀 Quick Start
@@ -55,18 +56,18 @@ cp .env.example .env
 # Edit .env and set:
 # - DATABASE_URL
 # - REDIS_HOST, REDIS_PORT, REDIS_PASSWORD
-# - JWT_SECRET
+# - JWT_SECRET (required for authentication)
+# - JWT_EXPIRES_IN (default: 24h)
 # - AI service API keys (GEMINI_API_KEY, OPENAI_API_KEY, or ANTHROPIC_API_KEY)
 
-# Generate Prisma Client
-pnpm prisma generate
+# Initialize database (generates client, runs migrations, verifies schema)
+pnpm db:init
 
-# Run database migrations
-pnpm prisma migrate dev
-
-# (Optional) Seed the database
-pnpm prisma db seed
+# Seed the database with test users
+pnpm db:seed
 ```
+
+**Note**: In development mode, migrations run automatically on server startup. For production, always run migrations manually before deployment.
 
 ## 🛠️ Development
 
@@ -95,21 +96,35 @@ pnpm build
 ### Database Management
 
 ```bash
-# Create a new migration
-pnpm prisma migrate dev --name migration_name
+# Initialize database (first-time setup)
+pnpm db:init
 
-# Apply migrations
-pnpm prisma migrate deploy
+# Generate Prisma Client
+pnpm db:generate
+
+# Run migrations (production)
+pnpm db:migrate
+
+# Run migrations (development - creates new migration)
+pnpm db:migrate:dev --name migration_name
+
+# Seed database with test data
+pnpm db:seed
 
 # Open Prisma Studio (Database GUI)
-pnpm prisma studio
+pnpm db:studio
 
 # Reset database (⚠️ WARNING: Deletes all data)
-pnpm prisma migrate reset
+pnpm db:reset
 
 # Check database connection
 bash scripts/check-env.sh
 ```
+
+**Test User Accounts** (after seeding):
+- Admin: `admin@contractassistant.com` / `admin123456`
+- Test: `test@example.com` / `test123456`
+- Demo: `demo@example.com` / `demo123456`
 
 ### Backup & Restore
 
@@ -147,38 +162,61 @@ pnpm test:cov
 ```
 server/
 ├── prisma/
-│   ├── schema.prisma          # Database schema
+│   ├── schema.prisma          # Database schema (8 models)
+│   ├── seed.ts                # Database seeding script
 │   └── migrations/            # Database migrations
 ├── src/
 │   ├── ai-analysis/           # AI contract analysis module
-│   ├── auth/                  # Authentication module (TODO)
+│   │   ├── dto/               # Data transfer objects
+│   │   ├── interfaces/        # TypeScript interfaces
+│   │   ├── ai-analysis.controller.ts
+│   │   ├── ai-analysis.service.ts
+│   │   └── ai-analysis.module.ts
+│   ├── auth/                  # Authentication module ✅
+│   │   ├── guards/            # JWT & Local auth guards
+│   │   ├── strategies/        # Passport strategies
+│   │   ├── auth.controller.ts # Register, login, logout, refresh
+│   │   ├── auth.service.ts    # JWT token management
+│   │   └── auth.module.ts     # JWT + Passport configuration
+│   ├── user/                  # User management module ✅
+│   │   ├── dto/               # Create, update, change-password DTOs
+│   │   ├── entities/          # User entity with @Exclude
+│   │   ├── user.controller.ts # CRUD + change password
+│   │   ├── user.service.ts    # Business logic
+│   │   └── user.module.ts
 │   ├── common/                # Shared utilities
 │   │   ├── constants/         # Constants (error codes, messages)
 │   │   ├── filters/           # Exception filters
 │   │   └── interceptors/      # Response interceptors
 │   ├── config/                # Configuration files
+│   │   ├── config.example.ts  # Config structure
+│   │   └── validation.schema.ts # Env validation
 │   ├── contract/              # Contract management module (TODO)
 │   ├── health/                # Health check endpoints
+│   │   ├── health.controller.ts # Health, live, ready, db endpoints
+│   │   └── health.module.ts
 │   ├── prisma/                # Prisma service
+│   │   ├── prisma.service.ts  # Auto-migration in dev mode
+│   │   └── prisma.module.ts
 │   ├── queues/                # Bull queue management
 │   │   ├── processors/        # Queue job processors
 │   │   ├── queue-names.const.ts
 │   │   ├── queues.service.ts
 │   │   └── README.md          # Queue documentation
-│   ├── user/                  # User management module (TODO)
 │   ├── app.module.ts          # Root module
 │   ├── app.controller.ts      # Root controller
 │   ├── app.service.ts         # Root service
 │   └── main.ts                # Application entry point
 ├── test/                      # E2E tests
 ├── scripts/                   # Utility scripts
-│   ├── backup-db.sh          # Database backup
-│   ├── restore-db.sh         # Database restore
-│   └── check-env.sh          # Environment check
+│   ├── init-db.ts             # Database initialization
+│   ├── backup-db.sh           # Database backup
+│   ├── restore-db.sh          # Database restore
+│   └── check-env.sh           # Environment check
 ├── .env                       # Environment variables (git-ignored)
-├── .env.example              # Environment template
-├── package.json              # Dependencies and scripts
-└── README.md                 # This file
+├── .env.example               # Environment template
+├── package.json               # Dependencies and scripts
+└── README.md                  # This file
 ```
 
 ## 🔧 Configuration
@@ -228,17 +266,29 @@ The application provides health check endpoints for monitoring:
 - **GET /api/v1/health** - Comprehensive health check (database, memory, disk)
 - **GET /api/v1/health/live** - Liveness probe (for Kubernetes)
 - **GET /api/v1/health/ready** - Readiness probe (for Kubernetes)
+- **GET /api/v1/health/db** - Database schema verification (table count)
 
-Example response:
+Example responses:
+
+**General Health Check:**
 ```json
 {
   "status": "ok",
   "info": {
     "database": { "status": "up" },
     "memory_heap": { "status": "up" },
-    "memory_rss": { "status": "up" },
-    "storage": { "status": "up" }
+    "memory_rss": { "status": "up" }
   }
+}
+```
+
+**Database Schema Check:**
+```json
+{
+  "status": "ok",
+  "tables": 8,
+  "message": "Found 8 tables",
+  "timestamp": "2026-01-04T04:30:18.056Z"
 }
 ```
 
@@ -255,12 +305,58 @@ See [src/queues/README.md](src/queues/README.md) for detailed queue documentatio
 
 ## 🔐 Authentication & Authorization
 
-Authentication system using JWT + Passport.js (Coming in Week 2-3):
-- User registration and login
-- JWT token generation and validation
-- Password hashing with bcrypt
+Authentication system using JWT + Passport.js:
+
+### ✅ Implemented Features
+- **User Registration** (`POST /api/v1/auth/register`)
+  - Email/password validation
+  - Automatic password hashing (bcrypt with 10 salt rounds)
+  - Returns JWT token on successful registration
+  
+- **User Login** (`POST /api/v1/auth/login`)
+  - Email/password authentication
+  - JWT token generation with configurable expiration
+  - Returns access token and user profile
+
+- **Get Current User** (`GET /api/v1/auth/me`)
+  - JWT token validation
+  - Returns authenticated user profile
+  - Password excluded from response
+
+- **Token Refresh** (`POST /api/v1/auth/refresh`)
+  - Renew expired tokens
+  - Maintains user session
+
+- **Logout** (`POST /api/v1/auth/logout`)
+  - Graceful session termination
+
+### User Management Endpoints
+- `GET /api/v1/users` - List all users (protected)
+- `GET /api/v1/users/:id` - Get user by ID (protected)
+- `PUT /api/v1/users/:id` - Update user profile (protected, self-only)
+- `POST /api/v1/users/:id/change-password` - Change password (protected, self-only)
+- `DELETE /api/v1/users/:id` - Delete user account (protected, self-only)
+
+### Authentication Flow
+1. **Register**: Client sends credentials → Server hashes password → Returns JWT token
+2. **Login**: Client sends credentials → Server validates → Returns JWT token
+3. **Protected Routes**: Client includes `Authorization: Bearer <token>` header
+4. **Token Validation**: Server verifies JWT → Extracts user info → Allows access
+
+### Security Features
+- Password hashing with bcrypt (10 rounds)
+- JWT tokens with configurable expiration (default: 24h)
+- Password excluded from API responses using `@Exclude()` decorator
+- Permission checks (users can only modify their own data)
+- Input validation using class-validator
+- Protected routes with `@UseGuards(JwtAuthGuard)`
+
+### 📅 Upcoming Features
 - Role-based access control (RBAC)
 - Password reset functionality
+- Email verification
+- Two-factor authentication (2FA)
+- Session management
 
 ## 🐛 Troubleshooting
 
@@ -295,21 +391,38 @@ lsof -ti:3000 | xargs kill -9
 
 ## 📖 Available Scripts
 
+### Application Scripts
 | Command | Description |
 |---------|-------------|
 | `pnpm start` | Start in production mode |
 | `pnpm start:dev` | Start in development mode with hot reload |
 | `pnpm start:debug` | Start in debug mode |
 | `pnpm build` | Build for production |
+
+### Testing Scripts
+| Command | Description |
+|---------|-------------|
 | `pnpm test` | Run unit tests |
 | `pnpm test:watch` | Run tests in watch mode |
 | `pnpm test:cov` | Generate coverage report |
 | `pnpm test:e2e` | Run e2e tests |
-| `pnpm lint` | Run ESLint |
+
+### Code Quality Scripts
+| Command | Description |
+|---------|-------------|
+| `pnpm lint` | Run ESLint with auto-fix |
 | `pnpm format` | Format code with Prettier |
-| `pnpm prisma generate` | Generate Prisma Client |
-| `pnpm prisma migrate dev` | Run migrations in dev |
-| `pnpm prisma studio` | Open Prisma Studio |
+
+### Database Scripts
+| Command | Description |
+|---------|-------------|
+| `pnpm db:init` | Initialize database (generate + migrate + verify) |
+| `pnpm db:generate` | Generate Prisma Client |
+| `pnpm db:migrate` | Deploy migrations (production) |
+| `pnpm db:migrate:dev` | Create and run migration (development) |
+| `pnpm db:seed` | Seed database with test users |
+| `pnpm db:reset` | Reset database (⚠️ deletes all data) |
+| `pnpm db:studio` | Open Prisma Studio GUI |
 
 ## 🚢 Deployment
 
@@ -371,29 +484,55 @@ For detailed deployment guide, see [NestJS Deployment Documentation](https://doc
 
 ## 📊 Current Development Status
 
-### ✅ Completed (Week 1-2)
+### ✅ Completed (Week 1-3)
 - [x] Project initialization and setup
 - [x] NestJS application configuration
 - [x] Database setup (Prisma + PostgreSQL)
+  - [x] 8 database models (User, Contract, Analysis, Risk, Favorite, Log, Preferences)
+  - [x] Auto-migration on startup (development mode)
+  - [x] Database initialization script
+  - [x] Seed script with test users
 - [x] Redis and Bull queue system
 - [x] Health check endpoints
+  - [x] General health check
+  - [x] Liveness probe
+  - [x] Readiness probe
+  - [x] Database schema verification
 - [x] Swagger API documentation
 - [x] Global error handling
 - [x] Request/response interceptors
-- [x] Environment configuration
+- [x] Environment configuration with validation
 - [x] AI Analysis module (basic)
+- [x] **Authentication Module** ✅
+  - [x] JWT authentication with Passport.js
+  - [x] User registration with auto-login
+  - [x] Login endpoint
+  - [x] Get current user endpoint
+  - [x] Token refresh endpoint
+  - [x] Logout endpoint
+  - [x] Password hashing with bcrypt
+  - [x] Local & JWT strategies
+  - [x] Auth guards (LocalAuthGuard, JwtAuthGuard)
+- [x] **User Management Module** ✅
+  - [x] List all users (protected)
+  - [x] Get user by ID (protected)
+  - [x] Update user profile (protected, self-only)
+  - [x] Change password (protected, self-only)
+  - [x] Delete user account (protected, self-only)
+  - [x] DTOs with validation
+  - [x] Password exclusion from responses
 
 ### 🚧 In Progress
-- [ ] Authentication module (Week 2-3)
-- [ ] User management
-- [ ] Contract management
-- [ ] File upload module
+- [ ] Contract management module (Week 3-4)
+- [ ] File upload module (Week 3-4)
 
 ### 📅 Upcoming
 - [ ] OCR integration (Week 3-4)
 - [ ] Advanced AI analysis (Week 4-5)
 - [ ] Favorites & preferences (Week 5-6)
+- [ ] Role-based access control (RBAC)
 - [ ] Email notifications (Week 6)
+- [ ] Password reset functionality
 - [ ] Report export (Week 6)
 - [ ] Security hardening (Week 7)
 - [ ] Performance optimization (Week 7)

@@ -7,7 +7,7 @@ import {
   Body,
   Param,
   Request,
-  // UseGuards, // Will be used in section 2.2
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -18,6 +18,7 @@ import {
 import { UserService } from './user.service';
 import { UpdateUserDto, ChangePasswordDto } from './dto';
 import { UserEntity } from './entities';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('users')
 @ApiTags('Users')
@@ -51,7 +52,7 @@ export class UserController {
   }
 
   @Put(':id')
-  // @UseGuards(JwtAuthGuard) // Will be added in section 2.2
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Update user profile' })
   @ApiResponse({
@@ -70,15 +71,14 @@ export class UserController {
   async update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
-    @Request() req: any, // Will be properly typed with JWT guard in section 2.2
+    @Request() req: any,
   ): Promise<UserEntity> {
-    // For now, we'll use a mock user ID. This will be replaced with JWT guard
-    const currentUserId: string = (req.user?.userId as string) || id;
+    const currentUserId: string = req.user.userId as string;
     return this.userService.update(id, updateUserDto, currentUserId);
   }
 
   @Post(':id/change-password')
-  // @UseGuards(JwtAuthGuard) // Will be added in section 2.2
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Change user password' })
   @ApiResponse({
@@ -100,15 +100,14 @@ export class UserController {
   async changePassword(
     @Param('id') id: string,
     @Body() changePasswordDto: ChangePasswordDto,
-    @Request() req: any, // Will be properly typed with JWT guard in section 2.2
+    @Request() req: any,
   ): Promise<{ message: string }> {
-    // For now, we'll use a mock user ID. This will be replaced with JWT guard
-    const currentUserId: string = (req.user?.userId as string) || id;
+    const currentUserId: string = req.user.userId as string;
     return this.userService.changePassword(id, changePasswordDto, currentUserId);
   }
 
   @Delete(':id')
-  // @UseGuards(JwtAuthGuard) // Will be added in section 2.2
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Delete user account' })
   @ApiResponse({
@@ -125,10 +124,9 @@ export class UserController {
   })
   async remove(
     @Param('id') id: string,
-    @Request() req: any, // Will be properly typed with JWT guard in section 2.2
+    @Request() req: any,
   ): Promise<{ message: string }> {
-    // For now, we'll use a mock user ID. This will be replaced with JWT guard
-    const currentUserId: string = (req.user?.userId as string) || id;
+    const currentUserId: string = req.user.userId as string;
     return this.userService.remove(id, currentUserId);
   }
 }

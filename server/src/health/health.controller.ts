@@ -120,4 +120,55 @@ export class HealthController {
       () => this.prismaHealth.pingCheck('database', this.prisma),
     ]);
   }
+
+  /**
+   * Database schema verification
+   * Checks if database tables exist and returns table count
+   */
+  @Get('db')
+  @ApiOperation({
+    summary: 'Database schema check',
+    description: 'Verifies database schema and returns table information',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Database schema information',
+    schema: {
+      example: {
+        status: 'ok',
+        tables: 5,
+        timestamp: '2024-01-01T00:00:00.000Z',
+      },
+    },
+  })
+  async getDatabaseInfo() {
+    try {
+      // Query to get table count from PostgreSQL
+      const tables = await this.prisma.$queryRaw<Array<{ count: bigint }>>`
+        SELECT COUNT(*) as count 
+        FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_type = 'BASE TABLE'
+      `;
+
+      const tableCount = Number(tables[0].count);
+
+      return {
+        status: tableCount > 0 ? 'ok' : 'warning',
+        tables: tableCount,
+        message:
+          tableCount === 0
+            ? 'No tables found. Run migrations: pnpm db:migrate'
+            : `Found ${tableCount} tables`,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      return {
+        status: 'error',
+        tables: 0,
+        message: error.message,
+        timestamp: new Date().toISOString(),
+      };
+    }
+  }
 }
