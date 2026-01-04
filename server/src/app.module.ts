@@ -11,6 +11,8 @@ import { QueuesModule } from './queues/queues.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { UploadModule } from './upload/upload.module';
+import { DocumentModule } from './document/document.module';
+import { ContractModule } from './contract/contract.module';
 
 @Module({
   imports: [
@@ -62,6 +64,8 @@ import { UploadModule } from './upload/upload.module';
     UserModule,
     AuthModule,
     UploadModule,
+    ContractModule,
+    DocumentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
