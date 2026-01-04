@@ -1,4 +1,10 @@
-import { Processor, Process, OnQueueActive, OnQueueCompleted, OnQueueFailed } from '@nestjs/bull';
+import {
+  Processor,
+  Process,
+  OnQueueActive,
+  OnQueueCompleted,
+  OnQueueFailed,
+} from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
 import type { Job } from 'bull';
 import { QUEUE_NAMES } from '../queue-names.const';
@@ -17,35 +23,39 @@ export class AnalysisProcessor {
   @Process('analyze')
   async handleAnalysis(job: Job) {
     const { contractId, userId, timestamp } = job.data;
-    
-    this.logger.log(`Processing analysis job ${job.id} for contract: ${contractId}`);
-    
+
+    this.logger.log(
+      `Processing analysis job ${job.id} for contract: ${contractId}`,
+    );
+
     try {
       // Update progress to 10%
       await job.progress(10);
-      
+
       // TODO: Step 1 - Fetch contract data from database
       this.logger.debug(`Fetching contract ${contractId}`);
       await this.simulateWork(1000);
       await job.progress(30);
-      
+
       // TODO: Step 2 - Extract text from contract
       this.logger.debug(`Extracting text from contract ${contractId}`);
       await this.simulateWork(2000);
       await job.progress(50);
-      
+
       // TODO: Step 3 - Call AI service for analysis
       this.logger.debug(`Analyzing contract ${contractId} with AI`);
       await this.simulateWork(3000);
       await job.progress(80);
-      
+
       // TODO: Step 4 - Store analysis results
       this.logger.debug(`Storing analysis results for contract ${contractId}`);
       await this.simulateWork(1000);
       await job.progress(100);
-      
-      this.logger.log(`Successfully completed analysis for contract: ${contractId}`);
-      
+
+      this.logger.log(
+        `Successfully completed analysis for contract: ${contractId}`,
+      );
+
       return {
         contractId,
         userId,
@@ -53,7 +63,10 @@ export class AnalysisProcessor {
         completedAt: new Date().toISOString(),
       };
     } catch (error) {
-      this.logger.error(`Failed to analyze contract ${contractId}:`, error.message);
+      this.logger.error(
+        `Failed to analyze contract ${contractId}:`,
+        error.message,
+      );
       throw error;
     }
   }
@@ -63,7 +76,9 @@ export class AnalysisProcessor {
    */
   @OnQueueActive()
   onActive(job: Job) {
-    this.logger.log(`Job ${job.id} is now active. Processing contract: ${job.data.contractId}`);
+    this.logger.log(
+      `Job ${job.id} is now active. Processing contract: ${job.data.contractId}`,
+    );
   }
 
   /**
@@ -72,7 +87,7 @@ export class AnalysisProcessor {
   @OnQueueCompleted()
   onCompleted(job: Job, result: any) {
     this.logger.log(`Job ${job.id} completed successfully. Result:`, result);
-    
+
     // TODO: Send notification to user about completion
     // TODO: Update contract status in database
   }
@@ -86,7 +101,7 @@ export class AnalysisProcessor {
       `Job ${job.id} failed after ${job.attemptsMade} attempts. Error:`,
       error.message,
     );
-    
+
     // TODO: Send notification to user about failure
     // TODO: Update contract status to 'failed' in database
     // TODO: Log error to monitoring service (Sentry)

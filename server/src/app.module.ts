@@ -8,6 +8,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { validationSchema } from './config/validation.schema';
 import { HealthModule } from './health/health.module';
 import { QueuesModule } from './queues/queues.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -32,12 +33,12 @@ import { QueuesModule } from './queues/queues.module';
           maxRetriesPerRequest: null, // Recommended for Bull
           enableReadyCheck: false, // Recommended for Bull
         };
-        
+
         // Only add password if it's defined and not empty
         if (redisPassword && redisPassword.trim() !== '') {
           redisConfig.password = redisPassword;
         }
-        
+
         return {
           redis: redisConfig,
           defaultJobOptions: {
@@ -56,6 +57,7 @@ import { QueuesModule } from './queues/queues.module';
     AiAnalysisModule,
     HealthModule,
     QueuesModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

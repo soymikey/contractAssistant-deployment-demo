@@ -1,4 +1,9 @@
-import { Processor, Process, OnQueueCompleted, OnQueueFailed } from '@nestjs/bull';
+import {
+  Processor,
+  Process,
+  OnQueueCompleted,
+  OnQueueFailed,
+} from '@nestjs/bull';
 import { Logger } from '@nestjs/common';
 import type { Job } from 'bull';
 import { QUEUE_NAMES } from '../queue-names.const';
@@ -14,22 +19,24 @@ export class UploadProcessor {
   @Process('process-upload')
   async handleUpload(job: Job) {
     const { fileId, userId, fileType } = job.data;
-    
-    this.logger.log(`Processing upload ${job.id} for file: ${fileId}, type: ${fileType}`);
-    
+
+    this.logger.log(
+      `Processing upload ${job.id} for file: ${fileId}, type: ${fileType}`,
+    );
+
     try {
       // TODO: Validate file
       await job.progress(20);
-      
+
       // TODO: Upload to storage (S3 or local)
       await job.progress(60);
-      
+
       // TODO: Generate thumbnail (if image)
       await job.progress(80);
-      
+
       // TODO: Update database with file URL
       await job.progress(100);
-      
+
       return {
         fileId,
         userId,
@@ -63,19 +70,19 @@ export class OcrProcessor {
   @Process('recognize')
   async handleOcr(job: Job) {
     const { fileId, userId } = job.data;
-    
+
     this.logger.log(`Processing OCR ${job.id} for file: ${fileId}`);
-    
+
     try {
       // TODO: Fetch file from storage
       await job.progress(20);
-      
+
       // TODO: Perform OCR recognition
       await job.progress(70);
-      
+
       // TODO: Store extracted text in database
       await job.progress(100);
-      
+
       return {
         fileId,
         userId,
@@ -109,16 +116,16 @@ export class NotificationProcessor {
   @Process('email')
   async handleEmail(job: Job) {
     const { recipient, data } = job.data;
-    
+
     this.logger.log(`Sending email notification to: ${recipient}`);
-    
+
     try {
       // TODO: Send email using @nestjs/mailer
       await job.progress(50);
-      
+
       // TODO: Log notification in database
       await job.progress(100);
-      
+
       return {
         recipient,
         type: 'email',
@@ -133,16 +140,16 @@ export class NotificationProcessor {
   @Process('push')
   async handlePush(job: Job) {
     const { recipient, data } = job.data;
-    
+
     this.logger.log(`Sending push notification to: ${recipient}`);
-    
+
     try {
       // TODO: Send push notification using Firebase/OneSignal
       await job.progress(50);
-      
+
       // TODO: Log notification in database
       await job.progress(100);
-      
+
       return {
         recipient,
         type: 'push',
