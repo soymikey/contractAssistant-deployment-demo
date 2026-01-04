@@ -2,7 +2,7 @@
 
 ## 项目概述
 
-基于 Node.js + NestJS 和 PostgreSQL 的企业级 RESTful API 后端，包括用户认证、文件管理、OCR 集成、AI 分析、数据存储等功能。
+基于 Node.js + NestJS 和 PostgreSQL 的企业级 RESTful API 后端，包括用户认证、文件管理、AI 分析（支持多模态）、数据存储等功能。
 
 **框架**: NestJS 10+ (基于 Node.js 18+)  
 **数据库**: PostgreSQL 14+  
@@ -44,7 +44,7 @@
 ### 文件处理
 - **文件上传**: multer (via @nestjs/platform-express)
 - **文件存储**: aws-sdk (S3) 或 fs (本地)
-- **文件处理**: pdf-parse, tesseract.js, sharp
+- **文件处理**: pdf-parse, sharp
 
 ### API 与验证
 - **API 文档**: `@nestjs/swagger` (自动生成)
@@ -249,7 +249,7 @@ TODO List - Redis 和 Bull 队列
 
 - [x] 1.4.3 创建队列模块
   - [x] nest g module queues
-  - [x] 创建 4 个队列配置 (analysis, upload, ocr, notification)
+  - [x] 创建 3 个队列配置 (analysis, upload, notification)
   - [x] 配置重试策略（exponential/fixed backoff）
   - [x] 配置并发处理和任务保留策略
 
@@ -263,10 +263,10 @@ TODO List - Redis 和 Bull 队列
 
 **完成时间**: 2026-01-03  
 **关键成果**:
-- ✅ Bull Queue 完整配置（4 个队列：analysis, upload, ocr, notification）
+- ✅ Bull Queue 完整配置（3 个队列：analysis, upload, notification）
 - ✅ Redis 连接配置（支持环境变量配置，解决 NOAUTH 错误）
 - ✅ QueuesService 实现（提供队列管理和统计）
-- ✅ 4 个队列处理器框架（AnalysisProcessor, UploadProcessor, OcrProcessor, NotificationProcessor）
+- ✅ 3 个队列处理器框架（AnalysisProcessor, UploadProcessor, NotificationProcessor）
 - ✅ 重试策略配置（exponential/fixed backoff，自动重试机制）
 - ✅ 任务监听和日志记录（@OnQueueActive, @OnQueueCompleted, @OnQueueFailed）
 - ✅ 队列文档（server/src/queues/README.md）
@@ -274,9 +274,8 @@ TODO List - Redis 和 Bull 队列
 - ✅ 应用构建成功，类型安全
 
 **队列配置总览**:
-- **analysis-queue**: AI 合同分析（3 次重试，指数退避）
+- **analysis-queue**: AI 合同分析（支持多模态，3 次重试，指数退避）
 - **upload-queue**: 文件上传处理（2 次重试，固定退避）
-- **ocr-queue**: OCR 文本提取（2 次重试，指数退避）
 - **notification-queue**: 通知发送（5 次重试，指数退避）
 
 **注意**: 队列处理器当前为框架实现（stub），将在各自模块开发时完成（Week 3-6）。需要 Redis 服务运行才能使用队列功能。
@@ -789,94 +788,32 @@ TODO List - 文件上传模块
 
 **待完成**:
 - 单元测试和 E2E 测试 (Section 8)
-- 上传队列处理器实现 (Section 3.2 之后)
+- 上传队列处理器实现 (Section 3.2)
 
-### 3.2 OCR 集成
-
-```
-TODO List - OCR 服务
-- [ ] 3.2.1 生成 OCR 模块
-  - [ ] nest g module ocr
-  - [ ] nest g service ocr
-
-- [ ] 3.2.2 选择并配置 OCR 方案
-  - [ ] 评测 Tesseract, PaddleOCR, Google Vision
-  - [ ] 如果使用 Tesseract:
-    - [ ] pnpm add tesseract.js
-  - [ ] 如果使用 Google Vision:
-    - [ ] pnpm add @google-cloud/vision
-    - [ ] 配置 Google Cloud 凭证
-
-- [ ] 3.2.3 实现 OCR 服务
-  - [ ] 文件: src/ocr/ocr.service.ts
-    ```typescript
-    @Injectable()
-    export class OcrService {
-      async recognizeImage(file: Express.Multer.File): Promise<string> {
-        // 图片 OCR 识别
-      }
-      
-      async recognizePdf(file: Express.Multer.File): Promise<string> {
-        // PDF OCR 识别
-      }
-      
-      async structureText(text: string): Promise<any> {
-        // 文本结构化
-      }
-    }
-    ```
-
-- [ ] 3.2.4 集成队列处理 OCR
-  - [ ] 创建 OCR 队列处理器
-    ```typescript
-    @Processor('ocr-queue')
-    export class OcrProcessor {
-      @Process('recognize')
-      async handleRecognition(job: Job) {
-        // 异步 OCR 处理
-      }
-    }
-    ```
-  - [ ] 实现进度跟踪
-  - [ ] 实现结果缓存
-
-- [ ] 3.2.5 添加 OCR 端点
-  - [ ] 在 UploadController 或单独的 OcrController 中
-  - [ ] POST /api/v1/ocr - 提交 OCR 任务
-  - [ ] GET /api/v1/ocr/:id/status - 获取 OCR 状态
-  - [ ] GET /api/v1/ocr/:id/result - 获取 OCR 结果
-
-- [ ] 3.2.6 编写 OCR 测试
-  - [ ] 图片识别测试
-  - [ ] PDF 识别测试
-  - [ ] 中文识别测试
-  - [ ] 异步处理测试
-```
-
-### 3.3 文档处理
+### 3.2 文档处理
 
 ```
 TODO List - 文档处理
-- [ ] 3.3.1 生成文档处理模块
+- [ ] 3.2.1 生成文档处理模块
   - [ ] nest g module document
   - [ ] nest g service document
 
-- [ ] 3.3.2 安装文档处理依赖
+- [ ] 3.2.2 安装文档处理依赖
   - [ ] pnpm add pdf-parse pdfjs-dist
   - [ ] pnpm add docx (用于 docx 处理)
 
-- [ ] 3.3.3 实现 PDF 处理服务
+- [ ] 3.2.3 实现 PDF 处理服务
   - [ ] 创建 PdfService
-  - [ ] extractText(file) - 提取文本
+  - [ ] extractText(file) - 提取文本（用于纯文本 PDF）
   - [ ] extractMetadata(file) - 提取元数据
-  - [ ] convertToImages(file) - 转换为图片
+  - [ ] convertToImages(file) - 转换为图片（用于多模态 AI 分析）
 
-- [ ] 3.3.4 实现 Word 处理服务
+- [ ] 3.2.4 实现 Word 处理服务
   - [ ] 创建 DocxService
   - [ ] extractText(file) - 提取文本
   - [ ] extractMetadata(file) - 提取元数据
 
-- [ ] 3.3.5 实现通用文档服务
+- [ ] 3.2.5 实现通用文档服务
   - [ ] 在 DocumentService 中:
     ```typescript
     @Injectable()
@@ -893,6 +830,9 @@ TODO List - 文档处理
             return this.pdfService.extractText(file);
           case 'docx':
             return this.docxService.extractText(file);
+          case 'image':
+            // 图片文件直接传给多模态 AI，无需预处理
+            return { type: 'image', buffer: file.buffer };
           default:
             throw new BadRequestException('Unsupported file type');
         }
@@ -900,11 +840,13 @@ TODO List - 文档处理
     }
     ```
 
-- [ ] 3.3.6 编写文档处理测试
+- [ ] 3.2.6 编写文档处理测试
   - [ ] PDF 处理测试
   - [ ] Word 处理测试
   - [ ] 文件类型检测测试
 ```
+
+**注意**: 对于图片格式的合同（JPEG, PNG），将直接传递给多模态 AI（如 Gemini）进行分析，无需单独的 OCR 处理步骤。
 
 ---
 
@@ -1002,33 +944,50 @@ TODO List - AI 分析模块
   - [ ] nest g service ai
 
 - [ ] 4.2.2 选择并配置 AI 服务
-  - [ ] 如果使用 OpenAI:
+  - [ ] 推荐使用多模态 AI（Gemini 1.5 Pro/Flash）:
+    - [ ] pnpm add @google/generative-ai
+    - [ ] 配置 API key (.env: GEMINI_API_KEY)
+    - [ ] 使用 ConfigModule 管理配置
+  - [ ] 或使用 OpenAI (GPT-4 Vision):
     - [ ] pnpm add openai
-    - [ ] 配置 API key (.env)
+    - [ ] 配置 API key (.env: OPENAI_API_KEY)
     - [ ] 使用 ConfigModule 管理配置
 
-- [ ] 4.2.3 实现 AI 服务
+- [ ] 4.2.3 实现 AI 服务（支持多模态）
   - [ ] 文件: src/analysis/ai.service.ts
     ```typescript
     @Injectable()
     export class AiService {
-      private openai: OpenAI;
+      private gemini: GoogleGenerativeAI;
       
       constructor(private configService: ConfigService) {
-        this.openai = new OpenAI({
-          apiKey: this.configService.get('OPENAI_API_KEY'),
-        });
+        this.gemini = new GoogleGenerativeAI(
+          this.configService.get('GEMINI_API_KEY')
+        );
       }
       
-      async generateOverview(contractText: string): Promise<any> {
+      async analyzeContract(file: Express.Multer.File): Promise<any> {
+        // 支持文本、图片、PDF 等多种格式
+        // 直接发送给 Gemini 多模态模型
+      }
+      
+      async analyzeContractText(text: string): Promise<any> {
+        // 纯文本分析
+      }
+      
+      async analyzeContractImage(imageBuffer: Buffer, mimeType: string): Promise<any> {
+        // 图片直接分析（无需 OCR）
+      }
+      
+      async generateOverview(analysisResult: any): Promise<any> {
         // 生成合同概览
       }
       
-      async identifyRisks(contractText: string): Promise<any> {
+      async identifyRisks(analysisResult: any): Promise<any> {
         // 识别风险
       }
       
-      async generateSuggestions(contractText: string): Promise<any> {
+      async generateSuggestions(analysisResult: any): Promise<any> {
         // 生成建议
       }
     }
@@ -1074,8 +1033,8 @@ TODO List - AI 分析模块
       async handleAnalysis(job: Job) {
         const { contractId, userId } = job.data;
         
-        // 1. 获取合同文本
-        // 2. 调用 AI 分析
+        // 1. 获取合同文件（可能是文本、图片或 PDF）
+        // 2. 调用多模态 AI 分析（支持直接处理图片）
         // 3. 存储结果
         // 4. 更新进度
         
