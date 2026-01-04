@@ -21,10 +21,11 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  contracts    Contract[]
-  favorites    Favorite[]
-  analysisLogs AnalysisLog[]
-  preferences  UserPreferences?
+  contracts         Contract[]
+  favorites         Favorite[]
+  analysisLogs      AnalysisLog[]
+  preferences       UserPreferences?
+  passwordResetTokens PasswordResetToken[]
 
   @@index([email])
   @@map("users")
@@ -151,3 +152,22 @@ model UserPreferences {
 
   @@map("user_preferences")
 }
+
+// Password Reset Token model - stores password reset tokens
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("password_reset_tokens")
+}
+
