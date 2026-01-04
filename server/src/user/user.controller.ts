@@ -6,7 +6,6 @@ import {
   Post,
   Body,
   Param,
-  Request,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -19,6 +18,7 @@ import { UserService } from './user.service';
 import { UpdateUserDto, ChangePasswordDto } from './dto';
 import { UserEntity } from './entities';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @Controller('users')
 @ApiTags('Users')
@@ -71,9 +71,8 @@ export class UserController {
   async update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
-    @Request() req: any,
+    @CurrentUser('userId') currentUserId: string,
   ): Promise<UserEntity> {
-    const currentUserId: string = req.user.userId as string;
     return this.userService.update(id, updateUserDto, currentUserId);
   }
 
@@ -100,10 +99,13 @@ export class UserController {
   async changePassword(
     @Param('id') id: string,
     @Body() changePasswordDto: ChangePasswordDto,
-    @Request() req: any,
+    @CurrentUser('userId') currentUserId: string,
   ): Promise<{ message: string }> {
-    const currentUserId: string = req.user.userId as string;
-    return this.userService.changePassword(id, changePasswordDto, currentUserId);
+    return this.userService.changePassword(
+      id,
+      changePasswordDto,
+      currentUserId,
+    );
   }
 
   @Delete(':id')
@@ -124,9 +126,8 @@ export class UserController {
   })
   async remove(
     @Param('id') id: string,
-    @Request() req: any,
+    @CurrentUser('userId') currentUserId: string,
   ): Promise<{ message: string }> {
-    const currentUserId: string = req.user.userId as string;
     return this.userService.remove(id, currentUserId);
   }
 }

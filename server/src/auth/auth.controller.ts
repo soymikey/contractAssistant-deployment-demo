@@ -70,7 +70,8 @@ export class AuthController {
     // In JWT authentication, logout is typically handled client-side by removing the token
     // Server-side logout would require token blacklisting (Redis) or refresh token revocation
     return {
-      message: 'Logout successful. Please remove the token from client storage.',
+      message:
+        'Logout successful. Please remove the token from client storage.',
     };
   }
 

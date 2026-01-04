@@ -18,7 +18,8 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       useFactory: (configService: ConfigService) => {
         const expiresIn = configService.get<string>('JWT_EXPIRES_IN') || '24h';
         return {
-          secret: configService.get<string>('JWT_SECRET') || 'default-secret-key',
+          secret:
+            configService.get<string>('JWT_SECRET') || 'default-secret-key',
           signOptions: {
             expiresIn: expiresIn as any, // Type cast to satisfy JWT module requirements
           },

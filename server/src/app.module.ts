@@ -10,6 +10,7 @@ import { HealthModule } from './health/health.module';
 import { QueuesModule } from './queues/queues.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { AuthModule } from './auth/auth.module';
     QueuesModule,
     UserModule,
     AuthModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],
