@@ -281,28 +281,38 @@ TODO List - Redis 和 Bull 队列
 
 **注意**: 队列处理器当前为框架实现（stub），将在各自模块开发时完成（Week 3-6）。需要 Redis 服务运行才能使用队列功能。
 
-### 1.5 API 文档配置 (Swagger 自动生成)
+### 1.5 API 文档配置 (Swagger 自动生成) ✅
 
 ```
 TODO List - Swagger 文档
-- [ ] 1.5.1 配置 Swagger (已安装)
-  - [ ] 在 main.ts 中配置 SwaggerModule
-  - [ ] 设置文档标题、版本、描述
-  - [ ] 设置 API 路径: /api-docs
-  - [ ] 配置 JWT Bearer 认证
+- [x] 1.5.1 配置 Swagger (已安装)
+  - [x] 在 main.ts 中配置 SwaggerModule
+  - [x] 设置文档标题、版本、描述
+  - [x] 设置 API 路径: /api-docs
+  - [x] 配置 JWT Bearer 认证
 
-- [ ] 1.5.2 配置文档装饰器
-  - [ ] 使用 @ApiTags 标记控制器
-  - [ ] 使用 @ApiOperation 描述操作
-  - [ ] 使用 @ApiResponse 定义响应
-  - [ ] 使用 @ApiProperty 标记 DTO 属性
-  - [ ] 使用 @ApiBearerAuth 标记需要认证的端点
+- [x] 1.5.2 配置文档装饰器
+  - [x] 使用 @ApiTags 标记控制器
+  - [x] 使用 @ApiOperation 描述操作
+  - [x] 使用 @ApiResponse 定义响应
+  - [x] 使用 @ApiProperty 标记 DTO 属性
+  - [x] 使用 @ApiBearerAuth 标记需要认证的端点
 
-- [ ] 1.5.3 验证文档
-  - [ ] 启动应用
-  - [ ] 访问 http://localhost:3000/api-docs
-  - [ ] 验证 UI 可访问
+- [x] 1.5.3 验证文档
+  - [x] 启动应用
+  - [x] 访问 http://localhost:3000/api-docs
+  - [x] 验证 UI 可访问
 ```
+
+**完成时间**: 2026-01-04  
+**关键成果**:
+- ✅ Swagger API 文档完整配置（访问 `/api-docs`）
+- ✅ JWT Bearer 认证配置（使用 `@ApiBearerAuth('JWT-auth')` 装饰器）
+- ✅ 多个 API 标签定义（Authentication, Contracts, Analysis, Upload, Favorites, Health）
+- ✅ 文档装饰器在 Health Controller 中已演示使用
+- ✅ 自定义 UI 选项（持久化授权、过滤、显示请求时间）
+- ✅ 多环境服务器配置（本地开发、生产环境）
+- ✅ 应用构建成功，Swagger 集成完整
 
 ---
 
