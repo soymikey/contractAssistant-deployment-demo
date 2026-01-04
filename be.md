@@ -660,98 +660,136 @@ TODO List - 密码重置
 
 ## 第3-4周: 文件处理模块 (NestJS 集成)
 
-### 3.1 文件上传服务
+### 3.1 文件上传服务 ✅
 
 ```
 TODO List - 文件上传模块
-- [ ] 3.1.1 生成上传模块
-  - [ ] nest g module upload
-  - [ ] nest g controller upload
-  - [ ] nest g service upload
+- [x] 3.1.1 生成上传模块
+  - [x] nest g module upload
+  - [x] nest g controller upload
+  - [x] nest g service upload
 
-- [ ] 3.1.2 配置文件存储
-  - [ ] 选择存储方案 (AWS S3 或本地存储)
-  - [ ] 如果使用 S3:
-    - [ ] pnpm add aws-sdk
-    - [ ] 配置 AWS 凭证 (.env)
-    - [ ] 创建 S3Service
-  - [ ] 如果使用本地存储:
-    - [ ] 创建 uploads/ 目录
-    - [ ] 配置静态文件服务
+- [x] 3.1.2 配置文件存储
+  - [x] 选择存储方案 (本地存储 + S3 准备)
+  - [x] 创建 uploads/ 目录 (uploads/contracts, uploads/temp)
+  - [x] 创建 StorageService (本地 + S3 接口)
+  - [x] S3 方法预留 (uploadToS3, deleteFromS3, getSignedUrl)
 
-- [ ] 3.1.3 配置 Multer (通过 @nestjs/platform-express)
-  - [ ] 创建 src/upload/multer.config.ts
-  - [ ] 配置文件大小限制 (50MB)
-  - [ ] 配置允许的文件类型 (jpg, png, pdf, docx)
-  - [ ] 创建文件过滤器
-    ```typescript
-    export const fileFilter = (req, file, callback) => {
-      const allowedMimes = ['image/jpeg', 'image/png', 'application/pdf'];
-      if (allowedMimes.includes(file.mimetype)) {
-        callback(null, true);
-      } else {
-        callback(new BadRequestException('Invalid file type'), false);
-      }
-    };
-    ```
+- [x] 3.1.3 配置 Multer (通过 @nestjs/platform-express)
+  - [x] 创建 src/upload/multer.config.ts
+  - [x] 配置文件大小限制 (50MB)
+  - [x] 配置允许的文件类型 (PDF, JPEG, PNG, DOC, DOCX)
+  - [x] 创建文件过滤器 (fileFilter)
+  - [x] 唯一文件名生成 (crypto.randomBytes)
 
-- [ ] 3.1.4 实现上传控制器
-  - [ ] 文件: src/upload/upload.controller.ts
-    ```typescript
-    @Controller('upload')
-    @ApiTags('Upload')
-    @UseGuards(JwtAuthGuard)
-    export class UploadController {
-      constructor(private uploadService: UploadService) {}
-      
-      @Post()
-      @ApiOperation({ summary: '上传文件' })
-      @UseInterceptors(FileInterceptor('file', multerConfig))
-      async uploadFile(
-        @UploadedFile() file: Express.Multer.File,
-        @Request() req
-      ) {
-        return this.uploadService.uploadFile(file, req.user);
-      }
-      
-      @Post('multiple')
-      @ApiOperation({ summary: '上传多个文件' })
-      @UseInterceptors(FilesInterceptor('files', 10, multerConfig))
-      async uploadFiles(
-        @UploadedFiles() files: Express.Multer.File[],
-        @Request() req
-      ) {
-        return this.uploadService.uploadMultipleFiles(files, req.user);
-      }
-      
-      @Delete(':id')
-      @ApiOperation({ summary: '删除文件' })
-      async deleteFile(@Param('id') id: string, @Request() req) {
-        return this.uploadService.deleteFile(id, req.user);
-      }
-      
-      @Get(':id')
-      @ApiOperation({ summary: '获取文件信息' })
-      async getFile(@Param('id') id: string, @Request() req) {
-        return this.uploadService.getFile(id, req.user);
-      }
-    }
-    ```
+- [x] 3.1.4 实现上传控制器
+  - [x] 文件: src/upload/upload.controller.ts
+  - [x] POST /upload - 单文件上传
+  - [x] POST /upload/multiple - 多文件上传 (最多10个)
+  - [x] GET /upload/:id - 获取合同信息
+  - [x] GET /upload - 获取用户所有合同
+  - [x] DELETE /upload/:id - 删除合同
+  - [x] JWT 认证保护
+  - [x] 使用 @CurrentUser 装饰器提取用户
 
-- [ ] 3.1.5 实现存储服务
-  - [ ] 文件: src/upload/storage.service.ts
-  - [ ] uploadToS3(file) - S3 上传
-  - [ ] uploadToLocal(file) - 本地上传
-  - [ ] deleteFile(fileUrl) - 删除文件
-  - [ ] getSignedUrl(fileKey) - 获取签名 URL
+- [x] 3.1.5 实现存储服务
+  - [x] 文件: src/upload/storage.service.ts
+  - [x] saveToLocal(file) - 本地上传
+  - [x] deleteFromLocal(fileUrl) - 删除文件
+  - [x] fileExists(fileUrl) - 检查文件存在
+  - [x] getFileSize(fileUrl) - 获取文件大小
+  - [x] getAbsoluteFilePath(fileUrl) - 获取绝对路径
+  - [x] uploadToS3(file) - S3 上传 (预留)
+  - [x] deleteFromS3(fileUrl) - S3 删除 (预留)
+  - [x] getSignedUrl(fileKey) - 签名 URL (预留)
 
-- [ ] 3.1.6 编写上传测试
+- [x] 3.1.6 实现上传服务
+  - [x] 文件: src/upload/upload.service.ts
+  - [x] uploadFile() - 单文件上传 (存储 + 数据库 + 队列)
+  - [x] uploadMultipleFiles() - 多文件上传 (批处理)
+  - [x] getContract() - 获取合同 (权限检查)
+  - [x] getUserContracts() - 获取用户合同列表
+  - [x] deleteContract() - 删除合同 (级联删除)
+  - [x] updateContractStatus() - 更新合同状态
+  - [x] 错误处理和文件清理
+
+- [x] 3.1.7 DTO 和类型定义
+  - [x] UploadResponseDto - 上传响应
+  - [x] 支持 nullable fileSize
+
+- [x] 3.1.8 模块集成
+  - [x] UploadModule 导入 PrismaModule, QueuesModule
+  - [x] 注册 UploadService, StorageService, UploadController
+  - [x] AppModule 导入 UploadModule
+
+- [x] 3.1.9 类型安全改进
+  - [x] 创建 @CurrentUser 装饰器 (类型安全)
+  - [x] 创建 RequestUser 接口
+  - [x] 创建 AuthenticatedRequest 接口
+  - [x] 更新 UploadController 使用 @CurrentUser
+  - [x] 更新 UserController 使用 @CurrentUser
+
+- [x] 3.1.10 错误处理改进
+  - [x] 创建错误处理工具 (error.util.ts)
+  - [x] getErrorMessage() - 安全提取错误消息
+  - [x] getErrorStack() - 安全提取堆栈
+  - [x] formatErrorForLog() - 格式化错误日志
+  - [x] 类型守卫 (isError, hasMessage)
+  - [x] 更新 StorageService 使用类型安全错误处理
+  - [x] 更新 UploadService 使用类型安全错误处理
+
+- [ ] 3.1.11 编写上传测试 (待完成)
   - [ ] 单个文件上传测试
   - [ ] 多个文件上传测试
   - [ ] 文件大小限制测试
   - [ ] 文件类型限制测试
   - [ ] 未授权上传测试
 ```
+
+**完成时间**: 2026-01-05  
+**关键成果**:
+- ✅ 文件上传模块完整实现 (UploadModule, UploadController, UploadService, StorageService)
+- ✅ Multer 配置完成 (50MB 限制, 6 种文件类型支持)
+- ✅ 本地存储实现 (S3 接口预留)
+- ✅ 5 个端点完成 (POST /upload, POST /upload/multiple, GET /upload, GET /upload/:id, DELETE /upload/:id)
+- ✅ 队列集成 (自动创建上传处理任务)
+- ✅ 数据库集成 (Contract 模型, Prisma 操作)
+- ✅ 类型安全改进 (@CurrentUser 装饰器, RequestUser 接口)
+- ✅ 错误处理改进 (统一错误处理工具, 类型安全)
+- ✅ 权限检查 (JWT 认证, 用户只能访问自己的合同)
+- ✅ 批量上传支持 (最多 10 个文件)
+- ✅ 错误恢复 (上传失败自动清理文件)
+- ✅ 应用构建成功, ESLint 通过
+- ✅ 文档完整 (README.md for decorators, ERROR_HANDLING.md)
+
+**文件结构**:
+- `src/upload/upload.module.ts` - 上传模块配置
+- `src/upload/upload.controller.ts` - 上传控制器 (5 个端点)
+- `src/upload/upload.service.ts` - 上传服务 (业务逻辑)
+- `src/upload/storage.service.ts` - 存储服务 (文件管理)
+- `src/upload/multer.config.ts` - Multer 配置
+- `src/upload/dto/upload-response.dto.ts` - 响应 DTO
+- `src/common/decorators/current-user.decorator.ts` - 用户装饰器
+- `src/common/types/authenticated-request.interface.ts` - 请求类型
+- `src/common/utils/error.util.ts` - 错误处理工具
+
+**安全特性**:
+- JWT 认证保护所有端点
+- 用户权限检查 (只能访问自己的合同)
+- 文件类型验证 (白名单)
+- 文件大小限制 (50MB)
+- 唯一文件名 (防止冲突和覆盖)
+- 类型安全错误处理 (无 `any` 类型)
+
+**性能优化**:
+- 批量上传支持
+- 错误时自动清理
+- 队列异步处理
+- 数据库索引 (userId, status, createdAt)
+
+**待完成**:
+- 单元测试和 E2E 测试 (Section 8)
+- 上传队列处理器实现 (Section 3.2 之后)
 
 ### 3.2 OCR 集成
 
