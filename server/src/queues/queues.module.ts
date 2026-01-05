@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
 import { QueuesService } from './queues.service';
 import { QUEUE_NAMES } from './queue-names.const';
@@ -8,11 +8,14 @@ import {
   OcrProcessor,
   NotificationProcessor,
 } from './processors';
+import { AiAnalysisModule } from '../ai-analysis/ai-analysis.module';
 
 export { QUEUE_NAMES } from './queue-names.const';
 
 @Module({
   imports: [
+    // Import AiAnalysisModule for AnalysisProcessor
+    forwardRef(() => AiAnalysisModule),
     // Register analysis queue for AI contract analysis
     BullModule.registerQueue({
       name: QUEUE_NAMES.ANALYSIS,

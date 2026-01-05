@@ -13,6 +13,8 @@ import { AuthModule } from './auth/auth.module';
 import { UploadModule } from './upload/upload.module';
 import { DocumentModule } from './document/document.module';
 import { ContractModule } from './contract/contract.module';
+import { FavoriteModule } from './favorite/favorite.module';
+import { PreferencesModule } from './preferences/preferences.module';
 
 @Module({
   imports: [
@@ -66,6 +68,8 @@ import { ContractModule } from './contract/contract.module';
     UploadModule,
     ContractModule,
     DocumentModule,
+    FavoriteModule,
+    PreferencesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

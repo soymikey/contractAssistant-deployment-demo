@@ -1,40 +1,207 @@
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { ConfigService } from '@nestjs/config';
+import {
+  GoogleGenerativeAI,
+  GenerativeModel,
+  Part,
+} from '@google/generative-ai';
 import { AnalyzeContractDto } from './dto/analyze-contract.dto';
 import { AnalysisResult } from './interfaces/analysis-result.interface';
+import type { ProcessedDocument } from '../document/interfaces/document.interface';
 
 @Injectable()
 export class AiAnalysisService {
   private readonly logger = new Logger(AiAnalysisService.name);
   private genAI: GoogleGenerativeAI;
-  private model: any;
+  private model: GenerativeModel;
 
-  constructor() {
-    const apiKey = process.env.GOOGLE_AI_API_KEY;
+  constructor(private readonly configService: ConfigService) {
+    const apiKey = this.configService.get<string>('GEMINI_API_KEY');
 
     if (!apiKey || apiKey === 'your_api_key_here') {
-      this.logger.warn('GOOGLE_AI_API_KEY is not configured properly');
+      this.logger.warn('GEMINI_API_KEY is not configured properly');
       throw new Error(
-        'GOOGLE_AI_API_KEY is not configured. Please add it to your .env file',
+        'GEMINI_API_KEY is not configured. Please add it to your .env file',
       );
     }
 
     this.genAI = new GoogleGenerativeAI(apiKey);
+    // Use gemini-1.5-flash for better multimodal support
     this.model = this.genAI.getGenerativeModel({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-1.5-flash',
     });
     this.logger.log('Google Gemini AI initialized successfully');
   }
 
+  /**
+   * Analyze contract from base64 image (legacy method for direct API calls)
+   * @param dto - AnalyzeContractDto with base64 image
+   * @returns Analysis result
+   */
   async analyzeContract(dto: AnalyzeContractDto): Promise<AnalysisResult> {
     try {
-      this.logger.log('Starting contract analysis...');
+      this.logger.log('Starting contract analysis from base64 image...');
 
       // Convert base64 to proper format for Gemini
       const imageData = this.prepareImageData(dto.image, dto.mimeType);
 
-      // Construct the prompt (in English, but ask for Chinese response)
-      const prompt = `You are a professional contract analysis assistant. Please analyze this contract image and provide:
+      // Call Gemini with multimodal content
+      const result = await this.callGeminiMultimodal([imageData]);
+
+      this.logger.log('Contract analysis completed successfully');
+      return result;
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error('Error analyzing contract:', errorMessage);
+
+      if (errorMessage.includes('API key')) {
+        throw new BadRequestException('Invalid API key configuration');
+      }
+
+      throw new BadRequestException(
+        `Failed to analyze contract: ${errorMessage}`,
+      );
+    }
+  }
+
+  /**
+   * Analyze contract from ProcessedDocument (for queue-based analysis)
+   * Supports text, images, and PDFs
+   * @param document - ProcessedDocument from DocumentService
+   * @returns Analysis result
+   */
+  async analyzeProcessedDocument(
+    document: ProcessedDocument,
+  ): Promise<AnalysisResult> {
+    try {
+      this.logger.log(`Analyzing document of type: ${document.type}`);
+
+      if (document.type === 'text' && document.text) {
+        // Text-based document (DOCX) - use text analysis
+        return await this.analyzeContractText(document.text);
+      } else if (
+        document.type === 'image' &&
+        document.base64 &&
+        document.mimeType
+      ) {
+        // Image or PDF - use multimodal analysis
+        const imageData = this.prepareImageData(
+          document.base64,
+          document.mimeType,
+        );
+        return await this.callGeminiMultimodal([imageData]);
+      } else {
+        throw new BadRequestException(
+          'Invalid document format: missing required data',
+        );
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error('Error analyzing processed document:', errorMessage);
+
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+
+      throw new BadRequestException(
+        `Failed to analyze document: ${errorMessage}`,
+      );
+    }
+  }
+
+  /**
+   * Analyze contract from text content
+   * @param text - Extracted text from document
+   * @returns Analysis result
+   */
+  async analyzeContractText(text: string): Promise<AnalysisResult> {
+    try {
+      this.logger.log('Starting text-based contract analysis...');
+
+      const prompt = this.buildAnalysisPrompt();
+      const fullPrompt = `${prompt}\n\n--- Contract Text ---\n${text}`;
+
+      const result = await this.model.generateContent(fullPrompt);
+      const response = result.response;
+      const responseText = response.text();
+
+      this.logger.log('Received response from Gemini API');
+
+      const analysisData = this.parseAnalysisResponse(responseText);
+
+      return {
+        ...analysisData,
+        analyzedAt: new Date().toISOString(),
+      };
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error('Error analyzing contract text:', errorMessage);
+      throw new BadRequestException(
+        `Failed to analyze contract text: ${errorMessage}`,
+      );
+    }
+  }
+
+  /**
+   * Analyze contract from image buffer
+   * @param imageBuffer - Image file buffer
+   * @param mimeType - Image MIME type
+   * @returns Analysis result
+   */
+  async analyzeContractImage(
+    imageBuffer: Buffer,
+    mimeType: string,
+  ): Promise<AnalysisResult> {
+    try {
+      this.logger.log('Starting image-based contract analysis...');
+
+      const base64 = imageBuffer.toString('base64');
+      const imageData = this.prepareImageData(base64, mimeType);
+
+      return await this.callGeminiMultimodal([imageData]);
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error('Error analyzing contract image:', errorMessage);
+      throw new BadRequestException(
+        `Failed to analyze contract image: ${errorMessage}`,
+      );
+    }
+  }
+
+  /**
+   * Call Gemini with multimodal content (images/PDFs)
+   * @param imageParts - Array of image parts
+   * @returns Analysis result
+   */
+  private async callGeminiMultimodal(
+    imageParts: Part[],
+  ): Promise<AnalysisResult> {
+    const prompt = this.buildAnalysisPrompt();
+
+    const result = await this.model.generateContent([prompt, ...imageParts]);
+    const response = result.response;
+    const text = response.text();
+
+    this.logger.log('Received multimodal response from Gemini API');
+
+    const analysisData = this.parseAnalysisResponse(text);
+
+    return {
+      ...analysisData,
+      analyzedAt: new Date().toISOString(),
+    };
+  }
+
+  /**
+   * Build the analysis prompt
+   * @returns Prompt string
+   */
+  private buildAnalysisPrompt(): string {
+    return `You are a professional contract analysis assistant. Please analyze this contract and provide:
 
 1. **Risk Identification**: Identify potential legal risks and unfavorable terms
 2. **Key Terms**: Extract important rights and obligations clauses
@@ -48,7 +215,9 @@ Please return the result in JSON format with the following structure:
     {
       "title": "Risk title",
       "description": "Detailed description",
-      "severity": "high|medium|low"
+      "severity": "high|medium|low",
+      "category": "legal|financial|operational|compliance|other",
+      "suggestion": "Improvement suggestion"
     }
   ],
   "keyTerms": [
@@ -58,45 +227,27 @@ Please return the result in JSON format with the following structure:
       "importance": "critical|important|normal"
     }
   ],
-  "recommendations": ["Recommendation 1", "Recommendation 2"]
+  "recommendations": ["Recommendation 1", "Recommendation 2"],
+  "contractInfo": {
+    "type": "Contract type if identifiable",
+    "parties": ["Party 1", "Party 2"],
+    "effectiveDate": "Date if found",
+    "expirationDate": "Date if found",
+    "totalValue": "Amount if found"
+  }
 }
 
 IMPORTANT: Please respond in Chinese (Simplified) for all text content in the JSON response.
 Return ONLY the JSON object, no additional text or markdown formatting.`;
-
-      // Call Gemini API
-      const result = await this.model.generateContent([prompt, imageData]);
-
-      const response = await result.response;
-      const text = response.text();
-
-      this.logger.log('Received response from Gemini API');
-
-      // Parse the JSON response
-      const analysisData = this.parseAnalysisResponse(text);
-
-      // Add timestamp
-      const analysisResult: AnalysisResult = {
-        ...analysisData,
-        analyzedAt: new Date().toISOString(),
-      };
-
-      this.logger.log('Contract analysis completed successfully');
-      return analysisResult;
-    } catch (error) {
-      this.logger.error('Error analyzing contract:', error.message);
-
-      if (error.message?.includes('API key')) {
-        throw new BadRequestException('Invalid API key configuration');
-      }
-
-      throw new BadRequestException(
-        `Failed to analyze contract: ${error.message}`,
-      );
-    }
   }
 
-  private prepareImageData(base64Image: string, mimeType?: string): any {
+  /**
+   * Prepare image data for Gemini API
+   * @param base64Image - Base64 encoded image
+   * @param mimeType - Image MIME type
+   * @returns Gemini image part
+   */
+  private prepareImageData(base64Image: string, mimeType?: string): Part {
     // Remove data URL prefix if present
     let imageBase64 = base64Image;
     if (base64Image.includes('base64,')) {
@@ -120,6 +271,11 @@ Return ONLY the JSON object, no additional text or markdown formatting.`;
     };
   }
 
+  /**
+   * Parse AI response to structured format
+   * @param text - Raw AI response text
+   * @returns Parsed analysis data
+   */
   private parseAnalysisResponse(
     text: string,
   ): Omit<AnalysisResult, 'analyzedAt'> {
@@ -134,31 +290,46 @@ Return ONLY the JSON object, no additional text or markdown formatting.`;
         cleanText = cleanText.replace(/```\n?/g, '');
       }
 
-      const parsed = JSON.parse(cleanText);
+      const parsed: Record<string, unknown> = JSON.parse(cleanText) as Record<
+        string,
+        unknown
+      >;
 
       // Validate required fields
       if (
-        !parsed.summary ||
-        !parsed.riskLevel ||
+        typeof parsed.summary !== 'string' ||
+        typeof parsed.riskLevel !== 'string' ||
         !Array.isArray(parsed.risks)
       ) {
         throw new Error('Invalid response format from AI');
       }
 
+      const summary = parsed.summary;
+      const riskLevel = parsed.riskLevel as 'high' | 'medium' | 'low';
+      const risks = (parsed.risks as unknown[]) || [];
+      const keyTerms = (parsed.keyTerms as unknown[]) || [];
+      const recommendations = (parsed.recommendations as string[]) || [];
+      const contractInfo = parsed.contractInfo as
+        | AnalysisResult['contractInfo']
+        | undefined;
+
       return {
-        summary: parsed.summary,
-        riskLevel: parsed.riskLevel,
-        risks: parsed.risks || [],
-        keyTerms: parsed.keyTerms || [],
-        recommendations: parsed.recommendations || [],
+        summary,
+        riskLevel,
+        risks: risks as AnalysisResult['risks'],
+        keyTerms: keyTerms as AnalysisResult['keyTerms'],
+        recommendations,
+        contractInfo,
       };
     } catch (error) {
-      this.logger.error('Failed to parse AI response:', error.message);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error';
+      this.logger.error('Failed to parse AI response:', errorMessage);
       this.logger.debug('Raw response:', text);
 
       // Return a fallback result
       return {
-        summary: '分析结果解析失败，但图片已成功识别',
+        summary: '分析结果解析失败，但文档已成功识别',
         riskLevel: 'medium',
         risks: [
           {
@@ -168,7 +339,7 @@ Return ONLY the JSON object, no additional text or markdown formatting.`;
           },
         ],
         keyTerms: [],
-        recommendations: ['请重新拍照并尝试分析', '确保合同图片清晰可见'],
+        recommendations: ['请重新上传文档并尝试分析', '确保文档内容清晰可见'],
       };
     }
   }
