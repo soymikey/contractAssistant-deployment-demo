@@ -359,31 +359,31 @@ TODO List - 展示组件
 
 ```
 TODO List - 认证 Hook
-- [ ] 3.1.1 创建 useAuth hook
-  - [ ] 文件: src/hooks/useAuth.ts
-  - [ ] 获取当前用户信息
-  - [ ] 获取登录状态
-  - [ ] 获取 token
-  - [ ] 登出操作
-  - [ ] 刷新 token
+- [x] 3.1.1 创建 useAuth hook
+  - [x] 文件: src/hooks/useAuth.ts
+  - [x] 获取当前用户信息
+  - [x] 获取登录状态
+  - [x] 获取 token
+  - [x] 登出操作
+  - [x] 刷新 token
 
-- [ ] 3.1.2 创建 useLogin hook
-  - [ ] 文件: src/hooks/useLogin.ts
-  - [ ] 处理登录逻辑
-  - [ ] 错误处理
-  - [ ] 状态管理
+- [x] 3.1.2 创建 useLogin hook
+  - [x] 文件: src/hooks/useLogin.ts
+  - [x] 处理登录逻辑
+  - [x] 错误处理
+  - [x] 状态管理
 
-- [ ] 3.1.3 创建 useRegister hook
-  - [ ] 文件: src/hooks/useRegister.ts
-  - [ ] 处理注册逻辑
-  - [ ] 邮箱验证
-  - [ ] 错误处理
+- [x] 3.1.3 创建 useRegister hook
+  - [x] 文件: src/hooks/useRegister.ts
+  - [x] 处理注册逻辑
+  - [x] 邮箱验证
+  - [x] 错误处理
 
-- [ ] 3.1.4 创建 usePasswordReset hook
-  - [ ] 文件: src/hooks/usePasswordReset.ts
-  - [ ] 处理密码重置逻辑
-  - [ ] 验证码发送
-  - [ ] 错误处理
+- [x] 3.1.4 创建 usePasswordReset hook
+  - [x] 文件: src/hooks/usePasswordReset.ts
+  - [x] 处理密码重置逻辑
+  - [x] 验证码发送
+  - [x] 错误处理
 ```
 
 ### 3.2 登录页面

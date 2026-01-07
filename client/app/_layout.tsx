@@ -6,6 +6,7 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { initializeStores, useAuthStore } from '../src/stores';
+import { QueryClientWrapper } from '../src/providers/QueryClientWrapper';
 
 /**
  * Root Layout Component
@@ -45,18 +46,20 @@ export default function RootLayout() {
   }, [isAuthenticated, segments, navigationState, router, isReady]);
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
-        {/* Authentication screens */}
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+    <QueryClientWrapper>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <Stack screenOptions={{ headerShown: false }}>
+          {/* Authentication screens */}
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
 
-        {/* Main app with bottom tabs */}
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          {/* Main app with bottom tabs */}
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-        {/* Modal screens */}
-        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+          {/* Modal screens */}
+          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+        </Stack>
+        <StatusBar style="auto" />
+      </ThemeProvider>
+    </QueryClientWrapper>
   );
 }
