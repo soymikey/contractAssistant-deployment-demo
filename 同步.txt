@@ -1,0 +1,3 @@
+2026/01/07
+1.server项目,修改.env.sample 为.env  可以启动后端项目. 之后会用你发给我的env 配置. 问题: 和prisma 相关的ts报红. 
+2.client项目 本地可以正常启动并且 可以通过浏览器访问, 但是手机端的expo 无法正常显示:There was a problem running the requested app.
