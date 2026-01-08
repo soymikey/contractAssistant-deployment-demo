@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { authService } from '@/services';
+import { authService } from '../services';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 /**
@@ -32,7 +32,7 @@ export function usePasswordReset() {
     mutationFn: async ({ token, password }: { token: string; password: string }) => {
       await authService.resetPassword(token, password);
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       // Clear reset state
       setEmail('');
       setResetToken('');

@@ -10,7 +10,8 @@ import {
   ScrollView,
 } from 'react-native';
 import { Link, useRouter, Href } from 'expo-router';
-import { useAuthStore, showErrorToast, showSuccessToast } from '../../src/stores';
+import { useRegister } from '../../src/hooks';
+import { showErrorToast, showSuccessToast } from '../../src/stores';
 
 /**
  * Register Screen
@@ -22,9 +23,20 @@ export default function RegisterScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  const register = useAuthStore((state) => state.register);
+  const { register, isLoading, error, clearError, validatePassword, validateEmail } =
+    useRegister();
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    if (value) {
+      const validation = validatePassword(value);
+      setPasswordError(validation.message || null);
+    } else {
+      setPasswordError(null);
+    }
+  };
 
   const handleRegister = async () => {
     // Validation
@@ -33,13 +45,14 @@ export default function RegisterScreen() {
       return;
     }
 
-    if (!email.includes('@')) {
+    if (!validateEmail(email)) {
       showErrorToast('Please enter a valid email address');
       return;
     }
 
-    if (password.length < 8) {
-      showErrorToast('Password must be at least 8 characters');
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
+      showErrorToast(passwordValidation.message || 'Password does not meet requirements');
       return;
     }
 
@@ -48,17 +61,13 @@ export default function RegisterScreen() {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      await register(email, password, fullName);
+    const result = await register(email, password, confirmPassword, fullName);
+    if (result.success) {
       showSuccessToast('Account created successfully');
       router.replace('/(tabs)');
-    } catch (error) {
-      showErrorToast(
-        error instanceof Error ? error.message : 'Registration failed. Please try again.'
-      );
-    } finally {
-      setIsLoading(false);
+    } else {
+      // Error is handled by the hook
+      console.log('Registration failed:', result.error);
     }
   };
 
@@ -112,11 +121,12 @@ export default function RegisterScreen() {
               placeholder="At least 8 characters"
               placeholderTextColor="#999"
               value={password}
-              onChangeText={setPassword}
+              onChangeText={handlePasswordChange}
               secureTextEntry
               autoComplete="password-new"
               editable={!isLoading}
             />
+            {passwordError && <Text style={styles.passwordErrorText}>{passwordError}</Text>}
           </View>
 
           <View style={styles.inputGroup}>
@@ -132,6 +142,15 @@ export default function RegisterScreen() {
               editable={!isLoading}
             />
           </View>
+
+          {error && (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+              <TouchableOpacity onPress={clearError}>
+                <Text style={styles.clearErrorText}>Dismiss</Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           <TouchableOpacity
             style={[styles.registerButton, isLoading && styles.registerButtonDisabled]}
@@ -207,6 +226,33 @@ const styles = StyleSheet.create({
     color: '#333',
     borderWidth: 1,
     borderColor: '#e0e0e0',
+  },
+  passwordErrorText: {
+    fontSize: 12,
+    color: '#ff9800',
+    marginTop: 6,
+    fontWeight: '500',
+  },
+  errorContainer: {
+    backgroundColor: '#fee',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#c33',
+    fontWeight: '500',
+    flex: 1,
+  },
+  clearErrorText: {
+    fontSize: 12,
+    color: '#667eea',
+    fontWeight: '600',
+    paddingLeft: 8,
   },
   registerButton: {
     backgroundColor: '#667eea',

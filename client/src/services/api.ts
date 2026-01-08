@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { API_CONFIG } from '../constants/config';
-import { useAuthStore } from '../stores/authStore';
+import { getAuthToken } from './tokenHelper';
 
 /**
  * API Error Response Interface
@@ -21,6 +21,7 @@ export interface ApiResponse<T = unknown> {
   message?: string;
 }
 
+console.log('API_CONFIG.baseURL: ', API_CONFIG.baseURL);
 /**
  * Create axios instance with default configuration
  */
@@ -36,7 +37,7 @@ const createApiClient = (): AxiosInstance => {
   // Request interceptor - Add authentication token
   instance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-      const token = useAuthStore.getState().token;
+      const token = getAuthToken();
 
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;

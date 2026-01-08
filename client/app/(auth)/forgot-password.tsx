@@ -10,6 +10,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Link, Href } from 'expo-router';
+import { usePasswordReset } from '../../src/hooks';
 import { showErrorToast, showSuccessToast } from '../../src/stores';
 
 /**
@@ -17,47 +18,90 @@ import { showErrorToast, showSuccessToast } from '../../src/stores';
  * Password reset request screen aligned with Contract Assistant UI design
  */
 export default function ForgotPasswordScreen() {
-  const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
+  const [inputEmail, setInputEmail] = useState('');
+  const [token, setToken] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  const handleResetPassword = async () => {
-    // Validation
-    if (!email) {
+  const {
+    step,
+    email,
+    isLoadingForgot,
+    isLoadingReset,
+    errorForgot,
+    errorReset,
+    forgotPassword,
+    resetPassword,
+    resetFlow,
+    validatePassword,
+  } = usePasswordReset();
+
+  const handlePasswordChange = (value: string) => {
+    setPassword(value);
+    if (value) {
+      const validation = validatePassword(value);
+      setPasswordError(validation.message || null);
+    } else {
+      setPasswordError(null);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!inputEmail) {
       showErrorToast('Please enter your email address');
       return;
     }
 
-    if (!email.includes('@')) {
-      showErrorToast('Please enter a valid email address');
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      // TODO: Integrate with actual API
-      // Mock delay
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      setEmailSent(true);
-      showSuccessToast('Password reset link sent to your email');
-    } catch (error) {
-      showErrorToast(
-        error instanceof Error ? error.message : 'Failed to send reset link. Please try again.'
-      );
-    } finally {
-      setIsLoading(false);
+    const result = await forgotPassword(inputEmail);
+    if (result.success) {
+      showSuccessToast('Check your email for password reset instructions');
+    } else {
+      showErrorToast(result.error || 'Failed to send reset email');
     }
   };
 
-  if (emailSent) {
+  const handleResetPassword = async () => {
+    if (!token) {
+      showErrorToast('Please enter the reset token');
+      return;
+    }
+
+    if (!password) {
+      showErrorToast('Please enter a new password');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      showErrorToast('Passwords do not match');
+      return;
+    }
+
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
+      showErrorToast(passwordValidation.message || 'Password does not meet requirements');
+      return;
+    }
+
+    const result = await resetPassword(token, password, confirmPassword);
+    if (result.success) {
+      showSuccessToast('Password reset successfully');
+      resetFlow();
+    } else {
+      showErrorToast(result.error || 'Failed to reset password');
+    }
+  };
+
+  if (step === 'reset') {
     return (
       <KeyboardAvoidingView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.header}>
             <Text style={styles.successIcon}>✉️</Text>
             <Text style={styles.title}>Check Your Email</Text>
-            <Text style={styles.subtitle}>We&apos;ve sent a password reset link to {email}</Text>
+            <Text style={styles.subtitle}>
+              We&apos;ve sent a password reset link to {email}
+            </Text>
           </View>
 
           <View style={styles.form}>
@@ -66,20 +110,61 @@ export default function ForgotPasswordScreen() {
               your spam folder.
             </Text>
 
-            <Link href={'/(auth)/login' as Href} asChild>
-              <TouchableOpacity style={styles.backButton}>
-                <Text style={styles.backButtonText}>Back to Sign In</Text>
-              </TouchableOpacity>
-            </Link>
+            <Text style={styles.label}>Reset Token</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Paste the reset token from the email"
+              placeholderTextColor="#999"
+              value={token}
+              onChangeText={setToken}
+              editable={!isLoadingReset}
+            />
+
+            <Text style={styles.label} style={{ marginTop: 20 }}>
+              New Password
+            </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter your new password"
+              placeholderTextColor="#999"
+              value={password}
+              onChangeText={handlePasswordChange}
+              secureTextEntry
+              editable={!isLoadingReset}
+            />
+            {passwordError && <Text style={styles.passwordErrorText}>{passwordError}</Text>}
+
+            <Text style={styles.label} style={{ marginTop: 20 }}>
+              Confirm Password
+            </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Confirm your new password"
+              placeholderTextColor="#999"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry
+              editable={!isLoadingReset}
+            />
+
+            {errorReset && (
+              <View style={styles.errorContainer}>
+                <Text style={styles.errorText}>{errorReset}</Text>
+              </View>
+            )}
 
             <TouchableOpacity
-              style={styles.resendButton}
-              onPress={() => {
-                setEmailSent(false);
-                setEmail('');
-              }}
+              style={[styles.resetButton, isLoadingReset && styles.resetButtonDisabled]}
+              onPress={handleResetPassword}
+              disabled={isLoadingReset}
             >
-              <Text style={styles.resendButtonText}>Try different email</Text>
+              <Text style={styles.resetButtonText}>
+                {isLoadingReset ? 'Resetting...' : 'Reset Password'}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={resetFlow}>
+              <Text style={styles.backToLoginText}>Back to Request New Token</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -110,22 +195,28 @@ export default function ForgotPasswordScreen() {
               style={styles.input}
               placeholder="user@example.com"
               placeholderTextColor="#999"
-              value={email}
-              onChangeText={setEmail}
+              value={inputEmail}
+              onChangeText={setInputEmail}
               autoCapitalize="none"
               autoComplete="email"
               keyboardType="email-address"
-              editable={!isLoading}
+              editable={!isLoadingForgot}
             />
           </View>
 
+          {errorForgot && (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{errorForgot}</Text>
+            </View>
+          )}
+
           <TouchableOpacity
-            style={[styles.resetButton, isLoading && styles.resetButtonDisabled]}
-            onPress={handleResetPassword}
-            disabled={isLoading}
+            style={[styles.resetButton, isLoadingForgot && styles.resetButtonDisabled]}
+            onPress={handleForgotPassword}
+            disabled={isLoadingForgot}
           >
             <Text style={styles.resetButtonText}>
-              {isLoading ? 'Sending...' : 'Send Reset Link'}
+              {isLoadingForgot ? 'Sending...' : 'Send Reset Link'}
             </Text>
           </TouchableOpacity>
 
@@ -196,6 +287,23 @@ const styles = StyleSheet.create({
     color: '#333',
     borderWidth: 1,
     borderColor: '#e0e0e0',
+  },
+  passwordErrorText: {
+    fontSize: 12,
+    color: '#ff9800',
+    marginTop: 6,
+    fontWeight: '500',
+  },
+  errorContainer: {
+    backgroundColor: '#fee',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#c33',
+    fontWeight: '500',
   },
   resetButton: {
     backgroundColor: '#667eea',

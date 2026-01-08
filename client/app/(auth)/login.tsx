@@ -10,7 +10,8 @@ import {
   ScrollView,
 } from 'react-native';
 import { Link, useRouter, Href } from 'expo-router';
-import { useAuthStore, showErrorToast, showSuccessToast } from '../../src/stores';
+import { useLogin } from '../../src/hooks';
+import { showErrorToast, showSuccessToast } from '../../src/stores';
 
 /**
  * Login Screen
@@ -18,11 +19,9 @@ import { useAuthStore, showErrorToast, showSuccessToast } from '../../src/stores
  */
 export default function LoginScreen() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const login = useAuthStore((state) => state.login);
+  const [email, setEmail] = useState('admin@contractassistant.com');
+  const [password, setPassword] = useState('admin123456');
+  const { login, isLoading, error, clearError } = useLogin();
 
   const handleLogin = async () => {
     // Validation
@@ -31,20 +30,13 @@ export default function LoginScreen() {
       return;
     }
 
-    if (!email.includes('@')) {
-      showErrorToast('Please enter a valid email address');
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      await login(email, password);
+    const result = await login(email, password);
+    if (result) {
       showSuccessToast('Login successful');
       router.replace('/(tabs)');
-    } catch (error) {
-      showErrorToast(error instanceof Error ? error.message : 'Login failed. Please try again.');
-    } finally {
-      setIsLoading(false);
+    } else {
+      // Error is handled by the hook and stored in the error state
+      console.log('Login failed');
     }
   };
 
@@ -91,6 +83,15 @@ export default function LoginScreen() {
               editable={!isLoading}
             />
           </View>
+
+          {error && (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{error}</Text>
+              <TouchableOpacity onPress={clearError}>
+                <Text style={styles.clearErrorText}>Dismiss</Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           <Link href={'/(auth)/forgot-password' as Href} asChild>
             <TouchableOpacity style={styles.forgotPassword}>
@@ -170,6 +171,27 @@ const styles = StyleSheet.create({
     color: '#333',
     borderWidth: 1,
     borderColor: '#e0e0e0',
+  },
+  errorContainer: {
+    backgroundColor: '#fee',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  errorText: {
+    fontSize: 14,
+    color: '#c33',
+    fontWeight: '500',
+    flex: 1,
+  },
+  clearErrorText: {
+    fontSize: 12,
+    color: '#667eea',
+    fontWeight: '600',
+    paddingLeft: 8,
   },
   forgotPassword: {
     alignSelf: 'flex-end',

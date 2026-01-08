@@ -1,8 +1,0 @@
-2026/01/07
-1.server项目,修改.env.sample 为.env  可以启动后端项目. 之后会用你发给我的env 配置. 问题: 和prisma 相关的ts报红. 
-    尝试运行下pnpm db:generate？
-2.client项目 本地可以正常启动并且 可以通过浏览器访问, 但是手机端的expo 无法正常显示:There was a problem running the requested app.
-
-
-- 3.1 完成了，总结在ai-summary/HOOKS_IMPLEMENTATION_SUMMARY.md。
-- 可以尝试用ai从3.2，3.3，3.4开始开发，注意提示ai已经存在的组件以及根据contract-assistant-ui.html 设计图开发

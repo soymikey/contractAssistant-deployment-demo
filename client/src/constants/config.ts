@@ -5,7 +5,7 @@
 
 // API 配置
 export const API_CONFIG = {
-  baseURL: process.env.EXPO_PUBLIC_API_URL || 'http://localhost:3000/api',
+  baseURL: process.env.EXPO_PUBLIC_API_URL || 'http://192.168.100.110:3000/api/v1',
   timeout: Number(process.env.EXPO_PUBLIC_API_TIMEOUT) || 30000,
 } as const;
 

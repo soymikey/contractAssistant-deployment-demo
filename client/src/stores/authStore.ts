@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { AuthStore, User } from '../types/store';
 import { authService } from '../services';
+import { setAuthToken } from '../services/tokenHelper';
 
 const STORAGE_KEYS = {
   USER: '@contractAssistant:user',
@@ -33,18 +34,21 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       // Save to state
       set({
         user: response.user,
-        token: response.token,
-        refreshToken: response.refreshToken,
+        token: response.access_token,
+        refreshToken: response.refresh_token || null,
         isAuthenticated: true,
         isLoading: false,
         error: null,
       });
 
+      // Set token in helper for API interceptor
+      setAuthToken(response.access_token);
+
       // Persist to AsyncStorage
       await AsyncStorage.multiSet([
         [STORAGE_KEYS.USER, JSON.stringify(response.user)],
-        [STORAGE_KEYS.TOKEN, response.token],
-        [STORAGE_KEYS.REFRESH_TOKEN, response.refreshToken],
+        [STORAGE_KEYS.TOKEN, response.access_token],
+        [STORAGE_KEYS.REFRESH_TOKEN, response.refresh_token || ''],
       ]);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Login failed';
@@ -63,18 +67,21 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       // Save to state
       set({
         user: response.user,
-        token: response.token,
-        refreshToken: response.refreshToken,
+        token: response.access_token,
+        refreshToken: response.refresh_token || null,
         isAuthenticated: true,
         isLoading: false,
         error: null,
       });
 
+      // Set token in helper for API interceptor
+      setAuthToken(response.access_token);
+
       // Persist to AsyncStorage
       await AsyncStorage.multiSet([
         [STORAGE_KEYS.USER, JSON.stringify(response.user)],
-        [STORAGE_KEYS.TOKEN, response.token],
-        [STORAGE_KEYS.REFRESH_TOKEN, response.refreshToken],
+        [STORAGE_KEYS.TOKEN, response.access_token],
+        [STORAGE_KEYS.REFRESH_TOKEN, response.refresh_token || ''],
       ]);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Registration failed';
@@ -96,6 +103,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         isAuthenticated: false,
         error: null,
       });
+
+      // Clear token from helper
+      setAuthToken(null);
 
       // Clear AsyncStorage
       await AsyncStorage.multiRemove([
@@ -123,15 +133,18 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
       // Update tokens in state
       set({
-        token: response.token,
-        refreshToken: response.refreshToken,
+        token: response.access_token,
+        refreshToken: response.refresh_token || null,
         isLoading: false,
       });
 
+      // Set token in helper for API interceptor
+      setAuthToken(response.access_token);
+
       // Persist to AsyncStorage
       await AsyncStorage.multiSet([
-        [STORAGE_KEYS.TOKEN, response.token],
-        [STORAGE_KEYS.REFRESH_TOKEN, response.refreshToken],
+        [STORAGE_KEYS.TOKEN, response.access_token],
+        [STORAGE_KEYS.REFRESH_TOKEN, response.refresh_token || ''],
       ]);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Token refresh failed';
@@ -190,6 +203,8 @@ export const restoreAuthState = async () => {
         refreshToken: refreshToken || null,
         isAuthenticated: true,
       });
+      // Restore token in helper for API interceptor
+      setAuthToken(token);
     }
   } catch (error) {
     console.error('Failed to restore auth state:', error);
