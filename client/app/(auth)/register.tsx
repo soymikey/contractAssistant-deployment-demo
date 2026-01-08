@@ -10,8 +10,8 @@ import {
   ScrollView,
 } from 'react-native';
 import { Link, useRouter, Href } from 'expo-router';
-import { useRegister } from '../../src/hooks';
-import { showErrorToast, showSuccessToast } from '../../src/stores';
+import { useRegister } from '@/hooks';
+import { showErrorToast, showSuccessToast } from '@/stores';
 
 /**
  * Register Screen
@@ -25,8 +25,7 @@ export default function RegisterScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
-  const { register, isLoading, error, clearError, validatePassword, validateEmail } =
-    useRegister();
+  const { register, isLoading, error, clearError, validatePassword, validateEmail } = useRegister();
 
   const handlePasswordChange = (value: string) => {
     setPassword(value);
@@ -65,10 +64,8 @@ export default function RegisterScreen() {
     if (result.success) {
       showSuccessToast('Account created successfully');
       router.replace('/(tabs)');
-    } else {
-      // Error is handled by the hook
-      console.log('Registration failed:', result.error);
     }
+    // Error is handled by the hook
   };
 
   return (

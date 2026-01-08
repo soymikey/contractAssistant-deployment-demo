@@ -5,8 +5,8 @@ import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { initializeStores, useAuthStore } from '../src/stores';
-import { QueryClientWrapper } from '../src/providers/QueryClientWrapper';
+import { initializeStores, useAuthStore } from '@/stores';
+import { QueryClientWrapper } from '@/providers/QueryClientWrapper';
 
 /**
  * Root Layout Component

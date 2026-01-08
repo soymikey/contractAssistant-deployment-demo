@@ -7,6 +7,7 @@
 export { useAuthStore, restoreAuthState } from './authStore';
 export { useContractStore, restoreFavorites } from './contractStore';
 export { useUploadStore } from './uploadStore';
+export { useAnalysisStore } from './analysisStore';
 export {
   useUIStore,
   showSuccessToast,

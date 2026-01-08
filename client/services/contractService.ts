@@ -1,5 +1,5 @@
-import { apiClient, handleApiError, ApiResponse } from './api';
-import type { Contract, ContractAnalysis } from '../types/store';
+import { apiClient, handleApiError, type ApiResponse } from './api';
+import type { Contract, ContractAnalysis } from '@/types/store';
 
 /**
  * Contract API Request/Response Types

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useAuthStore } from '../stores';
-import { authService } from '../services';
+import { useAuthStore } from '@/stores';
+import { authService } from '@/services';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 /**

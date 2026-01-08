@@ -10,8 +10,8 @@ import {
   ScrollView,
 } from 'react-native';
 import { Link, Href } from 'expo-router';
-import { usePasswordReset } from '../../src/hooks';
-import { showErrorToast, showSuccessToast } from '../../src/stores';
+import { usePasswordReset } from '@/hooks';
+import { showErrorToast, showSuccessToast } from '@/stores';
 
 /**
  * Forgot Password Screen
@@ -99,9 +99,7 @@ export default function ForgotPasswordScreen() {
           <View style={styles.header}>
             <Text style={styles.successIcon}>✉️</Text>
             <Text style={styles.title}>Check Your Email</Text>
-            <Text style={styles.subtitle}>
-              We&apos;ve sent a password reset link to {email}
-            </Text>
+            <Text style={styles.subtitle}>We&apos;ve sent a password reset link to {email}</Text>
           </View>
 
           <View style={styles.form}>
@@ -120,9 +118,7 @@ export default function ForgotPasswordScreen() {
               editable={!isLoadingReset}
             />
 
-            <Text style={styles.label} style={{ marginTop: 20 }}>
-              New Password
-            </Text>
+            <Text style={[styles.label, { marginTop: 20 }]}>New Password</Text>
             <TextInput
               style={styles.input}
               placeholder="Enter your new password"
@@ -134,9 +130,7 @@ export default function ForgotPasswordScreen() {
             />
             {passwordError && <Text style={styles.passwordErrorText}>{passwordError}</Text>}
 
-            <Text style={styles.label} style={{ marginTop: 20 }}>
-              Confirm Password
-            </Text>
+            <Text style={[styles.label, { marginTop: 20 }]}>Confirm Password</Text>
             <TextInput
               style={styles.input}
               placeholder="Confirm your new password"

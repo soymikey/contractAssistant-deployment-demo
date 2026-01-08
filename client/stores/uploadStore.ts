@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { UploadStore, UploadFile } from '../types/store';
+import type { UploadStore, UploadFile } from '@/types/store';
 
 let fileIdCounter = 0;
 

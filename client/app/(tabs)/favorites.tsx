@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useContractStore } from '../../src/stores';
+import { useContractStore } from '@/stores';
 
 /**
  * Favorites Tab Screen

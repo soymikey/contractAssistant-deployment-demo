@@ -10,8 +10,8 @@ import {
   ScrollView,
 } from 'react-native';
 import { Link, useRouter, Href } from 'expo-router';
-import { useLogin } from '../../src/hooks';
-import { showErrorToast, showSuccessToast } from '../../src/stores';
+import { useLogin } from '@/hooks';
+import { showErrorToast, showSuccessToast } from '@/stores';
 
 /**
  * Login Screen
@@ -34,10 +34,8 @@ export default function LoginScreen() {
     if (result) {
       showSuccessToast('Login successful');
       router.replace('/(tabs)');
-    } else {
-      // Error is handled by the hook and stored in the error state
-      console.log('Login failed');
     }
+    // Error is handled by the hook and stored in the error state
   };
 
   return (
@@ -93,11 +91,13 @@ export default function LoginScreen() {
             </View>
           )}
 
-          <Link href={'/(auth)/forgot-password' as Href} asChild>
-            <TouchableOpacity style={styles.forgotPassword}>
-              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-            </TouchableOpacity>
-          </Link>
+          {false && (
+            <Link href={'/(auth)/forgot-password' as Href} asChild>
+              <TouchableOpacity style={styles.forgotPassword}>
+                <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+              </TouchableOpacity>
+            </Link>
+          )}
 
           <TouchableOpacity
             style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}

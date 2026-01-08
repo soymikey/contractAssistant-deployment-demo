@@ -7,6 +7,9 @@
 export { apiClient, handleApiError, isApiError } from './api';
 export type { ApiError, ApiResponse } from './api';
 
+// Token Helper
+export { setAuthToken, getAuthToken } from './tokenHelper';
+
 // Authentication Service
 export { authService } from './authService';
 export type {

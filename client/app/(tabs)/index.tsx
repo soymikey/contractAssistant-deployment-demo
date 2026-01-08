@@ -12,8 +12,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { useAnalysisStore } from '@/src/stores/analysisStore';
-// import { compressImage } from '@/src/utils/imageUtils'; // Available for future use
+import { useAnalysisStore } from '@/stores';
+// import { compressImage } from '@/utils/imageUtils'; // Available for future use
 
 export default function HomeScreen() {
   const router = useRouter();

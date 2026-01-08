@@ -12,16 +12,17 @@
     "forceConsistentCasingInFileNames": true,
     "paths": {
       "@/*": ["./*"],
-      "@/components/*": ["./components/*", "./src/components/*"],
-      "@/screens/*": ["./src/screens/*"],
-      "@/hooks/*": ["./hooks/*", "./src/hooks/*"],
-      "@/stores": ["./src/stores/index.ts"],
-      "@/stores/*": ["./src/stores/*"],
-      "@/services/*": ["./src/services/*"],
-      "@/utils/*": ["./src/utils/*"],
-      "@/constants/*": ["./constants/*", "./src/constants/*"],
-      "@/types/*": ["./src/types/*"],
-      "@/assets/*": ["./assets/*", "./src/assets/*"]
+      "@/components/*": ["./components/*"],
+      "@/screens/*": ["./screens/*"],
+      "@/hooks/*": ["./hooks/*"],
+      "@/stores": ["./stores/index.ts"],
+      "@/stores/*": ["./stores/*"],
+      "@/services/*": ["./services/*"],
+      "@/utils/*": ["./utils/*"],
+      "@/constants/*": ["./constants/*"],
+      "@/types/*": ["./types/*"],
+      "@/providers/*": ["./providers/*"],
+      "@/assets/*": ["./assets/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],

@@ -10,7 +10,7 @@ import {
   Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useAnalysisStore } from '@/src/stores/analysisStore';
+import { useAnalysisStore } from '@/stores';
 
 /**
  * Analysis Tab Screen

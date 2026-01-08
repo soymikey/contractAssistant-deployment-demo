@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter, Href } from 'expo-router';
-import { useAuthStore } from '../../src/stores';
+import { useAuthStore } from '@/stores';
 
 /**
  * Profile Tab Screen

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { UIStore, ToastType, Toast } from '../types/store';
+import type { UIStore, ToastType, Toast } from '@/types/store';
 
 let toastIdCounter = 0;
 

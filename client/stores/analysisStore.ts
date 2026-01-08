@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { aiService, AnalysisResult } from '../services/aiService';
+import { aiService, type AnalysisResult } from '@/services';
 
 interface AnalysisStore {
   // State

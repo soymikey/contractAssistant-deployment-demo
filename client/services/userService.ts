@@ -1,5 +1,5 @@
-import { apiClient, handleApiError, ApiResponse } from './api';
-import type { User } from '../types/store';
+import { apiClient, handleApiError, type ApiResponse } from './api';
+import type { User } from '@/types/store';
 
 /**
  * User API Request/Response Types

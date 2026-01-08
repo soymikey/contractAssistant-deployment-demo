@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_CONFIG } from '../constants/config';
+import { API_CONFIG } from '@/constants/config';
 
 // Type definitions matching server-side interfaces
 export interface RiskItem {
