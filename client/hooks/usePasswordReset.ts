@@ -1,48 +1,42 @@
-import { useCallback } from 'react';
-import { useAuthStore } from '../stores';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useCallback } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { authService } from '../services';
 
 /**
- * useRegister Hook
- * Handles user registration with email validation and error handling
- * Uses React Query for mutation management and Zustand for auth state
+ * usePasswordReset Hook
+ * Handles password reset functionality including forgot password and reset password flows
+ * Uses React Query for mutation management with internal state for multi-step flow
  */
-export function useRegister() {
-  const queryClient = useQueryClient();
-  const isLoading = useAuthStore((state) => state.isLoading);
-  const error = useAuthStore((state) => state.error);
-  const register = useAuthStore((state) => state.register);
-  const setError = useAuthStore((state) => state.setError);
+export function usePasswordReset() {
+  // Internal state for multi-step flow
+  const [step, setStep] = useState<'forgot' | 'reset'>('forgot');
+  const [email, setEmail] = useState<string>('');
 
-  // Use React Query for register mutation
-  const mutation = useMutation({
-    mutationFn: async ({
-      email,
-      password,
-      name,
-    }: {
-      email: string;
-      password: string;
-      name?: string;
-    }) => {
-      await register(email, password, name);
+  // Forgot password mutation - sends reset email
+  const forgotPasswordMutation = useMutation({
+    mutationFn: async (emailInput: string) => {
+      await authService.forgotPassword(emailInput);
+      return emailInput;
     },
-    onSuccess: async () => {
-      // Invalidate and refetch user-related queries
-      await queryClient.invalidateQueries({ queryKey: ['user', 'profile'] });
+    onSuccess: (emailInput: string) => {
+      setEmail(emailInput);
+      setStep('reset');
     },
-    onError: (error: Error) => {
-      const errorMessage = error.message || 'Registration failed';
-      setError(errorMessage);
+  });
+
+  // Reset password mutation - sets new password with token
+  const resetPasswordMutation = useMutation({
+    mutationFn: async ({ token, password }: { token: string; password: string }) => {
+      await authService.resetPassword(token, password);
     },
   });
 
   /**
    * Validate email format
    */
-  const validateEmail = useCallback((email: string): boolean => {
+  const validateEmail = useCallback((emailInput: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+    return emailRegex.test(emailInput);
   }, []);
 
   /**
@@ -65,62 +59,76 @@ export function useRegister() {
   }, []);
 
   /**
-   * Perform registration
+   * Request password reset email
    */
-  const handleRegister = useCallback(
-    async (email: string, password: string, confirmPassword: string, name?: string) => {
+  const forgotPassword = useCallback(
+    async (emailInput: string) => {
+      // Validate email
+      if (!validateEmail(emailInput)) {
+        return { success: false, error: 'Invalid email format' };
+      }
+
       try {
-        setError(null);
-
-        // Validate email
-        if (!validateEmail(email)) {
-          const errorMsg = 'Invalid email format';
-          setError(errorMsg);
-          return { success: false, error: errorMsg };
-        }
-
-        // Validate password strength
-        const passwordValidation = validatePassword(password);
-        if (!passwordValidation.valid) {
-          const errorMsg = passwordValidation.message || 'Password does not meet requirements';
-          setError(errorMsg);
-          return { success: false, error: errorMsg };
-        }
-
-        // Validate password confirmation
-        if (password !== confirmPassword) {
-          const errorMsg = 'Passwords do not match';
-          setError(errorMsg);
-          return { success: false, error: errorMsg };
-        }
-
-        // Perform registration
-        await mutation.mutateAsync({ email, password, name });
+        await forgotPasswordMutation.mutateAsync(emailInput);
         return { success: true };
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Registration failed';
-        setError(errorMessage);
+        const errorMessage = err instanceof Error ? err.message : 'Failed to send reset email';
         return { success: false, error: errorMessage };
       }
     },
-    [mutation, setError, validateEmail, validatePassword]
+    [forgotPasswordMutation, validateEmail]
   );
 
   /**
-   * Clear error message
+   * Reset password with token
    */
-  const clearError = useCallback(() => {
-    setError(null);
-  }, [setError]);
+  const resetPassword = useCallback(
+    async (token: string, password: string, confirmPassword: string) => {
+      // Validate password strength
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.valid) {
+        return { success: false, error: passwordValidation.message || 'Password does not meet requirements' };
+      }
+
+      // Validate password confirmation
+      if (password !== confirmPassword) {
+        return { success: false, error: 'Passwords do not match' };
+      }
+
+      try {
+        await resetPasswordMutation.mutateAsync({ token, password });
+        return { success: true };
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Failed to reset password';
+        return { success: false, error: errorMessage };
+      }
+    },
+    [resetPasswordMutation, validatePassword]
+  );
+
+  /**
+   * Reset the flow back to forgot password step
+   */
+  const resetFlow = useCallback(() => {
+    setStep('forgot');
+    setEmail('');
+    forgotPasswordMutation.reset();
+    resetPasswordMutation.reset();
+  }, [forgotPasswordMutation, resetPasswordMutation]);
 
   return {
     // State
-    isLoading: isLoading || mutation.isPending,
-    error: error || mutation.error?.message || null,
+    step,
+    email,
+    isLoadingForgot: forgotPasswordMutation.isPending,
+    isLoadingReset: resetPasswordMutation.isPending,
+    errorForgot: forgotPasswordMutation.error?.message || null,
+    errorReset: resetPasswordMutation.error?.message || null,
 
     // Actions
-    register: handleRegister,
-    clearError,
+    forgotPassword,
+    resetPassword,
+    resetFlow,
     validateEmail,
     validatePassword,
   };

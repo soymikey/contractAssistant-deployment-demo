@@ -26,9 +26,9 @@ export class AiAnalysisService {
     }
 
     this.genAI = new GoogleGenerativeAI(apiKey);
-    // Use gemini-1.5-flash for better multimodal support
+
     this.model = this.genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-3-flash-preview',
     });
     this.logger.log('Google Gemini AI initialized successfully');
   }
@@ -47,6 +47,7 @@ export class AiAnalysisService {
 
       // Call Gemini with multimodal content
       const result = await this.callGeminiMultimodal([imageData]);
+      console.log('result: ', result);
 
       this.logger.log('Contract analysis completed successfully');
       return result;

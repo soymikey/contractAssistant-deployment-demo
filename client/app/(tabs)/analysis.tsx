@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,16 +11,70 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAnalysisStore } from '@/stores';
+import type { RiskItem, KeyTerm } from '@/services';
 
 /**
  * Analysis Tab Screen
- * Displays contract analysis loading state and results
+ * Displays contract analysis loading state, progress, and results
+ * Supports both direct image analysis and queue-based contract analysis
  */
 export default function AnalysisScreen() {
-  const { currentImage, analysisResult, isLoading, error, clearAnalysis } = useAnalysisStore();
+  const {
+    currentImage,
+    analysisResult,
+    queueResult,
+    analysisStatus,
+    isLoading,
+    isPolling,
+    progress,
+    error,
+    mode,
+    clearAnalysis,
+    stopPolling,
+  } = useAnalysisStore();
+  console.log('error: ', error);
 
-  // Loading state
-  if (isLoading) {
+  // Cleanup polling on unmount
+  useEffect(() => {
+    return () => {
+      stopPolling();
+    };
+  }, [stopPolling]);
+
+  // Helper to get the combined result (either direct or queue-based)
+  const getDisplayResult = () => {
+    if (mode === 'direct' && analysisResult) {
+      return {
+        summary: analysisResult.summary,
+        riskLevel: analysisResult.riskLevel,
+        risks: analysisResult.risks,
+        keyTerms: analysisResult.keyTerms,
+        recommendations: analysisResult.recommendations,
+        contractInfo: analysisResult.contractInfo,
+        analyzedAt: analysisResult.analyzedAt,
+      };
+    }
+    if (mode === 'queue' && queueResult) {
+      return {
+        summary: queueResult.overviewData.summary,
+        riskLevel: queueResult.overviewData.riskLevel,
+        risks: queueResult.risks,
+        keyTerms: queueResult.overviewData.keyTerms,
+        recommendations: queueResult.suggestionsData.recommendations,
+        contractInfo: queueResult.overviewData.contractInfo,
+        analyzedAt: queueResult.overviewData.analyzedAt,
+      };
+    }
+    return null;
+  };
+
+  const displayResult = getDisplayResult();
+
+  // Loading state with progress
+  if (isLoading || isPolling) {
+    const statusText =
+      analysisStatus?.status === 'processing' ? 'Processing Contract...' : 'Analyzing Contract...';
+
     return (
       <View style={styles.container}>
         <View style={styles.loadingContainer}>
@@ -30,8 +84,21 @@ export default function AnalysisScreen() {
             </View>
           )}
           <ActivityIndicator size="large" color="#667eea" style={styles.loader} />
-          <Text style={styles.loadingText}>Analyzing Contract...</Text>
+          <Text style={styles.loadingText}>{statusText}</Text>
           <Text style={styles.loadingSubtext}>AI is analyzing contract content</Text>
+
+          {/* Progress bar for queue-based analysis */}
+          {mode === 'queue' && (
+            <View style={styles.progressContainer}>
+              <View style={styles.progressBar}>
+                <View style={[styles.progressFill, { width: `${progress}%` }]} />
+              </View>
+              <Text style={styles.progressText}>{progress}%</Text>
+            </View>
+          )}
+
+          {/* Status info for queue-based analysis */}
+          {analysisStatus && <Text style={styles.statusText}>Status: {analysisStatus.status}</Text>}
         </View>
       </View>
     );
@@ -54,7 +121,7 @@ export default function AnalysisScreen() {
   }
 
   // Results state
-  if (analysisResult) {
+  if (displayResult) {
     const getRiskLevelColor = (level: string) => {
       switch (level) {
         case 'high':
@@ -104,12 +171,52 @@ export default function AnalysisScreen() {
             </View>
           )}
 
+          {/* Contract Info (if available) */}
+          {displayResult.contractInfo && (
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>📄 Contract Information</Text>
+              {displayResult.contractInfo.type && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>Type:</Text>
+                  <Text style={styles.infoValue}>{displayResult.contractInfo.type}</Text>
+                </View>
+              )}
+              {displayResult.contractInfo.parties &&
+                displayResult.contractInfo.parties.length > 0 && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Parties:</Text>
+                    <Text style={styles.infoValue}>
+                      {displayResult.contractInfo.parties.join(', ')}
+                    </Text>
+                  </View>
+                )}
+              {displayResult.contractInfo.effectiveDate && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>Effective Date:</Text>
+                  <Text style={styles.infoValue}>{displayResult.contractInfo.effectiveDate}</Text>
+                </View>
+              )}
+              {displayResult.contractInfo.expirationDate && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>Expiration Date:</Text>
+                  <Text style={styles.infoValue}>{displayResult.contractInfo.expirationDate}</Text>
+                </View>
+              )}
+              {displayResult.contractInfo.totalValue && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>Total Value:</Text>
+                  <Text style={styles.infoValue}>{displayResult.contractInfo.totalValue}</Text>
+                </View>
+              )}
+            </View>
+          )}
+
           {/* Overall Risk Level */}
           <View style={styles.riskLevelCard}>
             <LinearGradient
               colors={[
-                getRiskLevelColor(analysisResult.riskLevel) + '20',
-                getRiskLevelColor(analysisResult.riskLevel) + '10',
+                getRiskLevelColor(displayResult.riskLevel) + '20',
+                getRiskLevelColor(displayResult.riskLevel) + '10',
               ]}
               style={styles.riskLevelGradient}
             >
@@ -117,11 +224,11 @@ export default function AnalysisScreen() {
               <View
                 style={[
                   styles.riskBadge,
-                  { backgroundColor: getRiskLevelColor(analysisResult.riskLevel) },
+                  { backgroundColor: getRiskLevelColor(displayResult.riskLevel) },
                 ]}
               >
                 <Text style={styles.riskBadgeText}>
-                  {getRiskLevelText(analysisResult.riskLevel)}
+                  {getRiskLevelText(displayResult.riskLevel)}
                 </Text>
               </View>
             </LinearGradient>
@@ -130,17 +237,17 @@ export default function AnalysisScreen() {
           {/* Summary */}
           <View style={styles.card}>
             <Text style={styles.cardTitle}>📋 Summary</Text>
-            <Text style={styles.summaryText}>{analysisResult.summary}</Text>
+            <Text style={styles.summaryText}>{displayResult.summary}</Text>
           </View>
 
           {/* Risk Items */}
-          {analysisResult.risks.length > 0 && (
+          {displayResult.risks.length > 0 && (
             <View style={styles.card}>
               <Text style={styles.cardTitle}>
-                ⚠️ Risk Identification ({analysisResult.risks.length})
+                ⚠️ Risk Identification ({displayResult.risks.length})
               </Text>
-              {analysisResult.risks.map((risk, index) => (
-                <View key={index} style={styles.riskItem}>
+              {displayResult.risks.map((risk: RiskItem, index: number) => (
+                <View key={risk.id || index} style={styles.riskItem}>
                   <View style={styles.riskHeader}>
                     <Text style={styles.riskTitle}>{risk.title}</Text>
                     <View
@@ -153,16 +260,22 @@ export default function AnalysisScreen() {
                     </View>
                   </View>
                   <Text style={styles.riskDescription}>{risk.description}</Text>
+                  {risk.category && (
+                    <Text style={styles.riskCategory}>Category: {risk.category}</Text>
+                  )}
+                  {risk.suggestion && (
+                    <Text style={styles.riskSuggestion}>💡 {risk.suggestion}</Text>
+                  )}
                 </View>
               ))}
             </View>
           )}
 
           {/* Key Terms */}
-          {analysisResult.keyTerms.length > 0 && (
+          {displayResult.keyTerms.length > 0 && (
             <View style={styles.card}>
-              <Text style={styles.cardTitle}>📝 Key Terms ({analysisResult.keyTerms.length})</Text>
-              {analysisResult.keyTerms.map((term, index) => (
+              <Text style={styles.cardTitle}>📝 Key Terms ({displayResult.keyTerms.length})</Text>
+              {displayResult.keyTerms.map((term: KeyTerm, index: number) => (
                 <View key={index} style={styles.termItem}>
                   <View style={styles.termHeader}>
                     <Text style={styles.termTitle}>{term.title}</Text>
@@ -175,10 +288,10 @@ export default function AnalysisScreen() {
           )}
 
           {/* Recommendations */}
-          {analysisResult.recommendations.length > 0 && (
+          {displayResult.recommendations.length > 0 && (
             <View style={styles.card}>
               <Text style={styles.cardTitle}>💡 Recommendations</Text>
-              {analysisResult.recommendations.map((recommendation, index) => (
+              {displayResult.recommendations.map((recommendation: string, index: number) => (
                 <View key={index} style={styles.recommendationItem}>
                   <Text style={styles.recommendationBullet}>•</Text>
                   <Text style={styles.recommendationText}>{recommendation}</Text>
@@ -196,7 +309,7 @@ export default function AnalysisScreen() {
 
           {/* Timestamp */}
           <Text style={styles.timestamp}>
-            Analyzed at: {new Date(analysisResult.analyzedAt).toLocaleString('en-US')}
+            Analyzed at: {new Date(displayResult.analyzedAt).toLocaleString('en-US')}
           </Text>
         </View>
       </ScrollView>
@@ -266,6 +379,37 @@ const styles = StyleSheet.create({
   loadingSubtext: {
     fontSize: 14,
     color: '#666',
+    marginBottom: 16,
+  },
+  // Progress styles
+  progressContainer: {
+    width: '80%',
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  progressBar: {
+    width: '100%',
+    height: 8,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#667eea',
+    borderRadius: 4,
+  },
+  progressText: {
+    marginTop: 8,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#667eea',
+  },
+  statusText: {
+    marginTop: 12,
+    fontSize: 12,
+    color: '#999',
+    textTransform: 'capitalize',
   },
   // Error styles
   errorContainer: {
@@ -360,6 +504,22 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 12,
   },
+  // Contract info styles
+  infoRow: {
+    flexDirection: 'row',
+    marginBottom: 8,
+  },
+  infoLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#666',
+    width: 100,
+  },
+  infoValue: {
+    fontSize: 13,
+    color: '#333',
+    flex: 1,
+  },
   summaryText: {
     fontSize: 14,
     color: '#666',
@@ -397,6 +557,17 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#666',
     lineHeight: 18,
+  },
+  riskCategory: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 4,
+  },
+  riskSuggestion: {
+    fontSize: 12,
+    color: '#667eea',
+    marginTop: 6,
+    fontStyle: 'italic',
   },
   termItem: {
     marginBottom: 12,

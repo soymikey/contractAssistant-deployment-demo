@@ -17,7 +17,7 @@ import { useAnalysisStore } from '@/stores';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { analyzeImage } = useAnalysisStore();
+  const { analyzeImage, clearAnalysis } = useAnalysisStore();
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -43,6 +43,10 @@ export default function HomeScreen() {
     },
   ];
 
+  /**
+   * Handle taking a photo with the camera for direct analysis
+   * Uses the legacy direct analysis endpoint for quick image analysis
+   */
   const handleTakePhoto = async () => {
     try {
       // Check camera permission
@@ -66,7 +70,7 @@ export default function HomeScreen() {
       const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ['images'],
         allowsEditing: true,
-        quality: 1, // Reduce quality to 50% for smaller file size
+        quality: 1,
         base64: false,
       });
 
@@ -74,16 +78,19 @@ export default function HomeScreen() {
         const imageUri = result.assets[0].uri;
         setIsLoading(true);
 
-        // Navigate to analysis page
+        // Clear previous analysis state
+        clearAnalysis();
+
+        // Navigate to analysis page first for immediate feedback
         router.push('/analysis');
 
-        // Use original image without compression for best AI accuracy
-        // To enable compression, uncomment the line below:
-        // const compressedUri = await compressImage(imageUri, 1536, 0.8);
-        // await analyzeImage(compressedUri);
-
-        // Start analysis with original image
-        await analyzeImage(imageUri);
+        // Start direct image analysis (legacy endpoint for quick analysis)
+        // This sends the image directly to AI without queue
+        try {
+          await analyzeImage(imageUri);
+        } catch {
+          // Error is handled in the store and shown on analysis page
+        }
         setIsLoading(false);
       }
     } catch (error) {
@@ -92,6 +99,10 @@ export default function HomeScreen() {
     }
   };
 
+  /**
+   * Handle choosing an image from the gallery for direct analysis
+   * Uses the legacy direct analysis endpoint for quick image analysis
+   */
   const handleChooseFile = async () => {
     try {
       // Request media library permission
@@ -105,7 +116,7 @@ export default function HomeScreen() {
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images'],
         allowsEditing: true,
-        quality: 0.5, // Reduce quality to 50% for smaller file size
+        quality: 0.8,
         base64: false,
       });
 
@@ -113,16 +124,18 @@ export default function HomeScreen() {
         const imageUri = result.assets[0].uri;
         setIsLoading(true);
 
-        // Navigate to analysis page
+        // Clear previous analysis state
+        clearAnalysis();
+
+        // Navigate to analysis page first for immediate feedback
         router.push('/analysis');
 
-        // Use original image without compression for best AI accuracy
-        // To enable compression, uncomment the line below:
-        // const compressedUri = await compressImage(imageUri, 1536, 0.8);
-        // await analyzeImage(compressedUri);
-
-        // Start analysis with original image
-        await analyzeImage(imageUri);
+        // Start direct image analysis (legacy endpoint for quick analysis)
+        try {
+          await analyzeImage(imageUri);
+        } catch {
+          // Error is handled in the store and shown on analysis page
+        }
         setIsLoading(false);
       }
     } catch (error) {

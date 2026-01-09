@@ -43,9 +43,20 @@ export type {
   RiskDetailResponse,
 } from './analysisService';
 
-// AI Service (legacy)
+// AI Service
 export { aiService } from './aiService';
-export type { RiskItem, KeyTerm, AnalysisResult, AnalysisResponse } from './aiService';
+export type {
+  RiskItem,
+  KeyTerm,
+  ContractInfo,
+  AnalysisResult,
+  SubmitAnalysisResponse,
+  AnalysisStatus,
+  OverviewData,
+  SuggestionsData,
+  AnalysisResultDto,
+  AnalysisHistoryItem,
+} from './aiService';
 
 // User Service
 export { userService } from './userService';

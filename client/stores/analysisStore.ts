@@ -1,49 +1,110 @@
 import { create } from 'zustand';
-import { aiService, type AnalysisResult } from '@/services';
+import {
+  aiService,
+  type AnalysisResult,
+  type AnalysisResultDto,
+  type AnalysisStatus,
+  type SubmitAnalysisResponse,
+} from '@/services';
+import { ANALYSIS_CONFIG } from '@/constants/config';
+
+type AnalysisMode = 'direct' | 'queue';
 
 interface AnalysisStore {
   // State
   currentImage: string | null;
+  contractId: string | null;
+  analysisLogId: string | null;
   analysisResult: AnalysisResult | null;
+  queueResult: AnalysisResultDto | null;
+  analysisStatus: AnalysisStatus | null;
   isLoading: boolean;
+  isPolling: boolean;
+  progress: number;
   error: string | null;
+  mode: AnalysisMode;
 
   // Actions
   setImage: (uri: string) => void;
+  setContractId: (id: string) => void;
+
+  // Direct analysis (legacy - for quick image analysis)
   analyzeImage: (uri: string) => Promise<void>;
+
+  // Queue-based analysis (new - for uploaded contracts)
+  submitAnalysis: (contractId: string) => Promise<SubmitAnalysisResponse>;
+  pollAnalysisStatus: (analysisLogId: string) => Promise<void>;
+  stopPolling: () => void;
+  fetchAnalysisResult: (contractId: string) => Promise<void>;
+
+  // Common actions
   clearAnalysis: () => void;
   clearError: () => void;
 }
 
-export const useAnalysisStore = create<AnalysisStore>((set) => ({
+let pollingTimer: ReturnType<typeof setInterval> | null = null;
+
+export const useAnalysisStore = create<AnalysisStore>((set, get) => ({
   // Initial state
   currentImage: null,
+  contractId: null,
+  analysisLogId: null,
   analysisResult: null,
+  queueResult: null,
+  analysisStatus: null,
   isLoading: false,
+  isPolling: false,
+  progress: 0,
   error: null,
+  mode: 'direct',
 
   // Set current image
   setImage: (uri: string) => {
     set({ currentImage: uri, error: null });
   },
 
-  // Analyze image using AI service
+  // Set contract ID
+  setContractId: (id: string) => {
+    set({ contractId: id, error: null });
+  },
+
+  // Direct image analysis (legacy endpoint)
   analyzeImage: async (uri: string) => {
     set({
       currentImage: uri,
       isLoading: true,
       error: null,
       analysisResult: null,
+      queueResult: null,
+      progress: 0,
+      mode: 'direct',
     });
 
     try {
       const result = await aiService.analyzeImage(uri);
+      
+      // Validate result structure
+      if (!result || typeof result !== 'object') {
+        throw new Error('Invalid analysis result received');
+      }
+      
       set({
         analysisResult: result,
         isLoading: false,
+        progress: 100,
       });
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : '分析失败，请重试';
+      console.error('analyzeImage store error:', error);
+      
+      let errorMessage: string;
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      } else {
+        errorMessage = 'Analysis failed, please retry';
+      }
+      
       set({
         error: errorMessage,
         isLoading: false,
@@ -52,13 +113,133 @@ export const useAnalysisStore = create<AnalysisStore>((set) => ({
     }
   },
 
+  // Submit contract for queue-based analysis
+  submitAnalysis: async (contractId: string) => {
+    set({
+      contractId,
+      isLoading: true,
+      error: null,
+      analysisResult: null,
+      queueResult: null,
+      analysisStatus: null,
+      progress: 0,
+      mode: 'queue',
+    });
+
+    try {
+      const response = await aiService.submitAnalysis(contractId);
+      set({
+        analysisLogId: response.analysisLogId,
+        analysisStatus: {
+          id: response.analysisLogId,
+          contractId,
+          status: 'pending',
+          progress: 0,
+          startedAt: new Date().toISOString(),
+        },
+      });
+      return response;
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Submit analysis failed';
+      set({
+        error: errorMessage,
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
+  // Poll for analysis status
+  pollAnalysisStatus: async (analysisLogId: string) => {
+    const { stopPolling, fetchAnalysisResult } = get();
+
+    // Clear any existing polling
+    stopPolling();
+
+    set({ isPolling: true, analysisLogId });
+
+    const poll = async () => {
+      try {
+        const status = await aiService.getAnalysisStatus(analysisLogId);
+        set({
+          analysisStatus: status,
+          progress: status.progress,
+        });
+
+        if (status.status === 'completed') {
+          stopPolling();
+          set({ isLoading: false, isPolling: false });
+          // Fetch the full result
+          if (status.contractId) {
+            await fetchAnalysisResult(status.contractId);
+          }
+        } else if (status.status === 'failed') {
+          stopPolling();
+          set({
+            isLoading: false,
+            isPolling: false,
+            error: status.error || 'Analysis failed',
+          });
+        }
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to get status';
+        set({
+          error: errorMessage,
+          isLoading: false,
+          isPolling: false,
+        });
+        stopPolling();
+      }
+    };
+
+    // Initial poll
+    await poll();
+
+    // Continue polling if still in progress
+    const currentStatus = get().analysisStatus;
+    if (currentStatus?.status === 'pending' || currentStatus?.status === 'processing') {
+      pollingTimer = setInterval(poll, ANALYSIS_CONFIG.pollingInterval);
+    }
+  },
+
+  // Stop polling
+  stopPolling: () => {
+    if (pollingTimer) {
+      clearInterval(pollingTimer);
+      pollingTimer = null;
+    }
+    set({ isPolling: false });
+  },
+
+  // Fetch analysis result
+  fetchAnalysisResult: async (contractId: string) => {
+    try {
+      const result = await aiService.getAnalysisResult(contractId);
+      if (result) {
+        set({ queueResult: result });
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to get result';
+      set({ error: errorMessage });
+    }
+  },
+
   // Clear analysis data
   clearAnalysis: () => {
+    const { stopPolling } = get();
+    stopPolling();
     set({
       currentImage: null,
+      contractId: null,
+      analysisLogId: null,
       analysisResult: null,
+      queueResult: null,
+      analysisStatus: null,
       isLoading: false,
+      isPolling: false,
+      progress: 0,
       error: null,
+      mode: 'direct',
     });
   },
 
