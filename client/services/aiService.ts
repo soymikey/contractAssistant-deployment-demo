@@ -168,12 +168,9 @@ class AiService {
    */
   async getAnalysisStatus(analysisLogId: string): Promise<AnalysisStatus> {
     try {
-      const response = await axios.get(
-        `${this.baseURL}/analyses/status/${analysisLogId}`,
-        {
-          timeout: API_CONFIG.timeout,
-        }
-      );
+      const response = await axios.get(`${this.baseURL}/analyses/status/${analysisLogId}`, {
+        timeout: API_CONFIG.timeout,
+      });
 
       return this.unwrapResponse<AnalysisStatus>(response.data);
     } catch (error) {
@@ -192,12 +189,9 @@ class AiService {
    */
   async getAnalysisResult(contractId: string): Promise<AnalysisResultDto | null> {
     try {
-      const response = await axios.get(
-        `${this.baseURL}/analyses/contract/${contractId}`,
-        {
-          timeout: API_CONFIG.timeout,
-        }
-      );
+      const response = await axios.get(`${this.baseURL}/analyses/contract/${contractId}`, {
+        timeout: API_CONFIG.timeout,
+      });
 
       return this.unwrapResponse<AnalysisResultDto>(response.data);
     } catch (error) {
@@ -219,12 +213,9 @@ class AiService {
    */
   async getRisks(contractId: string): Promise<RiskItem[]> {
     try {
-      const response = await axios.get(
-        `${this.baseURL}/analyses/contract/${contractId}/risks`,
-        {
-          timeout: API_CONFIG.timeout,
-        }
-      );
+      const response = await axios.get(`${this.baseURL}/analyses/contract/${contractId}/risks`, {
+        timeout: API_CONFIG.timeout,
+      });
 
       return this.unwrapResponse<RiskItem[]>(response.data);
     } catch (error) {
@@ -243,12 +234,9 @@ class AiService {
    */
   async getAnalysisHistory(contractId: string): Promise<AnalysisHistoryItem[]> {
     try {
-      const response = await axios.get(
-        `${this.baseURL}/analyses/contract/${contractId}/history`,
-        {
-          timeout: API_CONFIG.timeout,
-        }
-      );
+      const response = await axios.get(`${this.baseURL}/analyses/contract/${contractId}/history`, {
+        timeout: API_CONFIG.timeout,
+      });
 
       return this.unwrapResponse<AnalysisHistoryItem[]>(response.data);
     } catch (error) {
@@ -288,11 +276,6 @@ class AiService {
         }
       );
 
-      console.info(
-        'Response received:',
-        JSON.stringify(response.data, null, 2).slice(0, 500)
-      );
-
       return this.unwrapResponse<AnalysisResult>(response.data);
     } catch (error) {
       console.error('analyzeImage error:', error);
@@ -300,8 +283,7 @@ class AiService {
       if (axios.isAxiosError(error)) {
         // Network or HTTP error
         const serverMessage = error.response?.data?.message;
-        const errorMessage =
-          typeof serverMessage === 'string' ? serverMessage : error.message;
+        const errorMessage = typeof serverMessage === 'string' ? serverMessage : error.message;
         throw new Error(`Analysis failed: ${errorMessage}`);
       }
 

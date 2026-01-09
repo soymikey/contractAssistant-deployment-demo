@@ -32,7 +32,6 @@ export default function AnalysisScreen() {
     clearAnalysis,
     stopPolling,
   } = useAnalysisStore();
-  console.log('error: ', error);
 
   // Cleanup polling on unmount
   useEffect(() => {
