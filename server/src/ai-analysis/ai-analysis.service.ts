@@ -47,7 +47,6 @@ export class AiAnalysisService {
 
       // Call Gemini with multimodal content
       const result = await this.callGeminiMultimodal([imageData]);
-      console.log('result: ', result);
 
       this.logger.log('Contract analysis completed successfully');
       return result;
