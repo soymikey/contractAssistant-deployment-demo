@@ -12,6 +12,8 @@ import {
 import { Link, useRouter, Href } from 'expo-router';
 import { useLogin } from '@/hooks';
 import { showErrorToast, showSuccessToast } from '@/stores';
+import GoogleSignInButton from '@/components/social-auth-buttons/google/google-sign-in-button';
+import ExpoAppleSignInButton from '@/components/social-auth-buttons/apple/expo-apple-sign-in-button';
 
 /**
  * Login Screen
@@ -106,6 +108,10 @@ export default function LoginScreen() {
           >
             <Text style={styles.loginButtonText}>{isLoading ? 'Signing in...' : 'Sign In'}</Text>
           </TouchableOpacity>
+          <View>
+            {Platform.OS !== 'ios' && <ExpoAppleSignInButton />}
+            <GoogleSignInButton />
+          </View>
 
           <View style={styles.signupContainer}>
             <Text style={styles.signupText}>Don&apos;t have an account? </Text>
