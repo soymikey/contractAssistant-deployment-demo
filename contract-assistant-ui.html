@@ -164,7 +164,6 @@
         font-size: 24px;
       }
 
-
       /* Toaster / Notification */
       .toast-container {
         position: absolute;
@@ -244,23 +243,23 @@
 
       /* Variants */
       .toast-success {
-        border-left-color: #34A853;
+        border-left-color: #34a853;
       }
       .toast-success .toast-icon {
         background: #e6f4ea;
-        color: #34A853;
+        color: #34a853;
       }
 
       .toast-error {
-        border-left-color: #EA4335;
+        border-left-color: #ea4335;
       }
       .toast-error .toast-icon {
         background: #fce8e6;
-        color: #EA4335;
+        color: #ea4335;
       }
 
       .toast-warning {
-        border-left-color: #FBBC05;
+        border-left-color: #fbbc05;
       }
       .toast-warning .toast-icon {
         background: #fef7e0;
@@ -303,13 +302,23 @@
       }
 
       @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
       }
 
       @keyframes scaleIn {
-        from { transform: scale(0.9); opacity: 0; }
-        to { transform: scale(1); opacity: 1; }
+        from {
+          transform: scale(0.9);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
       }
 
       .alert-icon {
@@ -317,7 +326,7 @@
         height: 48px;
         border-radius: 50%;
         background: #ffebee;
-        color: #EA4335;
+        color: #ea4335;
         font-size: 24px;
         display: flex;
         align-items: center;
@@ -372,7 +381,7 @@
       }
 
       .alert-btn-danger {
-        background: #EA4335;
+        background: #ea4335;
         color: white;
       }
       .alert-btn-danger:hover {
@@ -1041,20 +1050,21 @@
                 <button class="icon-btn">⚙️</button>
               </div>
               <div class="screen-content">
-                <div class="upload-area">
-                  <div class="upload-icon">📄</div>
-                  <div class="upload-text">Tap to Upload or Take Photo</div>
-                  <div class="upload-subtext">
-                    Supports contract photos, PDF, Word files
-                  </div>
+                <div class="action-buttons">
+                  <button
+                    class="btn btn-primary"
+                    style="flex: 1 0 100%; margin-bottom: 10px"
+                  >
+                    <span>📷</span> Take Photo
+                  </button>
                 </div>
 
                 <div class="action-buttons">
-                  <button class="btn btn-primary">
-                    <span>📷</span> Take Photo
+                  <button class="btn btn-secondary">
+                    <span>🖼️</span> Choose Photo
                   </button>
                   <button class="btn btn-secondary">
-                    <span>📁</span> Choose File
+                    <span>📁</span> Choose Document
                   </button>
                 </div>
 
@@ -1593,7 +1603,9 @@
                   <div class="toast-icon">ℹ️</div>
                   <div class="toast-content">
                     <div class="toast-title">New Feature</div>
-                    <div class="toast-message">Try our new batch upload mode</div>
+                    <div class="toast-message">
+                      Try our new batch upload mode
+                    </div>
                   </div>
                   <div class="toast-close">×</div>
                 </div>
@@ -1678,17 +1690,19 @@
                 <h2>Contract Details</h2>
                 <button class="icon-btn">⋯</button>
               </div>
-              
+
               <!-- Background Content (Blurred/Dimmed Concept) -->
               <div class="screen-content">
                 <div class="result-card">
-                   <div class="detail-section">
-                    <div class="detail-section-title">Employment_Contract.pdf</div>
+                  <div class="detail-section">
+                    <div class="detail-section-title">
+                      Employment_Contract.pdf
+                    </div>
                     <div class="detail-item">
                       <span class="detail-label">Size</span>
                       <span class="detail-value">2.4 MB</span>
                     </div>
-                   </div>
+                  </div>
                 </div>
               </div>
 
@@ -1698,7 +1712,8 @@
                   <div class="alert-icon">🗑️</div>
                   <div class="alert-title">Delete Contract?</div>
                   <div class="alert-message">
-                    Are you sure you want to delete "Employment_Contract.pdf"? This action cannot be undone.
+                    Are you sure you want to delete "Employment_Contract.pdf"?
+                    This action cannot be undone.
                   </div>
                   <div class="alert-actions">
                     <button class="alert-btn alert-btn-cancel">Cancel</button>
@@ -2055,13 +2070,7 @@
               >
                 Alert Title
               </div>
-              <div
-                style="
-                  font-size: 12px;
-                  color: #666;
-                  margin-bottom: 12px;
-                "
-              >
+              <div style="font-size: 12px; color: #666; margin-bottom: 12px">
                 Description text here...
               </div>
               <div style="display: flex; gap: 8px">

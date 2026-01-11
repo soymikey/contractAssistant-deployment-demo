@@ -11,11 +11,11 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useCamera, useUpload, useContractHistory } from '@/hooks';
-import { UploadArea, ContractList } from '@/components';
+import { ContractList } from '@/components';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { takePhoto, pickImage } = useCamera();
+  const { takePhoto, pickImage, pickDocument } = useCamera();
   const { handleImageAnalysis, isUploading } = useUpload();
   const { contracts, isLoading, refreshHistory, deleteHistoryItem } = useContractHistory();
 
@@ -32,9 +32,9 @@ export default function HomeScreen() {
   }, [takePhoto, handleImageAnalysis, router]);
 
   /**
-   * Handle choosing a file and starting analysis
+   * Handle choosing a photo from gallery and starting analysis
    */
-  const onChooseFile = useCallback(async () => {
+  const onChoosePhoto = useCallback(async () => {
     const uri = await pickImage();
     if (uri) {
       // Navigate to analysis page first for immediate feedback
@@ -42,6 +42,18 @@ export default function HomeScreen() {
       await handleImageAnalysis(uri);
     }
   }, [pickImage, handleImageAnalysis, router]);
+
+  /**
+   * Handle choosing a document (PDF, Word, or image) and starting analysis
+   */
+  const onChooseDocument = useCallback(async () => {
+    const uri = await pickDocument();
+    if (uri) {
+      // Navigate to analysis page first for immediate feedback
+      router.push('/analysis');
+      await handleImageAnalysis(uri);
+    }
+  }, [pickDocument, handleImageAnalysis, router]);
 
   /**
    * Navigate to contract details
@@ -59,11 +71,8 @@ export default function HomeScreen() {
       contentContainerStyle={styles.contentContainer}
       refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refreshHistory} />}
     >
-      {/* Upload Area */}
-      <UploadArea onPress={onTakePhoto} isUploading={isUploading} />
-
-      {/* Action Buttons */}
-      <View style={styles.actionButtons}>
+      {/* Primary Action Button */}
+      <View style={styles.primaryButtonContainer}>
         <TouchableOpacity
           style={styles.btnPrimary}
           activeOpacity={0.8}
@@ -82,15 +91,28 @@ export default function HomeScreen() {
             </Text>
           </LinearGradient>
         </TouchableOpacity>
+      </View>
+
+      {/* Secondary Action Buttons */}
+      <View style={styles.actionButtons}>
+        <TouchableOpacity
+          style={styles.btnSecondary}
+          activeOpacity={0.8}
+          onPress={onChoosePhoto}
+          disabled={isUploading}
+        >
+          <Text style={styles.btnIcon}>🖼️</Text>
+          <Text style={styles.btnTextSecondary}>Choose Photo</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.btnSecondary}
           activeOpacity={0.8}
-          onPress={onChooseFile}
+          onPress={onChooseDocument}
           disabled={isUploading}
         >
           <Text style={styles.btnIcon}>📁</Text>
-          <Text style={styles.btnTextSecondary}>Choose File</Text>
+          <Text style={styles.btnTextSecondary}>Choose Document</Text>
         </TouchableOpacity>
       </View>
 
@@ -115,6 +137,9 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 20,
+  },
+  primaryButtonContainer: {
+    marginBottom: 10,
   },
   actionButtons: {
     flexDirection: 'row',

@@ -1,10 +1,11 @@
 import { useCallback } from 'react';
 import { Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import * as DocumentPicker from 'expo-document-picker';
 import { useCameraPermissions } from 'expo-camera';
 
 /**
- * Hook for handling camera and gallery interactions
+ * Hook for handling camera, gallery, and document picker interactions
  */
 export const useCamera = () => {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
@@ -73,9 +74,36 @@ export const useCamera = () => {
     return null;
   }, [checkGalleryPermission]);
 
+  /**
+   * Pick a document (PDF, Word, or image) from the file system
+   */
+  const pickDocument = useCallback(async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: [
+          'image/*', // All image types
+          'application/pdf', // PDF files
+          'application/msword', // Word .doc files
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // Word .docx files
+        ],
+        copyToCacheDirectory: true,
+        multiple: false,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        return result.assets[0].uri;
+      }
+    } catch (error) {
+      console.error('pickDocument error:', error);
+      Alert.alert('Error', 'Failed to select document');
+    }
+    return null;
+  }, []);
+
   return {
     takePhoto,
     pickImage,
+    pickDocument,
     cameraPermission,
     requestCameraPermission,
   };
