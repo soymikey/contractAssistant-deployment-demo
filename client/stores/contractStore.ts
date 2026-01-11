@@ -179,14 +179,16 @@ export const useContractStore = create<ContractStore>((set, get) => ({
   },
 
   deleteContract: async (id: string) => {
+    set({ isLoading: true, error: null });
     try {
-      // TODO: Replace with actual API call
-      // await contractService.deleteContract(id);
+      const { contractService } = await import('@/services/contractService');
+      await contractService.deleteContract(id);
 
       set((state) => ({
         contracts: state.contracts.filter((c) => c.id !== id),
         favorites: state.favorites.filter((fid) => fid !== id),
         currentContract: state.currentContract?.id === id ? null : state.currentContract,
+        isLoading: false,
       }));
 
       // Update favorites in AsyncStorage
@@ -194,7 +196,7 @@ export const useContractStore = create<ContractStore>((set, get) => ({
       await AsyncStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(favorites));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to delete contract';
-      set({ error: errorMessage });
+      set({ isLoading: false, error: errorMessage });
       throw error;
     }
   },

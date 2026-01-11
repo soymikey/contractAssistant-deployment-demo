@@ -164,6 +164,117 @@
         font-size: 24px;
       }
 
+
+      /* Toaster / Notification */
+      .toast-container {
+        position: absolute;
+        top: 60px;
+        left: 20px;
+        right: 20px;
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        pointer-events: none;
+      }
+
+      .toast {
+        background: white;
+        border-radius: 12px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        animation: toastSlideIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        pointer-events: auto;
+        border-left: 4px solid #ddd;
+        overflow: hidden;
+      }
+
+      @keyframes toastSlideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px) scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      .toast-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        flex-shrink: 0;
+      }
+
+      .toast-content {
+        flex: 1;
+      }
+
+      .toast-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 2px;
+      }
+
+      .toast-message {
+        font-size: 11px;
+        color: #666;
+        line-height: 1.4;
+      }
+
+      .toast-close {
+        color: #999;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 4px;
+      }
+
+      .toast-close:hover {
+        color: #666;
+      }
+
+      /* Variants */
+      .toast-success {
+        border-left-color: #34A853;
+      }
+      .toast-success .toast-icon {
+        background: #e6f4ea;
+        color: #34A853;
+      }
+
+      .toast-error {
+        border-left-color: #EA4335;
+      }
+      .toast-error .toast-icon {
+        background: #fce8e6;
+        color: #EA4335;
+      }
+
+      .toast-warning {
+        border-left-color: #FBBC05;
+      }
+      .toast-warning .toast-icon {
+        background: #fef7e0;
+        color: #f9ab00;
+      }
+
+      .toast-info {
+        border-left-color: #667eea;
+      }
+      .toast-info .toast-icon {
+        background: #eff2fc;
+        color: #667eea;
+      }
+
       /* Home Screen */
       .home-card {
         background: white;
@@ -1346,6 +1457,110 @@
           </div>
           <div class="screen-label">Screen 6: Profile</div>
         </div>
+
+        <!-- Screen 7: Toasts & Alerts -->
+        <div class="frame-container">
+          <div class="phone-frame">
+            <div class="screen" style="position: relative">
+              <div class="status-bar">
+                <span>9:47</span>
+                <span>●●●●●</span>
+              </div>
+              <div class="screen-header">
+                <h2>Notifications</h2>
+              </div>
+
+              <!-- Simulated Toasts Overlay -->
+              <div class="toast-container">
+                <!-- Success Toast -->
+                <div class="toast toast-success">
+                  <div class="toast-icon">✓</div>
+                  <div class="toast-content">
+                    <div class="toast-title">Upload Successful</div>
+                    <div class="toast-message">
+                      Contract analyzed successfully
+                    </div>
+                  </div>
+                  <div class="toast-close">×</div>
+                </div>
+
+                <!-- Info Toast -->
+                <div class="toast toast-info">
+                  <div class="toast-icon">ℹ️</div>
+                  <div class="toast-content">
+                    <div class="toast-title">New Feature</div>
+                    <div class="toast-message">Try our new batch upload mode</div>
+                  </div>
+                  <div class="toast-close">×</div>
+                </div>
+              </div>
+
+              <div class="screen-content" style="padding-top: 140px">
+                <div class="section-label">Trigger Notifications</div>
+
+                <button
+                  class="btn btn-secondary"
+                  style="
+                    margin-bottom: 10px;
+                    border-color: #34a853;
+                    color: #34a853;
+                  "
+                >
+                  Show Success Toast
+                </button>
+                <button
+                  class="btn btn-secondary"
+                  style="
+                    margin-bottom: 10px;
+                    border-color: #ea4335;
+                    color: #ea4335;
+                  "
+                >
+                  Show Error Toast
+                </button>
+                <button
+                  class="btn btn-secondary"
+                  style="
+                    margin-bottom: 10px;
+                    border-color: #fbbc05;
+                    color: #f9ab00;
+                  "
+                >
+                  Show Warning Toast
+                </button>
+                <button
+                  class="btn btn-secondary"
+                  style="
+                    margin-bottom: 10px;
+                    border-color: #667eea;
+                    color: #667eea;
+                  "
+                >
+                  Show Info Toast
+                </button>
+              </div>
+              <div class="bottom-nav">
+                <div class="nav-item">
+                  <div class="nav-item-icon">🏠</div>
+                  <span>Home</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">📊</div>
+                  <span>Analysis</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">❤️</div>
+                  <span>Favorites</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">👤</div>
+                  <span>Profile</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="screen-label">Screen 7: Toasts & Alerts</div>
+        </div>
       </div>
 
       <div
@@ -1585,6 +1800,60 @@
                 • Shadow: 0 2px 8px rgba(0,0,0,0.08)
               </p>
               <p>• Transition: 0.3s all ease</p>
+            </div>
+          </div>
+
+          <div>
+            <h3
+              style="
+                font-size: 14px;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 12px;
+              "
+            >
+              Toast Notifications
+            </h3>
+            <div style="display: flex; flex-direction: column; gap: 10px">
+              <!-- Mini representations -->
+              <div
+                class="toast toast-success"
+                style="
+                  box-shadow: none;
+                  border: 1px solid #eee;
+                  padding: 8px 12px;
+                  animation: none;
+                "
+              >
+                <div
+                  class="toast-icon"
+                  style="width: 20px; height: 20px; font-size: 12px"
+                >
+                  ✓
+                </div>
+                <div class="toast-content">
+                  <div class="toast-title" style="font-size: 12px">Success</div>
+                </div>
+              </div>
+              <div
+                class="toast toast-error"
+                style="
+                  box-shadow: none;
+                  border: 1px solid #eee;
+                  padding: 8px 12px;
+                  animation: none;
+                "
+              >
+                <div
+                  class="toast-icon"
+                  style="width: 20px; height: 20px; font-size: 12px"
+                >
+                  ✕
+                </div>
+                <div class="toast-content">
+                  <div class="toast-title" style="font-size: 12px">Error</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
