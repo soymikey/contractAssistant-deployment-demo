@@ -9,6 +9,7 @@ import {
 import { ANALYSIS_CONFIG } from '@/constants/config';
 
 type AnalysisMode = 'direct' | 'queue';
+type ViewSource = 'new' | 'history';
 
 interface AnalysisStore {
   // State
@@ -23,6 +24,7 @@ interface AnalysisStore {
   progress: number;
   error: string | null;
   mode: AnalysisMode;
+  viewSource: ViewSource;
 
   // Actions
   setImage: (uri: string) => void;
@@ -36,6 +38,9 @@ interface AnalysisStore {
   pollAnalysisStatus: (analysisLogId: string) => Promise<void>;
   stopPolling: () => void;
   fetchAnalysisResult: (contractId: string) => Promise<void>;
+
+  // History viewing
+  loadHistoryResult: (contractId: string) => Promise<void>;
 
   // Common actions
   clearAnalysis: () => void;
@@ -57,6 +62,7 @@ export const useAnalysisStore = create<AnalysisStore>((set, get) => ({
   progress: 0,
   error: null,
   mode: 'direct',
+  viewSource: 'new',
 
   // Set current image
   setImage: (uri: string) => {
@@ -78,16 +84,17 @@ export const useAnalysisStore = create<AnalysisStore>((set, get) => ({
       queueResult: null,
       progress: 0,
       mode: 'direct',
+      viewSource: 'new',
     });
 
     try {
       const result = await aiService.analyzeImage(uri);
-      
+
       // Validate result structure
       if (!result || typeof result !== 'object') {
         throw new Error('Invalid analysis result received');
       }
-      
+
       set({
         analysisResult: result,
         isLoading: false,
@@ -95,7 +102,7 @@ export const useAnalysisStore = create<AnalysisStore>((set, get) => ({
       });
     } catch (error) {
       console.error('analyzeImage store error:', error);
-      
+
       let errorMessage: string;
       if (error instanceof Error) {
         errorMessage = error.message;
@@ -104,7 +111,7 @@ export const useAnalysisStore = create<AnalysisStore>((set, get) => ({
       } else {
         errorMessage = 'Analysis failed, please retry';
       }
-      
+
       set({
         error: errorMessage,
         isLoading: false,
@@ -124,6 +131,7 @@ export const useAnalysisStore = create<AnalysisStore>((set, get) => ({
       analysisStatus: null,
       progress: 0,
       mode: 'queue',
+      viewSource: 'new',
     });
 
     try {
@@ -224,6 +232,41 @@ export const useAnalysisStore = create<AnalysisStore>((set, get) => ({
     }
   },
 
+  // Load historical analysis result
+  loadHistoryResult: async (contractId: string) => {
+    set({
+      contractId,
+      isLoading: true,
+      error: null,
+      analysisResult: null,
+      queueResult: null,
+      mode: 'queue',
+      viewSource: 'history',
+    });
+
+    try {
+      const result = await aiService.getAnalysisResult(contractId);
+      if (result) {
+        set({
+          queueResult: result,
+          isLoading: false,
+          progress: 100,
+        });
+      } else {
+        set({
+          error: 'No analysis result found for this contract',
+          isLoading: false,
+        });
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load history';
+      set({
+        error: errorMessage,
+        isLoading: false,
+      });
+    }
+  },
+
   // Clear analysis data
   clearAnalysis: () => {
     const { stopPolling } = get();
@@ -240,6 +283,7 @@ export const useAnalysisStore = create<AnalysisStore>((set, get) => ({
       progress: 0,
       error: null,
       mode: 'direct',
+      viewSource: 'new',
     });
   },
 

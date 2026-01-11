@@ -11,6 +11,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useCamera, useUpload, useContractHistory } from '@/hooks';
+import { useAnalysisStore } from '@/stores';
 import { ContractList } from '@/components';
 
 export default function HomeScreen() {
@@ -56,14 +57,18 @@ export default function HomeScreen() {
   }, [pickDocument, handleImageAnalysis, router]);
 
   /**
-   * Navigate to contract details
+   * Navigate to contract details - loads historical analysis
    */
-  const onContractPress = (id: string) => {
-    router.push({
-      pathname: '/(details)/[id]',
-      params: { id },
-    } as any);
-  };
+  const onContractPress = useCallback(
+    (id: string) => {
+      const { loadHistoryResult } = useAnalysisStore.getState();
+      // Load historical analysis result
+      loadHistoryResult(id);
+      // Navigate to analysis page
+      router.push('/analysis');
+    },
+    [router]
+  );
 
   return (
     <ScrollView

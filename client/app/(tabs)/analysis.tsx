@@ -29,6 +29,7 @@ export default function AnalysisScreen() {
     progress,
     error,
     mode,
+    viewSource,
     clearAnalysis,
     stopPolling,
   } = useAnalysisStore();
@@ -163,6 +164,16 @@ export default function AnalysisScreen() {
     return (
       <ScrollView style={styles.container}>
         <View style={styles.content}>
+          {/* View Source Indicator */}
+          {viewSource === 'history' && (
+            <View style={styles.sourceBadgeContainer}>
+              <View style={styles.sourceBadge}>
+                <Text style={styles.sourceBadgeIcon}>📜</Text>
+                <Text style={styles.sourceBadgeText}>Historical Analysis</Text>
+              </View>
+            </View>
+          )}
+
           {/* Image Preview */}
           {currentImage && (
             <View style={styles.resultImagePreview}>
@@ -302,13 +313,16 @@ export default function AnalysisScreen() {
           {/* Action Buttons */}
           <View style={styles.actionButtons}>
             <TouchableOpacity style={styles.actionButton} onPress={clearAnalysis}>
-              <Text style={styles.actionButtonText}>Analyze Again</Text>
+              <Text style={styles.actionButtonText}>
+                {viewSource === 'history' ? 'Re-analyze' : 'Analyze Again'}
+              </Text>
             </TouchableOpacity>
           </View>
 
           {/* Timestamp */}
           <Text style={styles.timestamp}>
-            Analyzed at: {new Date(displayResult.analyzedAt).toLocaleString('en-US')}
+            {viewSource === 'history' ? 'Analyzed' : 'Completed'} at:{' '}
+            {new Date(displayResult.analyzedAt).toLocaleString('en-US')}
           </Text>
         </View>
       </ScrollView>
@@ -651,5 +665,29 @@ const styles = StyleSheet.create({
   placeholderSubtext: {
     fontSize: 14,
     color: '#999',
+  },
+  // Source badge styles
+  sourceBadgeContainer: {
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  sourceBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f0f4ff',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#667eea',
+  },
+  sourceBadgeIcon: {
+    fontSize: 16,
+    marginRight: 6,
+  },
+  sourceBadgeText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#667eea',
   },
 });
