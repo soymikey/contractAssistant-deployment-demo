@@ -1,1076 +1,1624 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Contract Assistant - App UI Design</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 40px 20px;
-            min-height: 100vh;
-        }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 40px 20px;
+        min-height: 100vh;
+      }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
 
-        h1 {
-            text-align: center;
-            color: white;
-            margin-bottom: 40px;
-            font-size: 32px;
-        }
+      h1 {
+        text-align: center;
+        color: white;
+        margin-bottom: 40px;
+        font-size: 32px;
+      }
 
+      .screens-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+        gap: 30px;
+        margin-bottom: 40px;
+      }
+
+      .phone-frame {
+        background: white;
+        border-radius: 40px;
+        padding: 12px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 390px;
+        margin: 0 auto;
+        width: 100%;
+        aspect-ratio: 9/16;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .phone-frame::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 150px;
+        height: 28px;
+        background: black;
+        border-radius: 0 0 20px 20px;
+        z-index: 10;
+      }
+
+      .screen {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: #f8f9fa;
+        border-radius: 30px;
+        overflow: hidden;
+        margin-top: 8px;
+      }
+
+      .status-bar {
+        background: #fff;
+        padding: 8px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 12px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .screen-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .screen-header h2 {
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      .screen-header .icon-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .screen-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .screen-content::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      .screen-content::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .screen-content::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 2px;
+      }
+
+      .bottom-nav {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 12px 0;
+        border-top: 1px solid #eee;
+        background: white;
+      }
+
+      .nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        color: #999;
+        text-decoration: none;
+        font-size: 11px;
+        cursor: pointer;
+      }
+
+      .nav-item.active {
+        color: #667eea;
+      }
+
+      .nav-item-icon {
+        font-size: 24px;
+      }
+
+      /* Home Screen */
+      .home-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      .upload-area {
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        border: 2px dashed #667eea;
+        border-radius: 12px;
+        padding: 30px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-bottom: 15px;
+      }
+
+      .upload-area:hover {
+        border-color: #764ba2;
+        background: linear-gradient(135deg, #667eea25 0%, #764ba225 100%);
+      }
+
+      .upload-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+      }
+
+      .upload-text {
+        color: #333;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .upload-subtext {
+        color: #999;
+        font-size: 12px;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+      }
+
+      .btn {
+        flex: 1;
+        padding: 12px 16px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-secondary {
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+      }
+
+      .btn-secondary:hover {
+        background: #f8f9ff;
+      }
+
+      .history-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 12px;
+      }
+
+      .contract-item {
+        background: white;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 10px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .contract-item:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .contract-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        background: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+      }
+
+      .contract-info {
+        flex: 1;
+      }
+
+      .contract-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 4px;
+      }
+
+      .contract-meta {
+        font-size: 11px;
+        color: #999;
+      }
+
+      .contract-status {
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        background: #f0f0f0;
+        color: #666;
+      }
+
+      /* Analysis Results */
+      .result-card {
+        background: white;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+
+      .result-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+      }
+
+      .result-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+      }
+
+      .result-badge {
+        font-size: 11px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+      }
+
+      .badge-overview {
+        background: #e3f2fd;
+        color: #1976d2;
+      }
+
+      .badge-risk {
+        background: #ffebee;
+        color: #d32f2f;
+      }
+
+      .badge-warning {
+        background: #fff3e0;
+        color: #f57c00;
+      }
+
+      .result-content {
+        font-size: 13px;
+        color: #666;
+        line-height: 1.6;
+      }
+
+      .risk-item {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .risk-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #ffebee;
+        color: #d32f2f;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+
+      .risk-content {
+        flex: 1;
+      }
+
+      .risk-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 4px;
+      }
+
+      .risk-description {
+        font-size: 12px;
+        color: #666;
+        line-height: 1.5;
+      }
+
+      .loading-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #e0e0e0;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .loading-text {
+        font-size: 14px;
+        color: #999;
+      }
+
+      .section-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #999;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 16px 0 8px 0;
+      }
+
+      /* Detail Screen */
+      .detail-section {
+        margin-bottom: 16px;
+      }
+
+      .detail-section-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #f0f0f0;
+      }
+
+      .detail-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 10px 0;
+        font-size: 13px;
+        border-bottom: 1px solid #f5f5f5;
+      }
+
+      .detail-label {
+        color: #999;
+        font-weight: 500;
+      }
+
+      .detail-value {
+        color: #333;
+        font-weight: 600;
+        text-align: right;
+        flex: 1;
+        margin-left: 12px;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
         .screens-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
+          grid-template-columns: 1fr;
         }
+      }
 
-        .phone-frame {
-            background: white;
-            border-radius: 40px;
-            padding: 12px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 390px;
-            margin: 0 auto;
-            width: 100%;
-            aspect-ratio: 9/16;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-        }
+      .annotation {
+        text-align: center;
+        color: #999;
+        margin-top: 20px;
+        font-size: 12px;
+        padding: 0 20px;
+      }
 
-        .phone-frame::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 150px;
-            height: 28px;
-            background: black;
-            border-radius: 0 0 20px 20px;
-            z-index: 10;
-        }
+      .screen-label {
+        text-align: center;
+        color: white;
+        margin-top: 15px;
+        font-size: 14px;
+        font-weight: 600;
+      }
 
-        .screen {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: #f8f9fa;
-            border-radius: 30px;
-            overflow: hidden;
-            margin-top: 8px;
-        }
+      .frame-container {
+        margin-bottom: 30px;
+      }
 
-        .status-bar {
-            background: #fff;
-            padding: 8px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-            border-bottom: 1px solid #eee;
-        }
+      /* Login Screen */
+      .login-screen {
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        background: white;
+      }
 
-        .screen-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+      .login-header {
+        text-align: center;
+        margin-top: 40px;
+        margin-bottom: 40px;
+      }
 
-        .screen-header h2 {
-            font-size: 18px;
-            font-weight: 600;
-        }
+      .app-logo {
+        width: 72px;
+        height: 72px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        color: white;
+        margin: 0 auto 20px;
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+      }
 
-        .screen-header .icon-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            cursor: pointer;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+      .login-input {
+        margin-bottom: 16px;
+      }
 
-        .screen-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-        }
+      .login-input label {
+        display: block;
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 8px;
+        margin-left: 4px;
+        font-weight: 500;
+      }
 
-        .screen-content::-webkit-scrollbar {
-            width: 4px;
-        }
+      .login-input input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        font-size: 14px;
+        transition: all 0.3s;
+        background: #f8f9fa;
+      }
 
-        .screen-content::-webkit-scrollbar-track {
-            background: transparent;
-        }
+      .login-input input:focus {
+        background: white;
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        outline: none;
+      }
 
-        .screen-content::-webkit-scrollbar-thumb {
-            background: #ccc;
-            border-radius: 2px;
-        }
+      .divider-text {
+        text-align: center;
+        color: #999;
+        font-size: 12px;
+        margin: 24px 0;
+        position: relative;
+      }
 
-        .bottom-nav {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 12px 0;
-            border-top: 1px solid #eee;
-            background: white;
-        }
+      .divider-text::before,
+      .divider-text::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        width: 30%;
+        height: 1px;
+        background: #eee;
+      }
 
-        .nav-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            color: #999;
-            text-decoration: none;
-            font-size: 11px;
-            cursor: pointer;
-        }
+      .divider-text::before {
+        left: 0;
+      }
+      .divider-text::after {
+        right: 0;
+      }
 
-        .nav-item.active {
-            color: #667eea;
-        }
+      .social-login-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        width: 100%;
+        padding: 14px;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        background: white;
+        color: #333;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
 
-        .nav-item-icon {
-            font-size: 24px;
-        }
-
-        /* Home Screen */
-        .home-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-
-        .upload-area {
-            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-            border: 2px dashed #667eea;
-            border-radius: 12px;
-            padding: 30px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-bottom: 15px;
-        }
-
-        .upload-area:hover {
-            border-color: #764ba2;
-            background: linear-gradient(135deg, #667eea25 0%, #764ba225 100%);
-        }
-
-        .upload-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
-
-        .upload-text {
-            color: #333;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .upload-subtext {
-            color: #999;
-            font-size: 12px;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 12px 16px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-secondary {
-            background: white;
-            color: #667eea;
-            border: 2px solid #667eea;
-        }
-
-        .btn-secondary:hover {
-            background: #f8f9ff;
-        }
-
-        .history-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 12px;
-        }
-
-        .contract-item {
-            background: white;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 10px;
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .contract-item:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .contract-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            background: #f0f0f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-
-        .contract-info {
-            flex: 1;
-        }
-
-        .contract-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 4px;
-        }
-
-        .contract-meta {
-            font-size: 11px;
-            color: #999;
-        }
-
-        .contract-status {
-            font-size: 11px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            background: #f0f0f0;
-            color: #666;
-        }
-
-        /* Analysis Results */
-        .result-card {
-            background: white;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-
-        .result-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
-
-        .result-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .result-badge {
-            font-size: 11px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: 600;
-        }
-
-        .badge-overview {
-            background: #e3f2fd;
-            color: #1976d2;
-        }
-
-        .badge-risk {
-            background: #ffebee;
-            color: #d32f2f;
-        }
-
-        .badge-warning {
-            background: #fff3e0;
-            color: #f57c00;
-        }
-
-        .result-content {
-            font-size: 13px;
-            color: #666;
-            line-height: 1.6;
-        }
-
-        .risk-item {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .risk-icon {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #ffebee;
-            color: #d32f2f;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .risk-content {
-            flex: 1;
-        }
-
-        .risk-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 4px;
-        }
-
-        .risk-description {
-            font-size: 12px;
-            color: #666;
-            line-height: 1.5;
-        }
-
-        .loading-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid #e0e0e0;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .loading-text {
-            font-size: 14px;
-            color: #999;
-        }
-
-        .section-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #999;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin: 16px 0 8px 0;
-        }
-
-        /* Detail Screen */
-        .detail-section {
-            margin-bottom: 16px;
-        }
-
-        .detail-section-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 12px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .detail-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            padding: 10px 0;
-            font-size: 13px;
-            border-bottom: 1px solid #f5f5f5;
-        }
-
-        .detail-label {
-            color: #999;
-            font-weight: 500;
-        }
-
-        .detail-value {
-            color: #333;
-            font-weight: 600;
-            text-align: right;
-            flex: 1;
-            margin-left: 12px;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .screens-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .annotation {
-            text-align: center;
-            color: #999;
-            margin-top: 20px;
-            font-size: 12px;
-            padding: 0 20px;
-        }
-
-        .screen-label {
-            text-align: center;
-            color: white;
-            margin-top: 15px;
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .frame-container {
-            margin-bottom: 30px;
-        }
+      .social-login-btn:hover {
+        background: #f8f9fa;
+        border-color: #d1d1d1;
+        transform: translateY(-1px);
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <h1>🔍 Contract Assistant - App UI Design</h1>
+      <h1>🔍 Contract Assistant - App UI Design</h1>
 
-        <div class="screens-grid">
-            <!-- Screen 1: Home -->
-            <div class="frame-container">
-                <div class="phone-frame">
-                    <div class="screen">
-                        <div class="status-bar">
-                            <span>9:41</span>
-                            <span>●●●●●</span>
-                        </div>
-                        <div class="screen-header">
-                            <h2>Contract Assistant</h2>
-                            <button class="icon-btn">⚙️</button>
-                        </div>
-                        <div class="screen-content">
-                            <div class="upload-area">
-                                <div class="upload-icon">📄</div>
-                                <div class="upload-text">Tap to Upload or Take Photo</div>
-                                <div class="upload-subtext">Supports contract photos, PDF, Word files</div>
-                            </div>
-
-                            <div class="action-buttons">
-                                <button class="btn btn-primary">
-                                    <span>📷</span> Take Photo
-                                </button>
-                                <button class="btn btn-secondary">
-                                    <span>📁</span> Choose File
-                                </button>
-                            </div>
-
-                            <div class="section-label">Recent Analysis</div>
-                            <div class="contract-item">
-                                <div class="contract-icon">📋</div>
-                                <div class="contract-info">
-                                    <div class="contract-name">Employment_Contract_2025.pdf</div>
-                                    <div class="contract-meta">2 hours ago</div>
-                                </div>
-                                <div class="contract-status">Analyzed</div>
-                            </div>
-                            <div class="contract-item">
-                                <div class="contract-icon">📋</div>
-                                <div class="contract-info">
-                                    <div class="contract-name">Purchase_Agreement_001.png</div>
-                                    <div class="contract-meta">1 day ago</div>
-                                </div>
-                                <div class="contract-status">Analyzed</div>
-                            </div>
-                            <div class="contract-item">
-                                <div class="contract-icon">📋</div>
-                                <div class="contract-info">
-                                    <div class="contract-name">Lease_Agreement.docx</div>
-                                    <div class="contract-meta">3 days ago</div>
-                                </div>
-                                <div class="contract-status">Analyzed</div>
-                            </div>
-                        </div>
-                        <div class="bottom-nav">
-                            <div class="nav-item active">
-                                <div class="nav-item-icon">🏠</div>
-                                <span>Home</span>
-                            </div>
-                            <div class="nav-item">
-                                <div class="nav-item-icon">📊</div>
-                                <span>Analysis</span>
-                            </div>
-                            <div class="nav-item">
-                                <div class="nav-item-icon">❤️</div>
-                                <span>Favorites</span>
-                            </div>
-                            <div class="nav-item">
-                                <div class="nav-item-icon">👤</div>
-                                <span>Profile</span>
-                            </div>
-                        </div>
-                    </div>
+      <div class="screens-grid">
+        <!-- Screen 0: Login -->
+        <div class="frame-container">
+          <div class="phone-frame">
+            <div class="screen" style="background: white">
+              <div class="status-bar">
+                <span>9:41</span>
+                <span>●●●●●</span>
+              </div>
+              <div class="login-screen">
+                <div class="login-header">
+                  <div class="app-logo">📄</div>
+                  <h1
+                    style="
+                      color: #333;
+                      font-size: 24px;
+                      margin: 0;
+                      text-align: center;
+                    "
+                  >
+                    Welcome Back
+                  </h1>
+                  <p
+                    style="
+                      color: #999;
+                      font-size: 14px;
+                      margin-top: 8px;
+                      text-align: center;
+                    "
+                  >
+                    Sign in to continue
+                  </p>
                 </div>
-                <div class="screen-label">Screen 1: Home</div>
-            </div>
 
-            <!-- Screen 2: Analyzing -->
-            <div class="frame-container">
-                <div class="phone-frame">
-                    <div class="screen">
-                        <div class="status-bar">
-                            <span>9:42</span>
-                            <span>●●●●●</span>
-                        </div>
-                        <div class="screen-header">
-                            <h2>Analyzing...</h2>
-                        </div>
-                        <div class="screen-content loading-screen">
-                            <div class="loading-spinner"></div>
-                            <div class="loading-text">Analyzing contract content</div>
-                            <div class="loading-text" style="margin-top: 8px; font-size: 12px; color: #ccc;">Please wait...</div>
-                        </div>
-                        <div class="bottom-nav">
-                            <div class="nav-item active">
-                                <div class="nav-item-icon">🏠</div>
-                                <span>Home</span>
-                            </div>
-                            <div class="nav-item">
-                                <div class="nav-item-icon">📊</div>
-                                <span>Analysis</span>
-                            </div>
-                            <div class="nav-item">
-                                <div class="nav-item-icon">❤️</div>
-                                <span>Favorites</span>
-                            </div>
-                            <div class="nav-item">
-                                <div class="nav-item-icon">👤</div>
-                                <span>Profile</span>
-                            </div>
-                        </div>
-                    </div>
+                <div class="login-input">
+                  <label>Email</label>
+                  <input
+                    type="email"
+                    placeholder="user@example.com"
+                    value="user@example.com"
+                  />
                 </div>
-                <div class="screen-label">Screen 2: Analyzing</div>
-            </div>
-
-            <!-- Screen 3: Analysis Results -->
-            <div class="frame-container">
-                <div class="phone-frame">
-                    <div class="screen">
-                        <div class="status-bar">
-                            <span>9:43</span>
-                            <span>●●●●●</span>
-                        </div>
-                        <div class="screen-header">
-                            <h2>Analysis Results</h2>
-                            <button class="icon-btn">⋯</button>
-                        </div>
-                        <div class="screen-content">
-                            <div class="result-card">
-                                <div class="result-header">
-                                    <div class="result-title">Contract Overview</div>
-                                    <div class="result-badge badge-overview">Overview</div>
-                                </div>
-                                <div class="result-content">
-                                    <strong>Contract Type:</strong> Employment Contract<br/>
-                                    <strong>Parties:</strong> Party A (Company), Party B (Employee)<br/>
-                                    <strong>Term:</strong> Jan 1, 2025 - Dec 31, 2027<br/>
-                                    <strong>Pages:</strong> 5 pages
-                                </div>
-                            </div>
-
-                            <div class="result-card">
-                                <div class="result-header">
-                                    <div class="result-title">Potential Risks</div>
-                                    <div class="result-badge badge-risk">3 Items</div>
-                                </div>
-                                <div class="result-content">
-                                    <div class="risk-item">
-                                        <div class="risk-icon">⚠️</div>
-                                        <div class="risk-content">
-                                            <div class="risk-title">Vague Termination Compensation</div>
-                                            <div class="risk-description">Termination compensation standards not clearly defined, may lead to disputes</div>
-                                        </div>
-                                    </div>
-                                    <div class="risk-item">
-                                        <div class="risk-icon">⚠️</div>
-                                        <div class="risk-content">
-                                            <div class="risk-title">Excessive Confidentiality Period</div>
-                                            <div class="risk-description">10-year confidentiality period exceeds legal requirements</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="section-label">View More Details</div>
-                        </div>
-                        <div class="bottom-nav">
-                            <div class="nav-item active">
-                                <div class="nav-item-icon">🏠</div>
-                                <span>Home</span>
-                            </div>
-                            <div class="nav-item">
-                                <div class="nav-item-icon">📊</div>
-                                <span>Analysis</span>
-                            </div>
-                            <div class="nav-item">
-                                <div class="nav-item-icon">❤️</div>
-                                <span>Favorites</span>
-                            </div>
-                            <div class="nav-item">
-                                <div class="nav-item-icon">👤</div>
-                                <span>Profile</span>
-                            </div>
-                        </div>
-                    </div>
+                <div class="login-input">
+                  <label>Password</label>
+                  <input type="password" value="********" />
                 </div>
-                <div class="screen-label">Screen 3: Analysis Summary</div>
-            </div>
 
-            <!-- Screen 4: Detailed Analysis -->
-            <div class="frame-container">
-                <div class="phone-frame">
-                    <div class="screen">
-                        <div class="status-bar">
-                            <span>9:44</span>
-                            <span>●●●●●</span>
-                        </div>
-                        <div class="screen-header">
-                            <h2>📋 Detailed Analysis</h2>
-                            <button class="icon-btn">↓</button>
-                        </div>
-                        <div class="screen-content">
-                            <div class="result-card">
-                                <div class="detail-section">
-                                    <div class="detail-section-title">Basic Information</div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">Contract Type</span>
-                                        <span class="detail-value">Employment Contract</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">Signing Date</span>
-                                        <span class="detail-value">Jan 15, 2025</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">Valid Period</span>
-                                        <span class="detail-value">24 months</span>
-                                    </div>
-                                </div>
+                <button
+                  class="btn btn-primary"
+                  style="margin-top: 10px; width: 100%"
+                >
+                  Sign In
+                </button>
 
-                                <div class="detail-section">
-                                    <div class="detail-section-title">Party A Information</div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">Name</span>
-                                        <span class="detail-value">XX Company Ltd.</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">Address</span>
-                                        <span class="detail-value">Beijing, Chaoyang...</span>
-                                    </div>
-                                </div>
+                <div class="divider-text">Or continue with</div>
 
-                                <div class="detail-section">
-                                    <div class="detail-section-title">Key Terms</div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">Salary</span>
-                                        <span class="detail-value">$15,000/month</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">Benefits</span>
-                                        <span class="detail-value">Full Insurance</span>
-                                    </div>
-                                    <div class="detail-item">
-                                        <span class="detail-label">Work Location</span>
-                                        <span class="detail-value">Beijing HQ</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bottom-nav">
-                            <div class="nav-item active">
-                                <div class="nav-item-icon">🏠</div>
-                                <span>Home</span>
-                            </div>
-                            <div class="nav-item">
-                                <div class="nav-item-icon">📊</div>
-                                <span>Analysis</span>
-                            </div>
-                            <div class="nav-item">
-                                <div class="nav-item-icon">❤️</div>
-                                <span>Favorites</span>
-                            </div>
-                            <div class="nav-item">
-                                <div class="nav-item-icon">👤</div>
-                                <span>Profile</span>
-                            </div>
-                        </div>
-                    </div>
+                <div style="display: flex; gap: 12px">
+                  <button class="social-login-btn" style="padding: 12px">
+                    <svg width="24" height="24" viewBox="0 0 24 24">
+                      <path
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                        fill="#4285F4"
+                      />
+                      <path
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                        fill="#34A853"
+                      />
+                      <path
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                        fill="#FBBC05"
+                      />
+                      <path
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                        fill="#EA4335"
+                      />
+                    </svg>
+                  </button>
+                  <button class="social-login-btn" style="padding: 12px">
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="black"
+                    >
+                      <path
+                        d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24.02-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.78 1.18-.19 2.31-.89 3.51-.84 1.43.06 2.52.69 3.2 1.76-2.88 1.76-2.4 5.33.52 6.53-.67 1.74-1.6 3.47-2.31 4.74zM13.06 4.25c.62-1.6 2.36-2.91 4.2-2.95.42 1.83-1.09 3.77-2.64 4.56-1.07.56-2.29.17-2.91-1.33.37-.1.75-.19 1.35-.28z"
+                      />
+                    </svg>
+                  </button>
                 </div>
-                <div class="screen-label">Screen 4: Detailed Analysis</div>
+              </div>
             </div>
-
-            <!-- Screen 5: Risk Details -->
-            <div class="frame-container">
-                <div class="phone-frame">
-                    <div class="screen">
-                        <div class="status-bar">
-                            <span>9:45</span>
-                            <span>●●●●●</span>
-                        </div>
-                        <div class="screen-header">
-                            <h2>⚠️ Risk Analysis</h2>
-                        </div>
-                        <div class="screen-content">
-                            <div class="result-card">
-                                <div class="result-header">
-                                    <div class="result-title">Risk Level: High</div>
-                                    <div class="result-badge badge-risk">3 Items</div>
-                                </div>
-                            </div>
-
-                            <div class="result-card">
-                                <div class="result-header">
-                                    <div class="result-title">High Risk Items</div>
-                                </div>
-                                <div class="result-content">
-                                    <div class="risk-item">
-                                        <div class="risk-icon">🔴</div>
-                                        <div class="risk-content">
-                                            <div class="risk-title">Vague Termination Compensation</div>
-                                            <div class="risk-description">Termination compensation standards not clearly defined. Recommend supplementing per Labor Law Article 47.</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="result-card">
-                                <div class="result-header">
-                                    <div class="result-title">Medium Risk Items</div>
-                                </div>
-                                <div class="result-content">
-                                    <div class="risk-item">
-                                        <div class="risk-icon">🟡</div>
-                                        <div class="risk-content">
-                                            <div class="risk-title">Excessive Confidentiality Period</div>
-                                            <div class="risk-description">10-year confidentiality exceeds standards. Recommend changing to 3-5 years.</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="result-card">
-                                <div class="result-header">
-                                    <div class="result-title">Recommendations</div>
-                                </div>
-                                <div class="result-content">
-                                    <div style="margin-bottom: 10px;">
-                                        <strong>✓ Add Clauses</strong><br>
-                                        <small>Add arbitration clause and jurisdiction agreement</small>
-                                    </div>
-                                    <div>
-                                        <strong>✓ Modify Clauses</strong><br>
-                                        <small>Adjust confidentiality period to legal range</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bottom-nav">
-                            <div class="nav-item active">
-                                <div class="nav-item-icon">🏠</div>
-                                <span>Home</span>
-                            </div>
-                            <div class="nav-item">
-                                <div class="nav-item-icon">📊</div>
-                                <span>Analysis</span>
-                            </div>
-                            <div class="nav-item">
-                                <div class="nav-item-icon">❤️</div>
-                                <span>Favorites</span>
-                            </div>
-                            <div class="nav-item">
-                                <div class="nav-item-icon">👤</div>
-                                <span>Profile</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="screen-label">Screen 5: Risk Details</div>
-            </div>
-
-            <!-- Screen 6: Profile -->
-            <div class="frame-container">
-                <div class="phone-frame">
-                    <div class="screen">
-                        <div class="status-bar">
-                            <span>9:46</span>
-                            <span>●●●●●</span>
-                        </div>
-                        <div class="screen-header">
-                            <h2>Profile</h2>
-                        </div>
-                        <div class="screen-content">
-                            <div style="text-align: center; padding: 20px 0;">
-                                <div style="width: 80px; height: 80px; border-radius: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 32px;">👤</div>
-                                <div style="font-size: 16px; font-weight: 600; color: #333; margin-bottom: 4px;">Username</div>
-                                <div style="font-size: 12px; color: #999;">user@example.com</div>
-                            </div>
-
-                            <div class="section-label" style="margin-top: 24px;">Account Statistics</div>
-                            <div class="result-card" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                                <div style="text-align: center; padding: 12px 0;">
-                                    <div style="font-size: 24px; font-weight: 600; color: #667eea;">12</div>
-                                    <div style="font-size: 12px; color: #999; margin-top: 4px;">Analyzed</div>
-                                </div>
-                                <div style="text-align: center; padding: 12px 0;">
-                                    <div style="font-size: 24px; font-weight: 600; color: #667eea;">5</div>
-                                    <div style="font-size: 12px; color: #999; margin-top: 4px;">Favorites</div>
-                                </div>
-                            </div>
-
-                            <div class="section-label">Settings</div>
-                            <div class="contract-item">
-                                <span style="font-size: 18px;">🔔</span>
-                                <div style="flex: 1;">
-                                    <div class="contract-name">Notifications</div>
-                                </div>
-                                <span style="color: #999;">›</span>
-                            </div>
-                            <div class="contract-item">
-                                <span style="font-size: 18px;">🛡️</span>
-                                <div style="flex: 1;">
-                                    <div class="contract-name">Privacy & Security</div>
-                                </div>
-                                <span style="color: #999;">›</span>
-                            </div>
-                            <div class="contract-item">
-                                <span style="font-size: 18px;">❓</span>
-                                <div style="flex: 1;">
-                                    <div class="contract-name">Help & Feedback</div>
-                                </div>
-                                <span style="color: #999;">›</span>
-                            </div>
-                            <div class="contract-item">
-                                <span style="font-size: 18px;">ℹ️</span>
-                                <div style="flex: 1;">
-                                    <div class="contract-name">About Us</div>
-                                </div>
-                                <span style="color: #999;">›</span>
-                            </div>
-
-                            <button class="btn btn-secondary" style="margin-top: 20px;">
-                                Sign Out
-                            </button>
-                        </div>
-                        <div class="bottom-nav">
-                            <div class="nav-item">
-                                <div class="nav-item-icon">🏠</div>
-                                <span>Home</span>
-                            </div>
-                            <div class="nav-item">
-                                <div class="nav-item-icon">📊</div>
-                                <span>Analysis</span>
-                            </div>
-                            <div class="nav-item">
-                                <div class="nav-item-icon">❤️</div>
-                                <span>Favorites</span>
-                            </div>
-                            <div class="nav-item active">
-                                <div class="nav-item-icon">👤</div>
-                                <span>Profile</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="screen-label">Screen 6: Profile</div>
-            </div>
+          </div>
+          <div class="screen-label">Screen 0: Login</div>
         </div>
 
-        <div style="background: white; border-radius: 12px; padding: 30px; margin-top: 40px;">
-            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px; color: #333;">📱 Feature Modules</h2>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px;">
-                    <h3 style="color: #667eea; margin-bottom: 10px;">📄 File Upload</h3>
-                    <ul style="font-size: 13px; color: #666; line-height: 1.8;">
-                        <li>✓ Photo recognition (OCR)</li>
-                        <li>✓ File selection (PDF, Word, Images)</li>
-                        <li>✓ Batch upload</li>
-                        <li>✓ History management</li>
-                    </ul>
+        <!-- Screen 0.5: Register -->
+        <div class="frame-container">
+          <div class="phone-frame">
+            <div class="screen" style="background: white">
+              <div class="status-bar">
+                <span>9:41</span>
+                <span>●●●●●</span>
+              </div>
+              <div class="login-screen">
+                <div
+                  class="login-header"
+                  style="margin-top: 20px; margin-bottom: 20px"
+                >
+                  <h1
+                    style="
+                      color: #333;
+                      font-size: 24px;
+                      margin: 0;
+                      text-align: center;
+                    "
+                  >
+                    Create Account
+                  </h1>
+                  <p
+                    style="
+                      color: #999;
+                      font-size: 14px;
+                      margin-top: 8px;
+                      text-align: center;
+                    "
+                  >
+                    Join us to manage contracts
+                  </p>
                 </div>
 
-                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px;">
-                    <h3 style="color: #764ba2; margin-bottom: 10px;">🤖 AI Analysis</h3>
-                    <ul style="font-size: 13px; color: #666; line-height: 1.8;">
-                        <li>✓ Contract content recognition & extraction</li>
-                        <li>✓ Key clause extraction</li>
-                        <li>✓ Legal risk identification</li>
-                        <li>✓ Real-time analysis progress</li>
-                    </ul>
+                <div class="login-input">
+                  <label>Full Name</label>
+                  <input type="text" placeholder="John Doe" />
+                </div>
+                <div class="login-input">
+                  <label>Email</label>
+                  <input type="email" placeholder="user@example.com" />
+                </div>
+                <div class="login-input">
+                  <label>Password</label>
+                  <input type="password" placeholder="Min. 8 characters" />
                 </div>
 
-                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px;">
-                    <h3 style="color: #667eea; margin-bottom: 10px;">📊 Results Display</h3>
-                    <ul style="font-size: 13px; color: #666; line-height: 1.8;">
-                        <li>✓ Contract overview</li>
-                        <li>✓ Risk level assessment</li>
-                        <li>✓ Detailed clause analysis</li>
-                        <li>✓ Improvement recommendations</li>
-                    </ul>
+                <button
+                  class="btn btn-primary"
+                  style="margin-top: 10px; width: 100%"
+                >
+                  Sign Up
+                </button>
+
+                <div class="divider-text">Or sign up with</div>
+
+                <div style="display: flex; gap: 12px">
+                  <button class="social-login-btn" style="padding: 12px">
+                    <svg width="24" height="24" viewBox="0 0 24 24">
+                      <path
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                        fill="#4285F4"
+                      />
+                      <path
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                        fill="#34A853"
+                      />
+                      <path
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                        fill="#FBBC05"
+                      />
+                      <path
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                        fill="#EA4335"
+                      />
+                    </svg>
+                  </button>
+                  <button class="social-login-btn" style="padding: 12px">
+                    <svg
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="black"
+                    >
+                      <path
+                        d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24.02-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.78 1.18-.19 2.31-.89 3.51-.84 1.43.06 2.52.69 3.2 1.76-2.88 1.76-2.4 5.33.52 6.53-.67 1.74-1.6 3.47-2.31 4.74zM13.06 4.25c.62-1.6 2.36-2.91 4.2-2.95.42 1.83-1.09 3.77-2.64 4.56-1.07.56-2.29.17-2.91-1.33.37-.1.75-.19 1.35-.28z"
+                      />
+                    </svg>
+                  </button>
                 </div>
 
-                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px;">
-                    <h3 style="color: #764ba2; margin-bottom: 10px;">💾 Data Management</h3>
-                    <ul style="font-size: 13px; color: #666; line-height: 1.8;">
-                        <li>✓ Analysis history</li>
-                        <li>✓ Favorite important contracts</li>
-                        <li>✓ Export analysis reports</li>
-                        <li>✓ Cloud sync</li>
-                    </ul>
+                <div
+                  style="
+                    margin-top: auto;
+                    text-align: center;
+                    font-size: 13px;
+                    color: #666;
+                  "
+                >
+                  Already have an account?
+                  <span
+                    style="color: #667eea; font-weight: 600; cursor: pointer"
+                    >Sign In</span
+                  >
                 </div>
-
-                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px;">
-                    <h3 style="color: #667eea; margin-bottom: 10px;">⚙️ User Center</h3>
-                    <ul style="font-size: 13px; color: #666; line-height: 1.8;">
-                        <li>✓ Account management</li>
-                        <li>✓ Notification settings</li>
-                        <li>✓ Privacy & security</li>
-                        <li>✓ Help & feedback</li>
-                    </ul>
-                </div>
-
-                <div style="padding: 20px; background: #f8f9fa; border-radius: 8px;">
-                    <h3 style="color: #764ba2; margin-bottom: 10px;">🔐 Security Features</h3>
-                    <ul style="font-size: 13px; color: #666; line-height: 1.8;">
-                        <li>✓ End-to-end encryption</li>
-                        <li>✓ Privacy protection</li>
-                        <li>✓ Data backup</li>
-                        <li>✓ Compliance processing</li>
-                    </ul>
-                </div>
+              </div>
             </div>
+          </div>
+          <div class="screen-label">Screen 0.5: Register</div>
         </div>
 
-        <div style="background: white; border-radius: 12px; padding: 30px; margin-top: 20px;">
-            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px; color: #333;">🎨 Design System</h2>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-                <div>
-                    <h3 style="font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px;">Color System</h3>
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 6px;"></div>
-                            <span style="font-size: 13px; color: #666;">Primary (Purple-Blue Gradient)</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 40px; height: 40px; background: #ffebee; border-radius: 6px;"></div>
-                            <span style="font-size: 13px; color: #666;">Risk (Light Red)</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 40px; height: 40px; background: #fff3e0; border-radius: 6px;"></div>
-                            <span style="font-size: 13px; color: #666;">Warning (Light Orange)</span>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 40px; height: 40px; background: #f8f9fa; border-radius: 6px; border: 1px solid #eee;"></div>
-                            <span style="font-size: 13px; color: #666;">Background (Light Gray)</span>
-                        </div>
-                    </div>
+        <!-- Screen 1: Home -->
+        <div class="frame-container">
+          <div class="phone-frame">
+            <div class="screen">
+              <div class="status-bar">
+                <span>9:41</span>
+                <span>●●●●●</span>
+              </div>
+              <div class="screen-header">
+                <h2>Contract Assistant</h2>
+                <button class="icon-btn">⚙️</button>
+              </div>
+              <div class="screen-content">
+                <div class="upload-area">
+                  <div class="upload-icon">📄</div>
+                  <div class="upload-text">Tap to Upload or Take Photo</div>
+                  <div class="upload-subtext">
+                    Supports contract photos, PDF, Word files
+                  </div>
                 </div>
 
-                <div>
-                    <h3 style="font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px;">Typography System</h3>
-                    <div style="font-size: 13px; color: #666; line-height: 1.8;">
-                        <p style="margin-bottom: 8px;"><strong>Title:</strong> 18px, 600 weight</p>
-                        <p style="margin-bottom: 8px;"><strong>Subtitle:</strong> 14px, 600 weight</p>
-                        <p style="margin-bottom: 8px;"><strong>Body:</strong> 13px, 400 weight</p>
-                        <p><strong>Caption:</strong> 12px, 400 weight</p>
-                    </div>
+                <div class="action-buttons">
+                  <button class="btn btn-primary">
+                    <span>📷</span> Take Photo
+                  </button>
+                  <button class="btn btn-secondary">
+                    <span>📁</span> Choose File
+                  </button>
                 </div>
 
-                <div>
-                    <h3 style="font-size: 14px; font-weight: 600; color: #333; margin-bottom: 12px;">Component Specs</h3>
-                    <div style="font-size: 13px; color: #666; line-height: 1.8;">
-                        <p style="margin-bottom: 8px;">• Border Radius: 8px (S), 12px (M), 30px (L)</p>
-                        <p style="margin-bottom: 8px;">• Spacing: 8px, 12px, 16px, 20px</p>
-                        <p style="margin-bottom: 8px;">• Shadow: 0 2px 8px rgba(0,0,0,0.08)</p>
-                        <p>• Transition: 0.3s all ease</p>
+                <div class="section-label">Recent Analysis</div>
+                <div class="contract-item">
+                  <div class="contract-icon">📋</div>
+                  <div class="contract-info">
+                    <div class="contract-name">
+                      Employment_Contract_2025.pdf
                     </div>
+                    <div class="contract-meta">2 hours ago</div>
+                  </div>
+                  <div class="contract-status">Analyzed</div>
                 </div>
+                <div class="contract-item">
+                  <div class="contract-icon">📋</div>
+                  <div class="contract-info">
+                    <div class="contract-name">Purchase_Agreement_001.png</div>
+                    <div class="contract-meta">1 day ago</div>
+                  </div>
+                  <div class="contract-status">Analyzed</div>
+                </div>
+                <div class="contract-item">
+                  <div class="contract-icon">📋</div>
+                  <div class="contract-info">
+                    <div class="contract-name">Lease_Agreement.docx</div>
+                    <div class="contract-meta">3 days ago</div>
+                  </div>
+                  <div class="contract-status">Analyzed</div>
+                </div>
+              </div>
+              <div class="bottom-nav">
+                <div class="nav-item active">
+                  <div class="nav-item-icon">🏠</div>
+                  <span>Home</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">📊</div>
+                  <span>Analysis</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">❤️</div>
+                  <span>Favorites</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">👤</div>
+                  <span>Profile</span>
+                </div>
+              </div>
             </div>
+          </div>
+          <div class="screen-label">Screen 1: Home</div>
         </div>
 
-        <div style="background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border-radius: 12px; padding: 30px; margin-top: 20px; text-align: center; border: 1px solid #667eea30;">
-            <h2 style="font-size: 18px; font-weight: 600; color: #333; margin-bottom: 12px;">🚀 Technology Stack</h2>
-            <p style="color: #666; margin-bottom: 20px; line-height: 1.8;">
-                <strong>Frontend Framework:</strong> React Native / Flutter<br>
-                <strong>AI Services:</strong> OpenAI API / Claude API / Local LLM<br>
-                <strong>OCR:</strong> Google Vision / Tesseract / PaddleOCR<br>
-                <strong>Backend:</strong> Node.js/NestJS or Python/FastAPI<br>
-                <strong>Database:</strong> PostgreSQL + Redis<br>
-                <strong>Storage:</strong> AWS S3 / Alibaba Cloud OSS<br>
-            </p>
+        <!-- Screen 2: Analyzing -->
+        <div class="frame-container">
+          <div class="phone-frame">
+            <div class="screen">
+              <div class="status-bar">
+                <span>9:42</span>
+                <span>●●●●●</span>
+              </div>
+              <div class="screen-header">
+                <h2>Analyzing...</h2>
+              </div>
+              <div class="screen-content loading-screen">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">Analyzing contract content</div>
+                <div
+                  class="loading-text"
+                  style="margin-top: 8px; font-size: 12px; color: #ccc"
+                >
+                  Please wait...
+                </div>
+              </div>
+              <div class="bottom-nav">
+                <div class="nav-item active">
+                  <div class="nav-item-icon">🏠</div>
+                  <span>Home</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">📊</div>
+                  <span>Analysis</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">❤️</div>
+                  <span>Favorites</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">👤</div>
+                  <span>Profile</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="screen-label">Screen 2: Analyzing</div>
         </div>
 
+        <!-- Screen 3: Analysis Results -->
+        <div class="frame-container">
+          <div class="phone-frame">
+            <div class="screen">
+              <div class="status-bar">
+                <span>9:43</span>
+                <span>●●●●●</span>
+              </div>
+              <div class="screen-header">
+                <h2>Analysis Results</h2>
+                <button class="icon-btn">⋯</button>
+              </div>
+              <div class="screen-content">
+                <div class="result-card">
+                  <div class="result-header">
+                    <div class="result-title">Contract Overview</div>
+                    <div class="result-badge badge-overview">Overview</div>
+                  </div>
+                  <div class="result-content">
+                    <strong>Contract Type:</strong> Employment Contract<br />
+                    <strong>Parties:</strong> Party A (Company), Party B
+                    (Employee)<br />
+                    <strong>Term:</strong> Jan 1, 2025 - Dec 31, 2027<br />
+                    <strong>Pages:</strong> 5 pages
+                  </div>
+                </div>
+
+                <div class="result-card">
+                  <div class="result-header">
+                    <div class="result-title">Potential Risks</div>
+                    <div class="result-badge badge-risk">3 Items</div>
+                  </div>
+                  <div class="result-content">
+                    <div class="risk-item">
+                      <div class="risk-icon">⚠️</div>
+                      <div class="risk-content">
+                        <div class="risk-title">
+                          Vague Termination Compensation
+                        </div>
+                        <div class="risk-description">
+                          Termination compensation standards not clearly
+                          defined, may lead to disputes
+                        </div>
+                      </div>
+                    </div>
+                    <div class="risk-item">
+                      <div class="risk-icon">⚠️</div>
+                      <div class="risk-content">
+                        <div class="risk-title">
+                          Excessive Confidentiality Period
+                        </div>
+                        <div class="risk-description">
+                          10-year confidentiality period exceeds legal
+                          requirements
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="section-label">View More Details</div>
+              </div>
+              <div class="bottom-nav">
+                <div class="nav-item active">
+                  <div class="nav-item-icon">🏠</div>
+                  <span>Home</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">📊</div>
+                  <span>Analysis</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">❤️</div>
+                  <span>Favorites</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">👤</div>
+                  <span>Profile</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="screen-label">Screen 3: Analysis Summary</div>
+        </div>
+
+        <!-- Screen 4: Detailed Analysis -->
+        <div class="frame-container">
+          <div class="phone-frame">
+            <div class="screen">
+              <div class="status-bar">
+                <span>9:44</span>
+                <span>●●●●●</span>
+              </div>
+              <div class="screen-header">
+                <h2>📋 Detailed Analysis</h2>
+                <button class="icon-btn">↓</button>
+              </div>
+              <div class="screen-content">
+                <div class="result-card">
+                  <div class="detail-section">
+                    <div class="detail-section-title">Basic Information</div>
+                    <div class="detail-item">
+                      <span class="detail-label">Contract Type</span>
+                      <span class="detail-value">Employment Contract</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Signing Date</span>
+                      <span class="detail-value">Jan 15, 2025</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Valid Period</span>
+                      <span class="detail-value">24 months</span>
+                    </div>
+                  </div>
+
+                  <div class="detail-section">
+                    <div class="detail-section-title">Party A Information</div>
+                    <div class="detail-item">
+                      <span class="detail-label">Name</span>
+                      <span class="detail-value">XX Company Ltd.</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Address</span>
+                      <span class="detail-value">Beijing, Chaoyang...</span>
+                    </div>
+                  </div>
+
+                  <div class="detail-section">
+                    <div class="detail-section-title">Key Terms</div>
+                    <div class="detail-item">
+                      <span class="detail-label">Salary</span>
+                      <span class="detail-value">$15,000/month</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Benefits</span>
+                      <span class="detail-value">Full Insurance</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Work Location</span>
+                      <span class="detail-value">Beijing HQ</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="bottom-nav">
+                <div class="nav-item active">
+                  <div class="nav-item-icon">🏠</div>
+                  <span>Home</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">📊</div>
+                  <span>Analysis</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">❤️</div>
+                  <span>Favorites</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">👤</div>
+                  <span>Profile</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="screen-label">Screen 4: Detailed Analysis</div>
+        </div>
+
+        <!-- Screen 5: Risk Details -->
+        <div class="frame-container">
+          <div class="phone-frame">
+            <div class="screen">
+              <div class="status-bar">
+                <span>9:45</span>
+                <span>●●●●●</span>
+              </div>
+              <div class="screen-header">
+                <h2>⚠️ Risk Analysis</h2>
+              </div>
+              <div class="screen-content">
+                <div class="result-card">
+                  <div class="result-header">
+                    <div class="result-title">Risk Level: High</div>
+                    <div class="result-badge badge-risk">3 Items</div>
+                  </div>
+                </div>
+
+                <div class="result-card">
+                  <div class="result-header">
+                    <div class="result-title">High Risk Items</div>
+                  </div>
+                  <div class="result-content">
+                    <div class="risk-item">
+                      <div class="risk-icon">🔴</div>
+                      <div class="risk-content">
+                        <div class="risk-title">
+                          Vague Termination Compensation
+                        </div>
+                        <div class="risk-description">
+                          Termination compensation standards not clearly
+                          defined. Recommend supplementing per Labor Law Article
+                          47.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="result-card">
+                  <div class="result-header">
+                    <div class="result-title">Medium Risk Items</div>
+                  </div>
+                  <div class="result-content">
+                    <div class="risk-item">
+                      <div class="risk-icon">🟡</div>
+                      <div class="risk-content">
+                        <div class="risk-title">
+                          Excessive Confidentiality Period
+                        </div>
+                        <div class="risk-description">
+                          10-year confidentiality exceeds standards. Recommend
+                          changing to 3-5 years.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="result-card">
+                  <div class="result-header">
+                    <div class="result-title">Recommendations</div>
+                  </div>
+                  <div class="result-content">
+                    <div style="margin-bottom: 10px">
+                      <strong>✓ Add Clauses</strong><br />
+                      <small
+                        >Add arbitration clause and jurisdiction
+                        agreement</small
+                      >
+                    </div>
+                    <div>
+                      <strong>✓ Modify Clauses</strong><br />
+                      <small
+                        >Adjust confidentiality period to legal range</small
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="bottom-nav">
+                <div class="nav-item active">
+                  <div class="nav-item-icon">🏠</div>
+                  <span>Home</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">📊</div>
+                  <span>Analysis</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">❤️</div>
+                  <span>Favorites</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">👤</div>
+                  <span>Profile</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="screen-label">Screen 5: Risk Details</div>
+        </div>
+
+        <!-- Screen 6: Profile -->
+        <div class="frame-container">
+          <div class="phone-frame">
+            <div class="screen">
+              <div class="status-bar">
+                <span>9:46</span>
+                <span>●●●●●</span>
+              </div>
+              <div class="screen-header">
+                <h2>Profile</h2>
+              </div>
+              <div class="screen-content">
+                <div style="text-align: center; padding: 20px 0">
+                  <div
+                    style="
+                      width: 80px;
+                      height: 80px;
+                      border-radius: 40px;
+                      background: linear-gradient(
+                        135deg,
+                        #667eea 0%,
+                        #764ba2 100%
+                      );
+                      margin: 0 auto 12px;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      color: white;
+                      font-size: 32px;
+                    "
+                  >
+                    👤
+                  </div>
+                  <div
+                    style="
+                      font-size: 16px;
+                      font-weight: 600;
+                      color: #333;
+                      margin-bottom: 4px;
+                    "
+                  >
+                    Username
+                  </div>
+                  <div style="font-size: 12px; color: #999">
+                    user@example.com
+                  </div>
+                </div>
+
+                <div class="section-label" style="margin-top: 24px">
+                  Account Statistics
+                </div>
+                <div
+                  class="result-card"
+                  style="
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 12px;
+                  "
+                >
+                  <div style="text-align: center; padding: 12px 0">
+                    <div
+                      style="font-size: 24px; font-weight: 600; color: #667eea"
+                    >
+                      12
+                    </div>
+                    <div style="font-size: 12px; color: #999; margin-top: 4px">
+                      Analyzed
+                    </div>
+                  </div>
+                  <div style="text-align: center; padding: 12px 0">
+                    <div
+                      style="font-size: 24px; font-weight: 600; color: #667eea"
+                    >
+                      5
+                    </div>
+                    <div style="font-size: 12px; color: #999; margin-top: 4px">
+                      Favorites
+                    </div>
+                  </div>
+                </div>
+
+                <div class="section-label">Settings</div>
+                <div class="contract-item">
+                  <span style="font-size: 18px">🔔</span>
+                  <div style="flex: 1">
+                    <div class="contract-name">Notifications</div>
+                  </div>
+                  <span style="color: #999">›</span>
+                </div>
+                <div class="contract-item">
+                  <span style="font-size: 18px">🛡️</span>
+                  <div style="flex: 1">
+                    <div class="contract-name">Privacy & Security</div>
+                  </div>
+                  <span style="color: #999">›</span>
+                </div>
+                <div class="contract-item">
+                  <span style="font-size: 18px">❓</span>
+                  <div style="flex: 1">
+                    <div class="contract-name">Help & Feedback</div>
+                  </div>
+                  <span style="color: #999">›</span>
+                </div>
+                <div class="contract-item">
+                  <span style="font-size: 18px">ℹ️</span>
+                  <div style="flex: 1">
+                    <div class="contract-name">About Us</div>
+                  </div>
+                  <span style="color: #999">›</span>
+                </div>
+
+                <button class="btn btn-secondary" style="margin-top: 20px">
+                  Sign Out
+                </button>
+              </div>
+              <div class="bottom-nav">
+                <div class="nav-item">
+                  <div class="nav-item-icon">🏠</div>
+                  <span>Home</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">📊</div>
+                  <span>Analysis</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">❤️</div>
+                  <span>Favorites</span>
+                </div>
+                <div class="nav-item active">
+                  <div class="nav-item-icon">👤</div>
+                  <span>Profile</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="screen-label">Screen 6: Profile</div>
+        </div>
+      </div>
+
+      <div
+        style="
+          background: white;
+          border-radius: 12px;
+          padding: 30px;
+          margin-top: 40px;
+        "
+      >
+        <h2
+          style="
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+          "
+        >
+          📱 Feature Modules
+        </h2>
+
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+          "
+        >
+          <div style="padding: 20px; background: #f8f9fa; border-radius: 8px">
+            <h3 style="color: #667eea; margin-bottom: 10px">📄 File Upload</h3>
+            <ul style="font-size: 13px; color: #666; line-height: 1.8">
+              <li>✓ Photo recognition (OCR)</li>
+              <li>✓ File selection (PDF, Word, Images)</li>
+              <li>✓ Batch upload</li>
+              <li>✓ History management</li>
+            </ul>
+          </div>
+
+          <div style="padding: 20px; background: #f8f9fa; border-radius: 8px">
+            <h3 style="color: #764ba2; margin-bottom: 10px">🤖 AI Analysis</h3>
+            <ul style="font-size: 13px; color: #666; line-height: 1.8">
+              <li>✓ Contract content recognition & extraction</li>
+              <li>✓ Key clause extraction</li>
+              <li>✓ Legal risk identification</li>
+              <li>✓ Real-time analysis progress</li>
+            </ul>
+          </div>
+
+          <div style="padding: 20px; background: #f8f9fa; border-radius: 8px">
+            <h3 style="color: #667eea; margin-bottom: 10px">
+              📊 Results Display
+            </h3>
+            <ul style="font-size: 13px; color: #666; line-height: 1.8">
+              <li>✓ Contract overview</li>
+              <li>✓ Risk level assessment</li>
+              <li>✓ Detailed clause analysis</li>
+              <li>✓ Improvement recommendations</li>
+            </ul>
+          </div>
+
+          <div style="padding: 20px; background: #f8f9fa; border-radius: 8px">
+            <h3 style="color: #764ba2; margin-bottom: 10px">
+              💾 Data Management
+            </h3>
+            <ul style="font-size: 13px; color: #666; line-height: 1.8">
+              <li>✓ Analysis history</li>
+              <li>✓ Favorite important contracts</li>
+              <li>✓ Export analysis reports</li>
+              <li>✓ Cloud sync</li>
+            </ul>
+          </div>
+
+          <div style="padding: 20px; background: #f8f9fa; border-radius: 8px">
+            <h3 style="color: #667eea; margin-bottom: 10px">⚙️ User Center</h3>
+            <ul style="font-size: 13px; color: #666; line-height: 1.8">
+              <li>✓ Account management</li>
+              <li>✓ Notification settings</li>
+              <li>✓ Privacy & security</li>
+              <li>✓ Help & feedback</li>
+            </ul>
+          </div>
+
+          <div style="padding: 20px; background: #f8f9fa; border-radius: 8px">
+            <h3 style="color: #764ba2; margin-bottom: 10px">
+              🔐 Security Features
+            </h3>
+            <ul style="font-size: 13px; color: #666; line-height: 1.8">
+              <li>✓ End-to-end encryption</li>
+              <li>✓ Privacy protection</li>
+              <li>✓ Data backup</li>
+              <li>✓ Compliance processing</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div
+        style="
+          background: white;
+          border-radius: 12px;
+          padding: 30px;
+          margin-top: 20px;
+        "
+      >
+        <h2
+          style="
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+          "
+        >
+          🎨 Design System
+        </h2>
+
+        <div
+          style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+          "
+        >
+          <div>
+            <h3
+              style="
+                font-size: 14px;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 12px;
+              "
+            >
+              Color System
+            </h3>
+            <div style="display: flex; flex-direction: column; gap: 10px">
+              <div style="display: flex; align-items: center; gap: 12px">
+                <div
+                  style="
+                    width: 40px;
+                    height: 40px;
+                    background: linear-gradient(
+                      135deg,
+                      #667eea 0%,
+                      #764ba2 100%
+                    );
+                    border-radius: 6px;
+                  "
+                ></div>
+                <span style="font-size: 13px; color: #666"
+                  >Primary (Purple-Blue Gradient)</span
+                >
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px">
+                <div
+                  style="
+                    width: 40px;
+                    height: 40px;
+                    background: #ffebee;
+                    border-radius: 6px;
+                  "
+                ></div>
+                <span style="font-size: 13px; color: #666"
+                  >Risk (Light Red)</span
+                >
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px">
+                <div
+                  style="
+                    width: 40px;
+                    height: 40px;
+                    background: #fff3e0;
+                    border-radius: 6px;
+                  "
+                ></div>
+                <span style="font-size: 13px; color: #666"
+                  >Warning (Light Orange)</span
+                >
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px">
+                <div
+                  style="
+                    width: 40px;
+                    height: 40px;
+                    background: #f8f9fa;
+                    border-radius: 6px;
+                    border: 1px solid #eee;
+                  "
+                ></div>
+                <span style="font-size: 13px; color: #666"
+                  >Background (Light Gray)</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3
+              style="
+                font-size: 14px;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 12px;
+              "
+            >
+              Typography System
+            </h3>
+            <div style="font-size: 13px; color: #666; line-height: 1.8">
+              <p style="margin-bottom: 8px">
+                <strong>Title:</strong> 18px, 600 weight
+              </p>
+              <p style="margin-bottom: 8px">
+                <strong>Subtitle:</strong> 14px, 600 weight
+              </p>
+              <p style="margin-bottom: 8px">
+                <strong>Body:</strong> 13px, 400 weight
+              </p>
+              <p><strong>Caption:</strong> 12px, 400 weight</p>
+            </div>
+          </div>
+
+          <div>
+            <h3
+              style="
+                font-size: 14px;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 12px;
+              "
+            >
+              Component Specs
+            </h3>
+            <div style="font-size: 13px; color: #666; line-height: 1.8">
+              <p style="margin-bottom: 8px">
+                • Border Radius: 8px (S), 12px (M), 30px (L)
+              </p>
+              <p style="margin-bottom: 8px">• Spacing: 8px, 12px, 16px, 20px</p>
+              <p style="margin-bottom: 8px">
+                • Shadow: 0 2px 8px rgba(0,0,0,0.08)
+              </p>
+              <p>• Transition: 0.3s all ease</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        style="
+          background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+          border-radius: 12px;
+          padding: 30px;
+          margin-top: 20px;
+          text-align: center;
+          border: 1px solid #667eea30;
+        "
+      >
+        <h2
+          style="
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+          "
+        >
+          🚀 Technology Stack
+        </h2>
+        <p style="color: #666; margin-bottom: 20px; line-height: 1.8">
+          <strong>Frontend Framework:</strong> React Native / Flutter<br />
+          <strong>AI Services:</strong> OpenAI API / Claude API / Local LLM<br />
+          <strong>OCR:</strong> Google Vision / Tesseract / PaddleOCR<br />
+          <strong>Backend:</strong> Node.js/NestJS or Python/FastAPI<br />
+          <strong>Database:</strong> PostgreSQL + Redis<br />
+          <strong>Storage:</strong> AWS S3 / Alibaba Cloud OSS<br />
+        </p>
+      </div>
     </div>
-</body>
+  </body>
 </html>
