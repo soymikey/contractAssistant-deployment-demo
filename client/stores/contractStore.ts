@@ -24,47 +24,29 @@ export const useContractStore = create<ContractStore>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      // TODO: Replace with actual API call
-      // const response = await contractService.getContracts();
+      const { contractService } = await import('@/services/contractService');
+      const response = await contractService.getContracts();
 
-      // Mock data aligned with English UI design (contract-assistant-ui.html)
-      const mockContracts: Contract[] = [
-        {
-          id: '1',
-          name: 'Employment_Contract_2025.pdf',
-          type: 'Employment Contract',
-          status: 'completed',
-          uploadedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-          analyzedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-          riskLevel: 'medium',
-          riskCount: 3,
-        },
-        {
-          id: '2',
-          name: 'Purchase_Agreement_001.png',
-          type: 'Purchase Agreement',
-          status: 'completed',
-          uploadedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          analyzedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          riskLevel: 'low',
-          riskCount: 1,
-        },
-        {
-          id: '3',
-          name: 'Lease_Agreement.docx',
-          type: 'Lease Agreement',
-          status: 'completed',
-          uploadedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-          analyzedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-          riskLevel: 'high',
-          riskCount: 5,
-        },
-      ];
+      console.log(response);
 
-      set({ contracts: mockContracts, isLoading: false });
+      // Map server fields (fileName) to client fields (name)
+      // Note: server response structure might vary, adjust mapping as needed
+      const contracts: Contract[] = (response.data || []).map((c: any) => ({
+        ...c,
+        name: c.fileName || c.name, // Handle both for safety
+      }));
+
+      set({ contracts: contracts, isLoading: false });
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to fetch contracts';
       set({ isLoading: false, error: errorMessage });
+
+      // Don't re-throw 401 errors to avoid red screen, they are handled by interceptor alerts
+      const { isApiError } = await import('@/services/api');
+      if (isApiError(error) && error.response?.status === 401) {
+        return;
+      }
+
       throw error;
     }
   },

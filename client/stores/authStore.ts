@@ -89,10 +89,12 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     }
   },
 
-  logout: async () => {
+  logout: async (options?: { skipApi?: boolean }) => {
     try {
-      // Call logout API
-      await authService.logout();
+      // Call logout API unless skipped
+      if (!options?.skipApi) {
+        await authService.logout();
+      }
 
       // Clear state
       set({
@@ -150,7 +152,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       set({ isLoading: false, error: errorMessage });
 
       // If refresh fails, logout user
-      await get().logout();
+      await get().logout({ skipApi: true });
       throw error;
     }
   },

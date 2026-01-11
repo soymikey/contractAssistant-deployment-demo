@@ -13,11 +13,13 @@ export interface ContractListParams {
 }
 
 export interface ContractListResponse {
-  contracts: Contract[];
-  total: number;
-  page: number;
-  limit: number;
-  hasMore: boolean;
+  data: Contract[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }
 
 export interface UploadContractRequest {

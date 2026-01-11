@@ -1,4 +1,4 @@
-import { apiClient, handleApiError, type ApiResponse } from './api';
+import { apiClient, handleApiError, isApiError, type ApiResponse } from './api';
 import type { User } from '@/types/store';
 
 /**
@@ -97,7 +97,12 @@ class AuthService {
       await apiClient.post(`${this.endpoint}/logout`);
     } catch (error) {
       // Log error but don't throw - logout should always succeed locally
-      console.error('Logout API error:', handleApiError(error));
+      // If it's a 401, it means the session was already invalid, which is fine
+      if (isApiError(error) && error.response?.status === 401) {
+        console.log('Logout API: Session already invalid (401)');
+      } else {
+        console.error('Logout API error:', handleApiError(error));
+      }
     }
   }
 

@@ -59,8 +59,10 @@ export function useAuth() {
           try {
             await refreshAuth();
           } catch {
-            // If refresh fails, logout
-            await logout();
+            // No need to call logout here as refreshAuth already handles it with skipApi: true
+            // but we might want to clear React Query cache
+            queryClient.removeQueries({ queryKey: ['user'] });
+            queryClient.removeQueries({ queryKey: ['contracts'] });
           }
         }
         setIsInitialized(true);
@@ -73,19 +75,22 @@ export function useAuth() {
   /**
    * Logout and clear all auth-related caches
    */
-  const handleLogout = useCallback(async () => {
-    try {
-      await logout();
-      // Clear all user-related queries
-      queryClient.removeQueries({ queryKey: ['user'] });
-      queryClient.removeQueries({ queryKey: ['contracts'] });
-      queryClient.removeQueries({ queryKey: ['favorites'] });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Logout failed';
-      setError(errorMessage);
-      throw err;
-    }
-  }, [logout, queryClient, setError]);
+  const handleLogout = useCallback(
+    async (options?: { skipApi?: boolean }) => {
+      try {
+        await logout(options);
+        // Clear all user-related queries
+        queryClient.removeQueries({ queryKey: ['user'] });
+        queryClient.removeQueries({ queryKey: ['contracts'] });
+        queryClient.removeQueries({ queryKey: ['favorites'] });
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Logout failed';
+        setError(errorMessage);
+        throw err;
+      }
+    },
+    [logout, queryClient, setError]
+  );
 
   /**
    * Refresh authentication token

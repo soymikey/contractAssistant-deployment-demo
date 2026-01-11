@@ -23,7 +23,7 @@ export interface AuthState {
 export interface AuthActions {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, name?: string) => Promise<void>;
-  logout: () => Promise<void>;
+  logout: (options?: { skipApi?: boolean }) => Promise<void>;
   refreshAuth: () => Promise<void>;
   setUser: (user: User) => void;
   setToken: (token: string, refreshToken?: string) => void;

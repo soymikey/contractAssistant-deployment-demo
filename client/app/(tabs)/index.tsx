@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,152 +6,65 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
-  Alert,
+  RefreshControl,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useCameraPermissions } from 'expo-camera';
-import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { useAnalysisStore } from '@/stores';
-// import { compressImage } from '@/utils/imageUtils'; // Available for future use
+import { useCamera, useUpload, useContractHistory } from '@/hooks';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { analyzeImage, clearAnalysis } = useAnalysisStore();
-  const [cameraPermission, requestCameraPermission] = useCameraPermissions();
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Mock data for recent analysis
-  const recentContracts = [
-    {
-      id: '1',
-      name: 'Employment_Contract_2025.pdf',
-      time: '2 hours ago',
-      status: 'Analyzed',
-    },
-    {
-      id: '2',
-      name: 'Purchase_Agreement_001.png',
-      time: '1 day ago',
-      status: 'Analyzed',
-    },
-    {
-      id: '3',
-      name: 'Lease_Agreement.docx',
-      time: '3 days ago',
-      status: 'Analyzed',
-    },
-  ];
+  const { takePhoto, pickImage } = useCamera();
+  const { handleImageAnalysis, isUploading } = useUpload();
+  const { contracts, isLoading, refreshHistory } = useContractHistory();
 
   /**
-   * Handle taking a photo with the camera for direct analysis
-   * Uses the legacy direct analysis endpoint for quick image analysis
+   * Handle taking a photo and starting analysis
    */
-  const handleTakePhoto = async () => {
-    try {
-      // Check camera permission
-      if (!cameraPermission) {
-        const { status } = await requestCameraPermission();
-        if (status !== 'granted') {
-          Alert.alert('Permission Denied', 'Camera permission is required to take photos');
-          return;
-        }
-      }
-
-      if (!cameraPermission?.granted) {
-        const { status } = await requestCameraPermission();
-        if (status !== 'granted') {
-          Alert.alert('Permission Denied', 'Camera permission is required to take photos');
-          return;
-        }
-      }
-
-      // Launch camera
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ['images'],
-        allowsEditing: false,
-        quality: 1,
-        base64: false,
-      });
-
-      if (!result.canceled && result.assets[0]) {
-        const imageUri = result.assets[0].uri;
-        setIsLoading(true);
-
-        // Clear previous analysis state
-        clearAnalysis();
-
-        // Navigate to analysis page first for immediate feedback
-        router.push('/analysis');
-
-        // Start direct image analysis (legacy endpoint for quick analysis)
-        // This sends the image directly to AI without queue
-        try {
-          await analyzeImage(imageUri);
-        } catch {
-          // Error is handled in the store and shown on analysis page
-        }
-        setIsLoading(false);
-      }
-    } catch (error) {
-      setIsLoading(false);
-      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to take photo');
+  const onTakePhoto = useCallback(async () => {
+    const uri = await takePhoto();
+    if (uri) {
+      // Navigate to analysis page first for immediate feedback
+      router.push('/analysis');
+      await handleImageAnalysis(uri);
     }
-  };
+  }, [takePhoto, handleImageAnalysis, router]);
 
   /**
-   * Handle choosing an image from the gallery for direct analysis
-   * Uses the legacy direct analysis endpoint for quick image analysis
+   * Handle choosing a file and starting analysis
    */
-  const handleChooseFile = async () => {
-    try {
-      // Request media library permission
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission Denied', 'Media library permission is required');
-        return;
-      }
-
-      // Launch image picker
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
-        allowsEditing: false,
-        quality: 0.8,
-        base64: false,
-      });
-
-      if (!result.canceled && result.assets[0]) {
-        const imageUri = result.assets[0].uri;
-        setIsLoading(true);
-
-        // Clear previous analysis state
-        clearAnalysis();
-
-        // Navigate to analysis page first for immediate feedback
-        router.push('/analysis');
-
-        // Start direct image analysis (legacy endpoint for quick analysis)
-        try {
-          await analyzeImage(imageUri);
-        } catch {
-          // Error is handled in the store and shown on analysis page
-        }
-        setIsLoading(false);
-      }
-    } catch (error) {
-      setIsLoading(false);
-      Alert.alert('Error', error instanceof Error ? error.message : 'Failed to choose image');
+  const onChooseFile = useCallback(async () => {
+    const uri = await pickImage();
+    if (uri) {
+      // Navigate to analysis page first for immediate feedback
+      router.push('/analysis');
+      await handleImageAnalysis(uri);
     }
+  }, [pickImage, handleImageAnalysis, router]);
+
+  /**
+   * Navigate to contract details
+   */
+  const onContractPress = (id: string) => {
+    // router.push(`/(details)/${id}`); // Potential link error, checking app structure
+    router.push({
+      pathname: '/(details)/[id]',
+      params: { id },
+    } as any);
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+      refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refreshHistory} />}
+    >
       {/* Upload Area */}
       <TouchableOpacity
         style={styles.uploadArea}
         activeOpacity={0.7}
-        onPress={handleTakePhoto}
-        disabled={isLoading}
+        onPress={onTakePhoto}
+        disabled={isUploading}
       >
         <LinearGradient
           colors={['#667eea15', '#764ba215']}
@@ -161,7 +74,7 @@ export default function HomeScreen() {
         >
           <Text style={styles.uploadIcon}>📄</Text>
           <Text style={styles.uploadText}>
-            {isLoading ? 'Processing...' : 'Tap to Upload or Take Photo'}
+            {isUploading ? 'Processing...' : 'Tap to Upload or Take Photo'}
           </Text>
           <Text style={styles.uploadSubtext}>Supports contract photos, PDF, Word files</Text>
         </LinearGradient>
@@ -172,8 +85,8 @@ export default function HomeScreen() {
         <TouchableOpacity
           style={styles.btnPrimary}
           activeOpacity={0.8}
-          onPress={handleTakePhoto}
-          disabled={isLoading}
+          onPress={onTakePhoto}
+          disabled={isUploading}
         >
           <LinearGradient
             colors={['#667eea', '#764ba2']}
@@ -182,15 +95,17 @@ export default function HomeScreen() {
             end={{ x: 1, y: 1 }}
           >
             <Text style={styles.btnIcon}>📷</Text>
-            <Text style={styles.btnTextPrimary}>{isLoading ? 'Processing...' : 'Take Photo'}</Text>
+            <Text style={styles.btnTextPrimary}>
+              {isUploading ? 'Processing...' : 'Take Photo'}
+            </Text>
           </LinearGradient>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.btnSecondary}
           activeOpacity={0.8}
-          onPress={handleChooseFile}
-          disabled={isLoading}
+          onPress={onChooseFile}
+          disabled={isUploading}
         >
           <Text style={styles.btnIcon}>📁</Text>
           <Text style={styles.btnTextSecondary}>Choose File</Text>
@@ -201,20 +116,41 @@ export default function HomeScreen() {
       <Text style={styles.sectionLabel}>RECENT ANALYSIS</Text>
 
       {/* Contract Items */}
-      {recentContracts.map((contract) => (
-        <TouchableOpacity key={contract.id} style={styles.contractItem} activeOpacity={0.7}>
-          <View style={styles.contractIcon}>
-            <Text style={styles.contractIconText}>📋</Text>
-          </View>
-          <View style={styles.contractInfo}>
-            <Text style={styles.contractName}>{contract.name}</Text>
-            <Text style={styles.contractMeta}>{contract.time}</Text>
-          </View>
-          <View style={styles.contractStatus}>
-            <Text style={styles.contractStatusText}>{contract.status}</Text>
-          </View>
-        </TouchableOpacity>
-      ))}
+      {contracts.length === 0 && !isLoading ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyText}>No recent contracts found</Text>
+        </View>
+      ) : (
+        contracts.map((contract) => (
+          <TouchableOpacity
+            key={contract.id}
+            style={styles.contractItem}
+            activeOpacity={0.7}
+            onPress={() => onContractPress(contract.id)}
+          >
+            <View style={styles.contractIcon}>
+              <Text style={styles.contractIconText}>📋</Text>
+            </View>
+            <View style={styles.contractInfo}>
+              <Text style={styles.contractName} numberOfLines={1}>
+                {contract.name}
+              </Text>
+              <Text style={styles.contractMeta}>
+                {new Date(contract.uploadedAt).toLocaleDateString()}
+              </Text>
+            </View>
+            <View
+              style={[
+                styles.contractStatus,
+                contract.status === 'completed' && styles.statusCompleted,
+                contract.status === 'failed' && styles.statusFailed,
+              ]}
+            >
+              <Text style={styles.contractStatusText}>{contract.status}</Text>
+            </View>
+          </TouchableOpacity>
+        ))
+      )}
     </ScrollView>
   );
 }
@@ -371,5 +307,20 @@ const styles = StyleSheet.create({
   contractStatusText: {
     fontSize: 11,
     color: '#666',
+    textTransform: 'capitalize',
+  },
+  statusCompleted: {
+    backgroundColor: '#e6fffa',
+  },
+  statusFailed: {
+    backgroundColor: '#fff5f5',
+  },
+  emptyState: {
+    padding: 40,
+    alignItems: 'center',
+  },
+  emptyText: {
+    color: '#999',
+    fontSize: 14,
   },
 });
