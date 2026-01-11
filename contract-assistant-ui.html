@@ -823,6 +823,60 @@
         border-color: #d1d1d1;
         transform: translateY(-1px);
       }
+
+      /* Search & Filter - Added for History Screen */
+      .search-bar {
+        background: #f0f0f0;
+        border-radius: 10px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+      .search-icon {
+        color: #999;
+        margin-right: 8px;
+        font-size: 16px;
+      }
+      .search-input {
+        border: none;
+        background: transparent;
+        flex: 1;
+        font-size: 14px;
+        outline: none;
+        color: #333;
+      }
+      .filter-tabs {
+        display: flex;
+        background: #f0f0f0;
+        border-radius: 8px;
+        padding: 4px;
+        margin-bottom: 15px;
+      }
+      .filter-tab {
+        flex: 1;
+        text-align: center;
+        padding: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        border-radius: 6px;
+        color: #666;
+        cursor: pointer;
+      }
+      .filter-tab.active {
+        background: white;
+        color: #333;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        font-weight: 600;
+      }
+      .star-icon {
+        font-size: 18px;
+        color: #ccc;
+        padding: 4px;
+      }
+      .star-icon.active {
+        color: #ffc107;
+      }
     </style>
   </head>
   <body>
@@ -1106,8 +1160,8 @@
                   <span>Analysis</span>
                 </div>
                 <div class="nav-item">
-                  <div class="nav-item-icon">❤️</div>
-                  <span>Favorites</span>
+                  <div class="nav-item-icon">🕒</div>
+                  <span>History</span>
                 </div>
                 <div class="nav-item">
                   <div class="nav-item-icon">👤</div>
@@ -1223,7 +1277,7 @@
                   </div>
                 </div>
 
-                <div class="section-label">View More Details</div>
+                <!-- <div class="section-label">View More Details</div> -->
               </div>
               <div class="bottom-nav">
                 <div class="nav-item active">
@@ -1248,7 +1302,7 @@
           <div class="screen-label">Screen 3: Analysis Summary</div>
         </div>
 
-        <!-- Screen 4: Detailed Analysis -->
+        <!-- Screen: History -->
         <div class="frame-container">
           <div class="phone-frame">
             <div class="screen">
@@ -1257,58 +1311,70 @@
                 <span>●●●●●</span>
               </div>
               <div class="screen-header">
-                <h2>📋 Detailed Analysis</h2>
-                <button class="icon-btn">↓</button>
+                <h2>History</h2>
+                <button class="icon-btn">🔍</button>
               </div>
               <div class="screen-content">
-                <div class="result-card">
-                  <div class="detail-section">
-                    <div class="detail-section-title">Basic Information</div>
-                    <div class="detail-item">
-                      <span class="detail-label">Contract Type</span>
-                      <span class="detail-value">Employment Contract</span>
-                    </div>
-                    <div class="detail-item">
-                      <span class="detail-label">Signing Date</span>
-                      <span class="detail-value">Jan 15, 2025</span>
-                    </div>
-                    <div class="detail-item">
-                      <span class="detail-label">Valid Period</span>
-                      <span class="detail-value">24 months</span>
-                    </div>
-                  </div>
+                <!-- Search Bar -->
+                <div class="search-bar">
+                  <span class="search-icon">🔍</span>
+                  <input
+                    type="text"
+                    class="search-input"
+                    placeholder="Search contracts..."
+                  />
+                </div>
 
-                  <div class="detail-section">
-                    <div class="detail-section-title">Party A Information</div>
-                    <div class="detail-item">
-                      <span class="detail-label">Name</span>
-                      <span class="detail-value">XX Company Ltd.</span>
-                    </div>
-                    <div class="detail-item">
-                      <span class="detail-label">Address</span>
-                      <span class="detail-value">Beijing, Chaoyang...</span>
-                    </div>
-                  </div>
+                <!-- Segmented Control -->
+                <div class="filter-tabs">
+                  <div class="filter-tab active">All</div>
+                  <div class="filter-tab">Favorites</div>
+                </div>
 
-                  <div class="detail-section">
-                    <div class="detail-section-title">Key Terms</div>
-                    <div class="detail-item">
-                      <span class="detail-label">Salary</span>
-                      <span class="detail-value">$15,000/month</span>
+                <!-- List -->
+                <div class="section-label">This Week</div>
+                <div class="contract-item">
+                  <div class="contract-icon">📋</div>
+                  <div class="contract-info">
+                    <div class="contract-name">
+                      Employment_Contract_2025.pdf
                     </div>
-                    <div class="detail-item">
-                      <span class="detail-label">Benefits</span>
-                      <span class="detail-value">Full Insurance</span>
-                    </div>
-                    <div class="detail-item">
-                      <span class="detail-label">Work Location</span>
-                      <span class="detail-value">Beijing HQ</span>
-                    </div>
+                    <div class="contract-meta">2 hours ago</div>
                   </div>
+                  <div class="star-icon">☆</div>
+                </div>
+
+                <div class="contract-item">
+                  <div class="contract-icon">📋</div>
+                  <div class="contract-info">
+                    <div class="contract-name">NDA_Client_X.pdf</div>
+                    <div class="contract-meta">Yesterday</div>
+                  </div>
+                  <div class="star-icon active">★</div>
+                </div>
+
+                <div class="section-label">Last Week</div>
+                <div class="contract-item">
+                  <div class="contract-icon">📋</div>
+                  <div class="contract-info">
+                    <div class="contract-name">Lease_Agreement_Office.docx</div>
+                    <div class="contract-meta">Jan 10</div>
+                  </div>
+                  <div class="star-icon">☆</div>
+                </div>
+                <div class="contract-item">
+                  <div class="contract-icon">📋</div>
+                  <div class="contract-info">
+                    <div class="contract-name">Vendor_Service_Level.pdf</div>
+                    <div class="contract-meta">Jan 08</div>
+                  </div>
+                  <div class="star-icon active">★</div>
                 </div>
               </div>
+
+              <!-- Bottom Nav (History Active) -->
               <div class="bottom-nav">
-                <div class="nav-item active">
+                <div class="nav-item">
                   <div class="nav-item-icon">🏠</div>
                   <span>Home</span>
                 </div>
@@ -1316,9 +1382,9 @@
                   <div class="nav-item-icon">📊</div>
                   <span>Analysis</span>
                 </div>
-                <div class="nav-item">
-                  <div class="nav-item-icon">❤️</div>
-                  <span>Favorites</span>
+                <div class="nav-item active">
+                  <div class="nav-item-icon">🕒</div>
+                  <span>History</span>
                 </div>
                 <div class="nav-item">
                   <div class="nav-item-icon">👤</div>
@@ -1327,111 +1393,7 @@
               </div>
             </div>
           </div>
-          <div class="screen-label">Screen 4: Detailed Analysis</div>
-        </div>
-
-        <!-- Screen 5: Risk Details -->
-        <div class="frame-container">
-          <div class="phone-frame">
-            <div class="screen">
-              <div class="status-bar">
-                <span>9:45</span>
-                <span>●●●●●</span>
-              </div>
-              <div class="screen-header">
-                <h2>⚠️ Risk Analysis</h2>
-              </div>
-              <div class="screen-content">
-                <div class="result-card">
-                  <div class="result-header">
-                    <div class="result-title">Risk Level: High</div>
-                    <div class="result-badge badge-risk">3 Items</div>
-                  </div>
-                </div>
-
-                <div class="result-card">
-                  <div class="result-header">
-                    <div class="result-title">High Risk Items</div>
-                  </div>
-                  <div class="result-content">
-                    <div class="risk-item">
-                      <div class="risk-icon">🔴</div>
-                      <div class="risk-content">
-                        <div class="risk-title">
-                          Vague Termination Compensation
-                        </div>
-                        <div class="risk-description">
-                          Termination compensation standards not clearly
-                          defined. Recommend supplementing per Labor Law Article
-                          47.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="result-card">
-                  <div class="result-header">
-                    <div class="result-title">Medium Risk Items</div>
-                  </div>
-                  <div class="result-content">
-                    <div class="risk-item">
-                      <div class="risk-icon">🟡</div>
-                      <div class="risk-content">
-                        <div class="risk-title">
-                          Excessive Confidentiality Period
-                        </div>
-                        <div class="risk-description">
-                          10-year confidentiality exceeds standards. Recommend
-                          changing to 3-5 years.
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="result-card">
-                  <div class="result-header">
-                    <div class="result-title">Recommendations</div>
-                  </div>
-                  <div class="result-content">
-                    <div style="margin-bottom: 10px">
-                      <strong>✓ Add Clauses</strong><br />
-                      <small
-                        >Add arbitration clause and jurisdiction
-                        agreement</small
-                      >
-                    </div>
-                    <div>
-                      <strong>✓ Modify Clauses</strong><br />
-                      <small
-                        >Adjust confidentiality period to legal range</small
-                      >
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="bottom-nav">
-                <div class="nav-item active">
-                  <div class="nav-item-icon">🏠</div>
-                  <span>Home</span>
-                </div>
-                <div class="nav-item">
-                  <div class="nav-item-icon">📊</div>
-                  <span>Analysis</span>
-                </div>
-                <div class="nav-item">
-                  <div class="nav-item-icon">❤️</div>
-                  <span>Favorites</span>
-                </div>
-                <div class="nav-item">
-                  <div class="nav-item-icon">👤</div>
-                  <span>Profile</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="screen-label">Screen 5: Risk Details</div>
+          <div class="screen-label">Screen 4: History (Replaces Favorites)</div>
         </div>
 
         <!-- Screen 6: Profile -->
@@ -1510,7 +1472,7 @@
                       5
                     </div>
                     <div style="font-size: 12px; color: #999; margin-top: 4px">
-                      Favorites
+                      History
                     </div>
                   </div>
                 </div>
