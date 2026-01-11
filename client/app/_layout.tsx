@@ -7,6 +7,12 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { initializeStores, useAuthStore } from '@/stores';
 import { QueryClientWrapper } from '@/providers/QueryClientWrapper';
+import * as SplashScreen from 'expo-splash-screen';
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync().catch(() => {
+  /* reloading the app might cause some errors */
+});
 
 /**
  * Root Layout Component
@@ -23,8 +29,14 @@ export default function RootLayout() {
   // Initialize stores on app startup
   useEffect(() => {
     const initialize = async () => {
-      await initializeStores();
-      setIsReady(true);
+      try {
+        await initializeStores();
+      } catch (e) {
+        console.warn(e);
+      } finally {
+        setIsReady(true);
+        await SplashScreen.hideAsync();
+      }
     };
     initialize();
   }, []);
@@ -44,6 +56,10 @@ export default function RootLayout() {
       router.replace('/(tabs)');
     }
   }, [isAuthenticated, segments, navigationState, router, isReady]);
+
+  if (!isReady) {
+    return null;
+  }
 
   return (
     <QueryClientWrapper>

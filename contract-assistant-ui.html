@@ -275,6 +275,110 @@
         color: #667eea;
       }
 
+      /* Modal / Alert Dialog */
+      .modal-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 200;
+        backdrop-filter: blur(2px);
+        animation: fadeIn 0.2s ease-out;
+      }
+
+      .alert-box {
+        background: white;
+        width: 85%;
+        max-width: 320px;
+        border-radius: 20px;
+        padding: 24px;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        animation: scaleIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      @keyframes scaleIn {
+        from { transform: scale(0.9); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+
+      .alert-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #ffebee;
+        color: #EA4335;
+        font-size: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+      }
+
+      .alert-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+      }
+
+      .alert-message {
+        font-size: 14px;
+        color: #666;
+        line-height: 1.5;
+        margin-bottom: 24px;
+      }
+
+      .alert-actions {
+        display: flex;
+        gap: 12px;
+      }
+
+      .alert-btn {
+        flex: 1;
+        padding: 12px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: background 0.2s;
+      }
+
+      .alert-btn-cancel {
+        background: #f5f5f5;
+        color: #666;
+      }
+      .alert-btn-cancel:hover {
+        background: #eeeeee;
+      }
+
+      .alert-btn-confirm {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+      }
+      .alert-btn-confirm:hover {
+        opacity: 0.9;
+      }
+
+      .alert-btn-danger {
+        background: #EA4335;
+        color: white;
+      }
+      .alert-btn-danger:hover {
+        background: #d32f2f;
+      }
+
       /* Home Screen */
       .home-card {
         background: white;
@@ -1561,6 +1665,70 @@
           </div>
           <div class="screen-label">Screen 7: Toasts & Alerts</div>
         </div>
+
+        <!-- Screen 8: Modal Dialog -->
+        <div class="frame-container">
+          <div class="phone-frame">
+            <div class="screen" style="position: relative">
+              <div class="status-bar">
+                <span>9:48</span>
+                <span>●●●●●</span>
+              </div>
+              <div class="screen-header">
+                <h2>Contract Details</h2>
+                <button class="icon-btn">⋯</button>
+              </div>
+              
+              <!-- Background Content (Blurred/Dimmed Concept) -->
+              <div class="screen-content">
+                <div class="result-card">
+                   <div class="detail-section">
+                    <div class="detail-section-title">Employment_Contract.pdf</div>
+                    <div class="detail-item">
+                      <span class="detail-label">Size</span>
+                      <span class="detail-value">2.4 MB</span>
+                    </div>
+                   </div>
+                </div>
+              </div>
+
+              <!-- Modal Overlay -->
+              <div class="modal-overlay">
+                <div class="alert-box">
+                  <div class="alert-icon">🗑️</div>
+                  <div class="alert-title">Delete Contract?</div>
+                  <div class="alert-message">
+                    Are you sure you want to delete "Employment_Contract.pdf"? This action cannot be undone.
+                  </div>
+                  <div class="alert-actions">
+                    <button class="alert-btn alert-btn-cancel">Cancel</button>
+                    <button class="alert-btn alert-btn-danger">Delete</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bottom-nav">
+                <div class="nav-item">
+                  <div class="nav-item-icon">🏠</div>
+                  <span>Home</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">📊</div>
+                  <span>Analysis</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">❤️</div>
+                  <span>Favorites</span>
+                </div>
+                <div class="nav-item">
+                  <div class="nav-item-icon">👤</div>
+                  <span>Profile</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="screen-label">Screen 8: Modal Dialog</div>
+        </div>
       </div>
 
       <div
@@ -1852,6 +2020,74 @@
                 </div>
                 <div class="toast-content">
                   <div class="toast-title" style="font-size: 12px">Error</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3
+              style="
+                font-size: 14px;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 12px;
+              "
+            >
+              Alert Dialogs
+            </h3>
+            <div
+              style="
+                border: 1px solid #eee;
+                border-radius: 12px;
+                padding: 16px;
+                background: white;
+                text-align: center;
+              "
+            >
+              <div
+                style="
+                  font-size: 14px;
+                  font-weight: 600;
+                  color: #333;
+                  margin-bottom: 4px;
+                "
+              >
+                Alert Title
+              </div>
+              <div
+                style="
+                  font-size: 12px;
+                  color: #666;
+                  margin-bottom: 12px;
+                "
+              >
+                Description text here...
+              </div>
+              <div style="display: flex; gap: 8px">
+                <div
+                  style="
+                    flex: 1;
+                    background: #f5f5f5;
+                    padding: 6px;
+                    border-radius: 6px;
+                    font-size: 11px;
+                    color: #666;
+                  "
+                >
+                  Cancel
+                </div>
+                <div
+                  style="
+                    flex: 1;
+                    background: #667eea;
+                    padding: 6px;
+                    border-radius: 6px;
+                    font-size: 11px;
+                    color: white;
+                  "
+                >
+                  Confirm
                 </div>
               </div>
             </div>

@@ -1,5 +1,4 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { Alert } from 'react-native';
 import { API_CONFIG } from '@/constants/config';
 import { getAuthToken } from './tokenHelper';
 
@@ -109,9 +108,10 @@ const createApiClient = (): AxiosInstance => {
           const { useAuthStore } = await import('@/stores');
 
           // Try to refresh token
-          const refreshToken = useAuthStore.getState().refreshToken;
+          const { refreshToken, isAuthenticated } = useAuthStore.getState();
 
-          if (refreshToken && error.config) {
+          // Only attempt refresh or logout if we were supposed to be authenticated
+          if (isAuthenticated && refreshToken && error.config) {
             try {
               // Attempt token refresh
               await useAuthStore.getState().refreshAuth();
@@ -127,10 +127,13 @@ const createApiClient = (): AxiosInstance => {
               await useAuthStore.getState().logout({ skipApi: true });
               return Promise.reject(new Error('Session expired. Please login again.'));
             }
-          } else {
-            // No refresh token, logout user
+          } else if (isAuthenticated) {
+            // If we think we are authenticated but 401 occurs, it's a real session expiration
             await useAuthStore.getState().logout({ skipApi: true });
             return Promise.reject(new Error('Authentication required. Please login.'));
+          } else {
+            // Not authenticated and got 401, just reject without clearing storage
+            return Promise.reject(error);
           }
         }
 

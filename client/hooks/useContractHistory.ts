@@ -1,4 +1,5 @@
 import { useCallback, useEffect } from 'react';
+import { useAuthStore } from '@/stores/authStore';
 import { useContractStore } from '@/stores/contractStore';
 
 /**
@@ -6,11 +7,14 @@ import { useContractStore } from '@/stores/contractStore';
  */
 export const useContractHistory = () => {
   const { contracts, isLoading, error, fetchContracts, deleteContract } = useContractStore();
+  const { isAuthenticated } = useAuthStore();
 
   // Load contracts on mount
   useEffect(() => {
-    fetchContracts();
-  }, []);
+    if (isAuthenticated) {
+      fetchContracts();
+    }
+  }, [isAuthenticated, fetchContracts]);
 
   const refreshHistory = useCallback(async () => {
     await fetchContracts();
