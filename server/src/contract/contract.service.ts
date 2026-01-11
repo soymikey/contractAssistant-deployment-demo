@@ -82,19 +82,28 @@ export class ContractService {
     // Calculate pagination
     const skip = (page - 1) * limit;
 
-    // Execute queries in parallel
+    // Execute queries sequentially instead of parallel Promise.all
+    // This is more stable for database environments with strict connection pool limits (like Supabase)
+    let contracts: any;
+    let total: any;
 
-    const [contracts, total] = await Promise.all([
-      this.prisma.contract.findMany({
+    try {
+      contracts = await this.prisma.contract.findMany({
         where,
         orderBy: {
           [sortBy]: sortOrder,
         },
         skip,
         take: limit,
-      }),
-      this.prisma.contract.count({ where }),
-    ]);
+      });
+
+      total = await this.prisma.contract.count({ where });
+    } catch (error) {
+      this.logger.error(
+        `Database operation failed in findAll: ${error.message}`,
+      );
+      throw error;
+    }
 
     this.logger.log(
       `Found ${contracts.length} contracts for user ${userId} (total: ${total})`,

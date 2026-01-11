@@ -27,8 +27,6 @@ export const useContractStore = create<ContractStore>((set, get) => ({
       const { contractService } = await import('@/services/contractService');
       const response = await contractService.getContracts();
 
-      console.log(response);
-
       // Map server fields (fileName) to client fields (name)
       // Note: server response structure might vary, adjust mapping as needed
       const contracts: Contract[] = (response.data || []).map((c: any) => ({

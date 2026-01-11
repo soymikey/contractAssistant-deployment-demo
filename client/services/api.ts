@@ -22,7 +22,6 @@ export interface ApiResponse<T = unknown> {
   message?: string;
 }
 
-console.log('API_CONFIG.baseURL: ', API_CONFIG.baseURL);
 /**
  * Create axios instance with default configuration
  */
@@ -49,7 +48,7 @@ const createApiClient = (): AxiosInstance => {
         console.log('[API Request]', {
           method: config.method?.toUpperCase(),
           url: config.url,
-          data: config.data,
+          // data: config.data,
         });
       }
 
@@ -69,7 +68,7 @@ const createApiClient = (): AxiosInstance => {
         console.log('[API Response]', {
           status: response.status,
           url: response.config.url,
-          data: response.data,
+          // data: response.data,
         });
       }
 

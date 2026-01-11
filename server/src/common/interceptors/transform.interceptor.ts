@@ -56,12 +56,16 @@ export class TransformInterceptor<T> implements NestInterceptor<
           data && typeof data === 'object' && 'message' in data;
 
         // Otherwise, wrap it in standard format
+        // Optimization: If it looks like a paginated response (has both data and meta),
+        // don't unwrap the data property to preserve metadata.
+        const shouldUnwrap = hasDataProperty && !('meta' in (data as object));
+
         return {
           statusCode: response.statusCode as number,
           message: hasMessageProperty
             ? String((data as { message: unknown }).message)
             : 'Success',
-          data: hasDataProperty ? (data as { data: T }).data : data,
+          data: shouldUnwrap ? (data as { data: T }).data : data,
           timestamp: new Date().toISOString(),
         };
       }),

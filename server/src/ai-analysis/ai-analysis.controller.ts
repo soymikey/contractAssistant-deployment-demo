@@ -193,25 +193,33 @@ export class AiAnalysisController {
    * This endpoint is for direct, synchronous analysis without queue
    */
   @Post('analyze')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Analyze contract image directly',
     description:
-      'Performs synchronous analysis on a base64-encoded contract image. Use the queue-based POST /analyses endpoint for production use.',
+      'Performs synchronous analysis on a base64-encoded contract image and stores the result. Use the queue-based POST /analyses endpoint for production use.',
   })
   @ApiResponse({
     status: 200,
     description: 'Analysis result',
   })
   @ApiResponse({ status: 400, description: 'Bad request' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   async analyzeContract(
     @Body() analyzeContractDto: AnalyzeContractDto,
+    @CurrentUser() user: RequestUser,
   ): Promise<AnalysisResponse> {
     try {
-      this.logger.log('Received direct contract analysis request');
+      this.logger.log(
+        `Received direct contract analysis request from user: ${user.userId}`,
+      );
 
-      const result =
-        await this.aiAnalysisService.analyzeContract(analyzeContractDto);
+      const result = await this.analysisService.analyzeAndStoreResult(
+        analyzeContractDto,
+        user.userId,
+      );
 
       return {
         success: true,

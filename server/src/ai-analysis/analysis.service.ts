@@ -11,7 +11,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import { AiAnalysisService } from './ai-analysis.service';
 import { DocumentService } from '../document/document.service';
 import { StorageService } from '../upload/storage.service';
+import { ContractService } from '../contract/contract.service';
 import { QUEUE_NAMES } from '../queues/queue-names.const';
+import { AnalyzeContractDto } from './dto/analyze-contract.dto';
 import type {
   AnalysisResult,
   RiskItem as AIRiskItem,
@@ -62,6 +64,7 @@ export class AnalysisService {
     private readonly aiAnalysisService: AiAnalysisService,
     private readonly documentService: DocumentService,
     private readonly storageService: StorageService,
+    private readonly contractService: ContractService,
     @InjectQueue(QUEUE_NAMES.ANALYSIS) private readonly analysisQueue: Queue,
   ) {}
 
@@ -151,6 +154,45 @@ export class AnalysisService {
       status: 'pending',
       message: 'Analysis job submitted successfully',
     };
+  }
+  /**
+   * Analyze contract directly and store results (for quick scan)
+   * @param dto - AnalyzeContractDto with base64 image
+   * @param userId - User ID
+   * @returns Analysis result
+   */
+  async analyzeAndStoreResult(
+    dto: AnalyzeContractDto,
+    userId: string,
+  ): Promise<AnalysisResult> {
+    this.logger.log(`Performing direct analysis for user: ${userId}`);
+
+    // 1. Perform AI analysis
+    const analysisResult = await this.aiAnalysisService.analyzeContract(dto);
+
+    // 2. Create a contract record (without saving the file as requested)
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const fileName = `Quick-Analysis-${timestamp}`;
+
+    const contract = await this.contractService.create(
+      {
+        fileName,
+        fileUrl: 'direct-analysis-no-file', // Placeholder as we don't save the source file
+        fileType: dto.mimeType || 'image/jpeg',
+        fileSize: 0,
+        status: 'completed',
+      },
+      userId,
+    );
+
+    // 3. Store analysis results
+    await this.storeAnalysisResults(contract.id, analysisResult);
+
+    this.logger.log(
+      `Stored direct analysis result for contract: ${contract.id}`,
+    );
+
+    return analysisResult;
   }
 
   /**

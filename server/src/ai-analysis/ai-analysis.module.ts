@@ -6,12 +6,14 @@ import { AnalysisService } from './analysis.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { DocumentModule } from '../document/document.module';
 import { UploadModule } from '../upload/upload.module';
+import { ContractModule } from '../contract/contract.module';
 import { QUEUE_NAMES } from '../queues/queue-names.const';
 
 @Module({
   imports: [
     PrismaModule,
     DocumentModule,
+    ContractModule,
     forwardRef(() => UploadModule),
     // Register analysis queue for this module
     BullModule.registerQueue({

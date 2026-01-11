@@ -1,5 +1,4 @@
-import axios from 'axios';
-import { API_CONFIG } from '@/constants/config';
+import { apiClient, handleApiError, type ApiResponse } from './api';
 
 // Type definitions matching server-side interfaces
 
@@ -25,14 +24,6 @@ export interface ContractInfo {
   effectiveDate?: string;
   expirationDate?: string;
   totalValue?: string;
-}
-
-// Response wrapper from server's global interceptor
-interface ApiResponseWrapper<T> {
-  statusCode: number;
-  message: string;
-  data: T;
-  timestamp?: string;
 }
 
 // Direct analysis result
@@ -102,198 +93,87 @@ export interface AnalysisHistoryItem {
  * Handles communication with the backend AI analysis API
  */
 class AiService {
-  private baseURL: string;
+  private readonly endpoint = '/analyses';
 
-  constructor() {
-    this.baseURL = API_CONFIG.baseURL;
-  }
+  constructor() {}
 
-  /**
-   * Unwrap the server's standard API response format
-   * Server wraps all responses in: { statusCode, message, data, timestamp }
-   * @param response - The axios response data
-   * @returns The unwrapped data of type T
-   */
-  private unwrapResponse<T>(response: unknown): T {
-    // Check if response is wrapped format
-    if (
-      response &&
-      typeof response === 'object' &&
-      'statusCode' in response &&
-      'data' in response
-    ) {
-      const wrapped = response as ApiResponseWrapper<T>;
-      if (wrapped.statusCode >= 200 && wrapped.statusCode < 300) {
-        return wrapped.data;
-      }
-      throw new Error(wrapped.message || 'Request failed');
-    }
-
-    // If not wrapped, return as-is (fallback for edge cases)
-    return response as T;
-  }
-
-  /**
-   * Submit a contract for queue-based analysis
-   * @param contractId - Contract ID to analyze
-   * @returns Submit response with job ID and analysis log ID
-   */
   async submitAnalysis(contractId: string): Promise<SubmitAnalysisResponse> {
     try {
-      const response = await axios.post(
-        `${this.baseURL}/analyses`,
-        { contractId },
-        {
-          timeout: API_CONFIG.timeout,
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const response = await apiClient.post<ApiResponse<SubmitAnalysisResponse>>(this.endpoint, {
+        contractId,
+      });
 
-      return this.unwrapResponse<SubmitAnalysisResponse>(response.data);
+      return response.data.data;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const message = error.response?.data?.message || error.message;
-        throw new Error(`Submit analysis failed: ${message}`);
-      }
-      throw error;
+      throw new Error(handleApiError(error));
     }
   }
 
-  /**
-   * Get analysis status by analysis log ID
-   * @param analysisLogId - Analysis log ID
-   * @returns Analysis status with progress
-   */
   async getAnalysisStatus(analysisLogId: string): Promise<AnalysisStatus> {
     try {
-      const response = await axios.get(`${this.baseURL}/analyses/status/${analysisLogId}`, {
-        timeout: API_CONFIG.timeout,
-      });
+      const response = await apiClient.get<ApiResponse<AnalysisStatus>>(
+        `${this.endpoint}/status/${analysisLogId}`
+      );
 
-      return this.unwrapResponse<AnalysisStatus>(response.data);
+      return response.data.data;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const message = error.response?.data?.message || error.message;
-        throw new Error(`Get analysis status failed: ${message}`);
-      }
-      throw error;
+      throw new Error(handleApiError(error));
     }
   }
 
-  /**
-   * Get analysis result by contract ID
-   * @param contractId - Contract ID
-   * @returns Analysis result with risks, key terms, and recommendations
-   */
   async getAnalysisResult(contractId: string): Promise<AnalysisResultDto | null> {
     try {
-      const response = await axios.get(`${this.baseURL}/analyses/contract/${contractId}`, {
-        timeout: API_CONFIG.timeout,
-      });
+      const response = await apiClient.get<ApiResponse<AnalysisResultDto>>(
+        `${this.endpoint}/contract/${contractId}`
+      );
 
-      return this.unwrapResponse<AnalysisResultDto>(response.data);
+      return response.data.data;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 404) {
-          return null;
-        }
-        const message = error.response?.data?.message || error.message;
-        throw new Error(`Get analysis result failed: ${message}`);
-      }
-      throw error;
+      throw new Error(handleApiError(error));
     }
   }
 
-  /**
-   * Get risks for a contract
-   * @param contractId - Contract ID
-   * @returns List of risk items
-   */
   async getRisks(contractId: string): Promise<RiskItem[]> {
     try {
-      const response = await axios.get(`${this.baseURL}/analyses/contract/${contractId}/risks`, {
-        timeout: API_CONFIG.timeout,
-      });
+      const response = await apiClient.get<ApiResponse<RiskItem[]>>(
+        `${this.endpoint}/contract/${contractId}/risks`
+      );
 
-      return this.unwrapResponse<RiskItem[]>(response.data);
+      return response.data.data;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const message = error.response?.data?.message || error.message;
-        throw new Error(`Get risks failed: ${message}`);
-      }
-      throw error;
+      throw new Error(handleApiError(error));
     }
   }
 
-  /**
-   * Get analysis history for a contract
-   * @param contractId - Contract ID
-   * @returns List of analysis history items
-   */
   async getAnalysisHistory(contractId: string): Promise<AnalysisHistoryItem[]> {
     try {
-      const response = await axios.get(`${this.baseURL}/analyses/contract/${contractId}/history`, {
-        timeout: API_CONFIG.timeout,
-      });
+      const response = await apiClient.get<ApiResponse<AnalysisHistoryItem[]>>(
+        `${this.endpoint}/contract/${contractId}/history`
+      );
 
-      return this.unwrapResponse<AnalysisHistoryItem[]>(response.data);
+      return response.data.data;
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const message = error.response?.data?.message || error.message;
-        throw new Error(`Get analysis history failed: ${message}`);
-      }
-      throw error;
+      throw new Error(handleApiError(error));
     }
   }
 
-  /**
-   * Direct image analysis (legacy endpoint for quick analysis)
-   * @param imageUri - Local image URI from camera or gallery
-   * @returns Analysis result with risks, key terms, and recommendations
-   */
   async analyzeImage(imageUri: string): Promise<AnalysisResult> {
     try {
       // Convert image to base64
       const base64Image = await this.convertImageToBase64(imageUri);
 
-      console.info(`Calling: ${this.baseURL}/analyses/analyze`);
-
       // Call backend API
-      // Server returns: { statusCode, message, data: AnalysisResult } via global interceptor
-      const response = await axios.post(
-        `${this.baseURL}/analyses/analyze`,
+      const response = await apiClient.post<ApiResponse<AnalysisResult>>(
+        `${this.endpoint}/analyze`,
         {
           image: base64Image,
           mimeType: 'image/jpeg',
-        },
-        {
-          timeout: API_CONFIG.timeout,
-          headers: {
-            'Content-Type': 'application/json',
-          },
         }
       );
 
-      return this.unwrapResponse<AnalysisResult>(response.data);
+      return response.data.data;
     } catch (error) {
-      console.error('analyzeImage error:', error);
-
-      if (axios.isAxiosError(error)) {
-        // Network or HTTP error
-        const serverMessage = error.response?.data?.message;
-        const errorMessage = typeof serverMessage === 'string' ? serverMessage : error.message;
-        throw new Error(`Analysis failed: ${errorMessage}`);
-      }
-
-      // Re-throw if it's already a proper Error
-      if (error instanceof Error) {
-        throw error;
-      }
-
-      // Unknown error type
-      throw new Error('Analysis failed: Unknown error occurred');
+      throw new Error(handleApiError(error));
     }
   }
 
@@ -323,14 +203,12 @@ class AiService {
     }
   }
 
-  /**
-   * Health check for AI analysis service
-   */
   async healthCheck(): Promise<boolean> {
     try {
-      const response = await axios.post(`${this.baseURL}/analyses/health`);
-      const data = this.unwrapResponse<{ status: string }>(response.data);
-      return data.status === 'ok';
+      const response = await apiClient.post<ApiResponse<{ status: string }>>(
+        `${this.endpoint}/health`
+      );
+      return response.data.data.status === 'ok';
     } catch {
       return false;
     }
