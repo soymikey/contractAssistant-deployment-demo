@@ -55,6 +55,22 @@ export default function LoginScreen() {
               </TouchableOpacity>
             </Link>
           </View>
+          <View style={styles.signupContainer}>
+            <Link href={'/forgot-password' as Href} asChild>
+              <TouchableOpacity>
+                <Text style={styles.signupLink}>Forgot password</Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
+          {/* 
+          忘记会发送链接到邮箱, 点击链接应该到要打开app并且到 reset-password 页面
+          <View style={styles.signupContainer}>
+            <Link href={'/reset-password' as Href} asChild>
+              <TouchableOpacity>
+                <Text style={styles.signupLink}>reset-password</Text>
+              </TouchableOpacity>
+            </Link>
+          </View> */}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
