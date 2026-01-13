@@ -203,11 +203,15 @@ export const useContractStore = create<ContractStore>((set, get) => ({
 
   toggleFavorite: async (contractId: string) => {
     try {
+      // Call the API to toggle favorite on the server
+      const { favoriteService } = await import('@/services/favoriteService');
+      const result = await favoriteService.toggleFavorite(contractId);
+
+      // Update local state based on server response
       set((state) => {
-        const isFavorite = state.favorites.includes(contractId);
-        const newFavorites = isFavorite
-          ? state.favorites.filter((id) => id !== contractId)
-          : [...state.favorites, contractId];
+        const newFavorites = result.isFavorited
+          ? [...state.favorites, contractId]
+          : state.favorites.filter((id) => id !== contractId);
 
         // Persist to AsyncStorage
         AsyncStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(newFavorites));
@@ -216,6 +220,7 @@ export const useContractStore = create<ContractStore>((set, get) => ({
       });
     } catch (error) {
       console.error('Failed to toggle favorite:', error);
+      throw error;
     }
   },
 
@@ -235,19 +240,53 @@ export const useContractStore = create<ContractStore>((set, get) => ({
       error: null,
     });
   },
+
+  /**
+   * Fetch favorites from the server
+   */
+  fetchFavorites: async () => {
+    try {
+      const { favoriteService } = await import('@/services/favoriteService');
+      const favorites = await favoriteService.getFavorites();
+
+      // Extract contract IDs from the favorites response
+      const favoriteIds = favorites.map((fav) => fav.contractId);
+
+      set({ favorites: favoriteIds });
+
+      // Persist to AsyncStorage
+      await AsyncStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(favoriteIds));
+    } catch (error) {
+      console.error('Failed to fetch favorites:', error);
+      // Fall back to AsyncStorage if API fails
+      const favoritesJson = await AsyncStorage.getItem(STORAGE_KEYS.FAVORITES);
+      if (favoritesJson) {
+        const favorites: string[] = JSON.parse(favoritesJson);
+        set({ favorites });
+      }
+    }
+  },
 }));
 
 /**
- * Restore favorites from AsyncStorage on app startup
+ * Restore favorites from server on app startup
+ * Falls back to AsyncStorage if API call fails
  */
 export const restoreFavorites = async () => {
   try {
-    const favoritesJson = await AsyncStorage.getItem(STORAGE_KEYS.FAVORITES);
-    if (favoritesJson) {
-      const favorites: string[] = JSON.parse(favoritesJson);
-      useContractStore.setState({ favorites });
-    }
+    // Try to fetch from server first
+    await useContractStore.getState().fetchFavorites();
   } catch (error) {
-    console.error('Failed to restore favorites:', error);
+    console.error('Failed to restore favorites from server:', error);
+    // Fallback to AsyncStorage
+    try {
+      const favoritesJson = await AsyncStorage.getItem(STORAGE_KEYS.FAVORITES);
+      if (favoritesJson) {
+        const favorites: string[] = JSON.parse(favoritesJson);
+        useContractStore.setState({ favorites });
+      }
+    } catch (storageError) {
+      console.error('Failed to restore favorites from AsyncStorage:', storageError);
+    }
   }
 };

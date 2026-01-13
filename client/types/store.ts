@@ -104,10 +104,11 @@ export interface ContractActions {
   addContract: (contract: Contract) => void;
   updateContract: (id: string, updates: Partial<Contract>) => void;
   deleteContract: (id: string) => Promise<void>;
-  toggleFavorite: (contractId: string) => void;
+  toggleFavorite: (contractId: string) => Promise<void>;
   setCurrentContract: (contract: Contract | null) => void;
   setError: (error: string | null) => void;
   clearContracts: () => void;
+  fetchFavorites: () => Promise<void>;
 }
 
 export type ContractStore = ContractState & ContractActions;

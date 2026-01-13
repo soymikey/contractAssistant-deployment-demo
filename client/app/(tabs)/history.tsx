@@ -204,7 +204,7 @@ export default function HistoryScreen() {
                   <Text style={styles.contractName} numberOfLines={1}>
                     {contract.name}
                   </Text>
-                  <Text style={styles.contractMeta}>{formatRelativeTime(contract.uploadedAt)}</Text>
+                  <Text style={styles.contractMeta}>{formatRelativeTime(contract.updatedAt)}</Text>
                 </View>
                 <TouchableOpacity
                   style={styles.starButton}
