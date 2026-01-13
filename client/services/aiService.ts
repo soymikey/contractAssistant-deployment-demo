@@ -157,7 +157,7 @@ class AiService {
     }
   }
 
-  async analyzeImage(imageUri: string): Promise<AnalysisResult> {
+  async analyzeImage(imageUri: string, fileName?: string): Promise<AnalysisResult> {
     try {
       // Convert image to base64
       const base64Image = await this.convertImageToBase64(imageUri);
@@ -168,6 +168,7 @@ class AiService {
         {
           image: base64Image,
           mimeType: 'image/jpeg',
+          fileName, // Include fileName if provided
         }
       );
 

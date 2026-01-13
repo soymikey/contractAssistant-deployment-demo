@@ -172,7 +172,8 @@ export class AnalysisService {
 
     // 2. Create a contract record (without saving the file as requested)
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const fileName = `Quick-Analysis-${timestamp}`;
+    // Use uploaded filename if provided, otherwise use timestamp-based name
+    const fileName = dto.fileName || `Quick-Analysis-${timestamp}`;
 
     const contract = await this.contractService.create(
       {

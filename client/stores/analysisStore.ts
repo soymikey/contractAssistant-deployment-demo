@@ -31,7 +31,7 @@ interface AnalysisStore {
   setContractId: (id: string) => void;
 
   // Direct analysis (legacy - for quick image analysis)
-  analyzeImage: (uri: string) => Promise<void>;
+  analyzeImage: (uri: string, fileName?: string) => Promise<void>;
 
   // Queue-based analysis (new - for uploaded contracts)
   submitAnalysis: (contractId: string) => Promise<SubmitAnalysisResponse>;
@@ -75,7 +75,7 @@ export const useAnalysisStore = create<AnalysisStore>((set, get) => ({
   },
 
   // Direct image analysis (legacy endpoint)
-  analyzeImage: async (uri: string) => {
+  analyzeImage: async (uri: string, fileName?: string) => {
     set({
       currentImage: uri,
       isLoading: true,
@@ -88,7 +88,7 @@ export const useAnalysisStore = create<AnalysisStore>((set, get) => ({
     });
 
     try {
-      const result = await aiService.analyzeImage(uri);
+      const result = await aiService.analyzeImage(uri, fileName);
 
       // Validate result structure
       if (!result || typeof result !== 'object') {

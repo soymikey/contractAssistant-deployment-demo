@@ -8,4 +8,8 @@ export class AnalyzeContractDto {
   @IsOptional()
   @IsString()
   mimeType?: string; // image/jpeg, image/png, etc.
+
+  @IsOptional()
+  @IsString()
+  fileName?: string; // original filename if uploaded from file
 }

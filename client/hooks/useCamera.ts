@@ -76,6 +76,7 @@ export const useCamera = () => {
 
   /**
    * Pick a document (PDF, Word, or image) from the file system
+   * Returns an object with uri and fileName
    */
   const pickDocument = useCallback(async () => {
     try {
@@ -91,7 +92,10 @@ export const useCamera = () => {
       });
 
       if (!result.canceled && result.assets[0]) {
-        return result.assets[0].uri;
+        return {
+          uri: result.assets[0].uri,
+          fileName: result.assets[0].name,
+        };
       }
     } catch (error) {
       console.error('pickDocument error:', error);

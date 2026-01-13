@@ -39,7 +39,7 @@ export interface Contract {
   name: string;
   type?: string;
   status: 'pending' | 'analyzing' | 'completed' | 'failed';
-  uploadedAt: string;
+  updatedAt: string;
   analyzedAt?: string;
   fileUrl?: string;
   thumbnailUrl?: string;

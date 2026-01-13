@@ -51,7 +51,7 @@ export const ContractList: React.FC<ContractListProps> = ({
               {contract.name}
             </Text>
             <Text style={styles.contractMeta}>
-              {new Date(contract.uploadedAt).toLocaleDateString()}
+              {new Date(contract.updatedAt).toLocaleDateString()}
             </Text>
           </View>
 

@@ -48,11 +48,11 @@ export default function HomeScreen() {
    * Handle choosing a document (PDF, Word, or image) and starting analysis
    */
   const onChooseDocument = useCallback(async () => {
-    const uri = await pickDocument();
-    if (uri) {
+    const result = await pickDocument();
+    if (result) {
       // Navigate to analysis page first for immediate feedback
       router.push('/analysis');
-      await handleImageAnalysis(uri);
+      await handleImageAnalysis(result.uri, result.fileName);
     }
   }, [pickDocument, handleImageAnalysis, router]);
 

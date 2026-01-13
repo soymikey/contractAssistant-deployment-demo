@@ -67,7 +67,7 @@ const createApiClient = (): AxiosInstance => {
         console.log('[API Response]', {
           status: response.status,
           url: response.config.url,
-          // data: response.data,
+          data: response.data,
         });
       }
 

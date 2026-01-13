@@ -18,14 +18,14 @@ export const useUpload = () => {
    * Handle image analysis flow (direct analysis for quick feedback)
    */
   const handleImageAnalysis = useCallback(
-    async (uri: string) => {
+    async (uri: string, fileName?: string) => {
       try {
         // Clear previous states
         clearAnalysis();
         clearUploads();
 
         // Start direct analysis
-        await analyzeImage(uri);
+        await analyzeImage(uri, fileName);
         return true;
       } catch (error) {
         console.error('handleImageAnalysis error:', error);
