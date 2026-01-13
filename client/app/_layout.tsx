@@ -1,65 +1,40 @@
-import { useEffect, useState } from 'react';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { Stack, useRouter, useSegments, useRootNavigationState } from 'expo-router';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
+import { useAuthContext } from '@/hooks/use-auth-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { initializeStores, useAuthStore } from '@/stores';
-import { QueryClientWrapper } from '@/providers/QueryClientWrapper';
+import AuthProvider from '@/providers/auth-provider';
+import { SplashScreenController } from '@/components/splash-screen-controller';
 
-/**
- * Root Layout Component
- * Sets up navigation stack and initializes app state
- */
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const router = useRouter();
-  const segments = useSegments();
-  const navigationState = useRootNavigationState();
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-  const [isReady, setIsReady] = useState(false);
-
-  // Initialize stores on app startup
-  useEffect(() => {
-    const initialize = async () => {
-      await initializeStores();
-      setIsReady(true);
-    };
-    initialize();
-  }, []);
-
-  // Auth guard - redirect to appropriate screen based on auth state
-  useEffect(() => {
-    if (!isReady || !navigationState?.key) return; // Wait for store initialization and navigation to be ready
-
-    const inAuthGroup = segments[0] === '(auth)';
-    const inTabsGroup = segments[0] === '(tabs)';
-
-    if (!isAuthenticated && inTabsGroup) {
-      // User is not authenticated and trying to access protected routes
-      router.replace('/(auth)/login');
-    } else if (isAuthenticated && inAuthGroup) {
-      // User is authenticated and on auth screens, redirect to tabs
-      router.replace('/(tabs)');
-    }
-  }, [isAuthenticated, segments, navigationState, router, isReady]);
+// Separate RootNavigator so we can access the AuthContext
+function RootNavigator() {
+  const { isLoggedIn } = useAuthContext();
 
   return (
-    <QueryClientWrapper>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack screenOptions={{ headerShown: false }}>
-          {/* Authentication screens */}
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+    <Stack>
+      <Stack.Protected guard={isLoggedIn}>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      </Stack.Protected>
+      <Stack.Protected guard={!isLoggedIn}>
+        <Stack.Screen name="login" options={{ headerShown: false }} />
+      </Stack.Protected>
+      <Stack.Screen name="+not-found" />
+    </Stack>
+  );
+}
 
-          {/* Main app with bottom tabs */}
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+export default function RootLayout() {
+  const colorScheme = useColorScheme();
 
-          {/* Modal screens */}
-          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-        </Stack>
+  return (
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <AuthProvider>
+        <SplashScreenController />
+        <RootNavigator />
         <StatusBar style="auto" />
-      </ThemeProvider>
-    </QueryClientWrapper>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
