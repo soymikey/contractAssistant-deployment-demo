@@ -100,6 +100,16 @@ export const useAnalysisStore = create<AnalysisStore>((set, get) => ({
         isLoading: false,
         progress: 100,
       });
+
+      // Refresh contract list to show the newly analyzed contract
+      try {
+        const { useContractStore } = await import('./contractStore');
+        const { fetchContracts } = useContractStore.getState();
+        await fetchContracts();
+      } catch (refreshError) {
+        console.error('Failed to refresh contract list:', refreshError);
+        // Don't throw - analysis succeeded, refresh is just a nice-to-have
+      }
     } catch (error) {
       console.error('analyzeImage store error:', error);
 

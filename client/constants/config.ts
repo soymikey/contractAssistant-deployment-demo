@@ -6,7 +6,7 @@
 // API 配置
 export const API_CONFIG = {
   baseURL: process.env.EXPO_PUBLIC_API_URL || 'http://192.168.100.110:3000/api/v1',
-  timeout: Number(process.env.EXPO_PUBLIC_API_TIMEOUT) || 30000,
+  timeout: Number(process.env.EXPO_PUBLIC_API_TIMEOUT) || 180000, // 3 minutes for AI analysis
 } as const;
 
 // 应用配置

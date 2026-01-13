@@ -55,11 +55,11 @@ export default function HistoryScreen() {
 
     const groups: { label: string; contracts: typeof filteredContracts }[] = [];
 
-    const thisWeek = filteredContracts.filter((c) => new Date(c.uploadedAt) >= oneWeekAgo);
+    const thisWeek = filteredContracts.filter((c) => new Date(c.updatedAt) >= oneWeekAgo);
     const lastMonth = filteredContracts.filter(
-      (c) => new Date(c.uploadedAt) < oneWeekAgo && new Date(c.uploadedAt) >= oneMonthAgo
+      (c) => new Date(c.updatedAt) < oneWeekAgo && new Date(c.updatedAt) >= oneMonthAgo
     );
-    const older = filteredContracts.filter((c) => new Date(c.uploadedAt) < oneMonthAgo);
+    const older = filteredContracts.filter((c) => new Date(c.updatedAt) < oneMonthAgo);
 
     if (thisWeek.length > 0) groups.push({ label: 'This Week', contracts: thisWeek });
     if (lastMonth.length > 0) groups.push({ label: 'Last Month', contracts: lastMonth });
