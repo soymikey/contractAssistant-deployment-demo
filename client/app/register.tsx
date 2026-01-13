@@ -1,22 +1,12 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-} from 'react-native';
-import { Link, Href } from 'expo-router';
-import GoogleSignInButton from '@/components/social-auth-buttons/google/google-sign-in-button';
-import ExpoAppleSignInButton from '@/components/social-auth-buttons/apple/expo-apple-sign-in-button';
+import { View, Text, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+
 import EmailSignIn from '@/components/social-auth-buttons/email/email-sign-in-button';
 
 /**
- * Login Screen
- * User authentication screen aligned with Contract Assistant UI design
+ * Register Screen
+ * User registration screen aligned with Contract Assistant UI design
  */
-export default function LoginScreen() {
+export default function RegisterScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -27,35 +17,9 @@ export default function LoginScreen() {
         <View style={styles.header}>
           <Text style={styles.logo}>📄</Text>
           <Text style={styles.title}>Contract Assistant</Text>
-          <Text style={styles.subtitle}>Sign in to your account</Text>
+          <Text style={styles.subtitle}>Create your account</Text>
         </View>
-
-        {/* Form */}
-        <View style={styles.form}>
-          <EmailSignIn />
-
-          {false && (
-            <Link href={'/(auth)/forgot-password' as Href} asChild>
-              <TouchableOpacity style={styles.forgotPassword}>
-                <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-              </TouchableOpacity>
-            </Link>
-          )}
-
-          <View>
-            {Platform.OS !== 'ios' && <ExpoAppleSignInButton />}
-            <GoogleSignInButton />
-          </View>
-
-          <View style={styles.signupContainer}>
-            <Text style={styles.signupText}>Don&apos;t have an account? </Text>
-            <Link href={'/register' as Href} asChild>
-              <TouchableOpacity>
-                <Text style={styles.signupLink}>Sign Up</Text>
-              </TouchableOpacity>
-            </Link>
-          </View>
-        </View>
+        <EmailSignIn isSign={false} />;
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -112,6 +76,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e0e0e0',
   },
+  passwordErrorText: {
+    fontSize: 12,
+    color: '#ff9800',
+    marginTop: 6,
+    fontWeight: '500',
+  },
   errorContainer: {
     backgroundColor: '#fee',
     borderRadius: 8,
@@ -133,40 +103,31 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     paddingLeft: 8,
   },
-  forgotPassword: {
-    alignSelf: 'flex-end',
-    marginBottom: 24,
-  },
-  forgotPasswordText: {
-    fontSize: 14,
-    color: '#667eea',
-    fontWeight: '600',
-  },
-  loginButton: {
+  registerButton: {
     backgroundColor: '#667eea',
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
     marginBottom: 20,
   },
-  loginButtonDisabled: {
+  registerButtonDisabled: {
     opacity: 0.6,
   },
-  loginButtonText: {
+  registerButtonText: {
     fontSize: 16,
     fontWeight: '700',
     color: '#fff',
   },
-  signupContainer: {
+  loginContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  signupText: {
+  loginText: {
     fontSize: 14,
     color: '#666',
   },
-  signupLink: {
+  loginLink: {
     fontSize: 14,
     color: '#667eea',
     fontWeight: '600',

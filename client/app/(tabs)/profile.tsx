@@ -1,7 +1,6 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { useRouter, Href } from 'expo-router';
-import { useAuthStore } from '@/stores';
 import SignOutButton from '@/components/social-auth-buttons/sign-out-button';
+import { useAuthContext } from '@/hooks/use-auth-context';
 
 /**
  * Profile Tab Screen
@@ -9,14 +8,7 @@ import SignOutButton from '@/components/social-auth-buttons/sign-out-button';
  * TODO: Implement full profile UI matching contract-assistant-ui.html
  */
 export default function ProfileScreen() {
-  const router = useRouter();
-  const user = useAuthStore((state) => state.user);
-  const logout = useAuthStore((state) => state.logout);
-
-  const handleLogout = async () => {
-    await logout();
-    router.replace('/(auth)/login' as Href);
-  };
+  const { profile } = useAuthContext();
 
   return (
     <ScrollView style={styles.container}>
@@ -24,10 +16,12 @@ export default function ProfileScreen() {
         {/* User Info */}
         <View style={styles.userSection}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{user?.name?.charAt(0).toUpperCase() || 'U'}</Text>
+            <Text style={styles.avatarText}>
+              {profile?.full_name?.charAt(0).toUpperCase() || 'U'}
+            </Text>
           </View>
-          <Text style={styles.userName}>{user?.name || 'User'}</Text>
-          <Text style={styles.userEmail}>{user?.email || 'user@example.com'}</Text>
+          <Text style={styles.userName}>{profile?.full_name || 'User'}</Text>
+          <Text style={styles.userEmail}>{profile?.email || 'user@example.com'}</Text>
         </View>
 
         {/* Menu Options */}
