@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter, Href } from 'expo-router';
 import { useAuthStore } from '@/stores';
+import SignOutButton from '@/components/social-auth-buttons/sign-out-button';
 
 /**
  * Profile Tab Screen
@@ -63,9 +64,7 @@ export default function ProfileScreen() {
         </View>
 
         {/* Logout Button */}
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>Sign Out</Text>
-        </TouchableOpacity>
+        <SignOutButton />
 
         <Text style={styles.version}>Version 1.0.0</Text>
       </View>

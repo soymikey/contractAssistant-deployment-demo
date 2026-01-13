@@ -1,43 +1,22 @@
-import { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
 } from 'react-native';
-import { Link, useRouter, Href } from 'expo-router';
-import { useLogin } from '@/hooks';
-import { showErrorToast, showSuccessToast } from '@/stores';
+import { Link, Href } from 'expo-router';
+import GoogleSignInButton from '@/components/social-auth-buttons/google/google-sign-in-button';
+import ExpoAppleSignInButton from '@/components/social-auth-buttons/apple/expo-apple-sign-in-button';
+import EmailSignIn from '@/components/social-auth-buttons/email/email-sign-in-button';
 
 /**
  * Login Screen
  * User authentication screen aligned with Contract Assistant UI design
  */
 export default function LoginScreen() {
-  const router = useRouter();
-  const [email, setEmail] = useState('admin@contractassistant.com');
-  const [password, setPassword] = useState('admin123456');
-  const { login, isLoading, error, clearError } = useLogin();
-
-  const handleLogin = async () => {
-    // Validation
-    if (!email || !password) {
-      showErrorToast('Please enter email and password');
-      return;
-    }
-
-    const result = await login(email, password);
-    if (result) {
-      showSuccessToast('Login successful');
-      router.replace('/(tabs)');
-    }
-    // Error is handled by the hook and stored in the error state
-  };
-
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -53,43 +32,7 @@ export default function LoginScreen() {
 
         {/* Form */}
         <View style={styles.form}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="user@example.com"
-              placeholderTextColor="#999"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              autoComplete="email"
-              keyboardType="email-address"
-              editable={!isLoading}
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your password"
-              placeholderTextColor="#999"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoComplete="password"
-              editable={!isLoading}
-            />
-          </View>
-
-          {error && (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{error}</Text>
-              <TouchableOpacity onPress={clearError}>
-                <Text style={styles.clearErrorText}>Dismiss</Text>
-              </TouchableOpacity>
-            </View>
-          )}
+          <EmailSignIn />
 
           {false && (
             <Link href={'/(auth)/forgot-password' as Href} asChild>
@@ -99,13 +42,10 @@ export default function LoginScreen() {
             </Link>
           )}
 
-          <TouchableOpacity
-            style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
-            onPress={handleLogin}
-            disabled={isLoading}
-          >
-            <Text style={styles.loginButtonText}>{isLoading ? 'Signing in...' : 'Sign In'}</Text>
-          </TouchableOpacity>
+          <View>
+            {Platform.OS !== 'ios' && <ExpoAppleSignInButton />}
+            <GoogleSignInButton />
+          </View>
 
           <View style={styles.signupContainer}>
             <Text style={styles.signupText}>Don&apos;t have an account? </Text>
