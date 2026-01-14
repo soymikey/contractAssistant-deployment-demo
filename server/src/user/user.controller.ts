@@ -2,11 +2,10 @@ import { Controller, Post, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UserEntity } from './entities';
-import { SupabaseAuthGuard } from 'src/auth/guards/supabase-auth.guard';
-
-interface SupabaseAuthenticatedRequest extends Request {
-  user: UserEntity;
-}
+import {
+  type SupabaseAuthenticatedRequest,
+  SupabaseAuthGuard,
+} from 'src/auth/guards/supabase-auth.guard';
 
 @Controller('users')
 @ApiTags('Users')

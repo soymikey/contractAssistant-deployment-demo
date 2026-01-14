@@ -6,10 +6,11 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { createClient, User } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
+import { UserEntity } from 'src/user/entities';
 
-interface SupabaseAuthenticatedRequest extends Request {
-  user: User;
+export interface SupabaseAuthenticatedRequest extends Request {
+  user: UserEntity;
 }
 
 @Injectable()
@@ -44,7 +45,7 @@ export class SupabaseAuthGuard implements CanActivate {
     }
 
     // 3. 将用户信息挂载到 request，方便 Controller 使用
-    request.user = user;
+    request.user = user as unknown as UserEntity;
     return true;
   }
 }
