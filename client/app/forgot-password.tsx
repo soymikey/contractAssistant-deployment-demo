@@ -10,7 +10,7 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import { Link, Href } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
 import { validateEmail } from '@/utils';
 
@@ -19,16 +19,14 @@ import { validateEmail } from '@/utils';
  * Password reset request screen aligned with Contract Assistant UI design
  */
 export default function ForgotPasswordScreen() {
+  const router = useRouter();
+
   const [email, setEmail] = useState('');
+  const [token, setToken] = useState('');
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [step, setStep] = useState(1); // 1: enter email, 2: verify code
 
   const handleResetPassword = async () => {
-    if (!email) {
-      Alert.alert('Error', 'Please enter your email address');
-      return;
-    }
-
     const emailValidation = validateEmail(email);
     if (!emailValidation.valid) {
       Alert.alert('Error', emailValidation.message || 'Please enter a valid email address');
@@ -37,21 +35,14 @@ export default function ForgotPasswordScreen() {
 
     setLoading(true);
     try {
-      // Use deep link scheme for mobile app, or web URL if deployed
-      const redirectTo =
-        Platform.OS === 'web'
-          ? `${typeof window !== 'undefined' ? window.location.origin : ''}/reset-password`
-          : 'contractassistant://reset-password';
-
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo,
-      });
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
 
       if (error) {
         Alert.alert('Error', error.message || 'Failed to send reset email');
       } else {
-        setSuccess(true);
-        Alert.alert('Success', 'Check your email for password reset instructions');
+        Alert.alert('Success', 'Check your email for verification code!', [
+          { text: 'OK', onPress: () => setStep(2) },
+        ]);
       }
     } catch (err) {
       Alert.alert('Error', err instanceof Error ? err.message : 'An unexpected error occurred');
@@ -60,38 +51,31 @@ export default function ForgotPasswordScreen() {
     }
   };
 
-  if (success) {
-    return (
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View style={styles.header}>
-            <Text style={styles.logo}>✉️</Text>
-            <Text style={styles.title}>Check Your Email</Text>
-            <Text style={styles.subtitle}>We&apos;ve sent a password reset link to {email}</Text>
-          </View>
+  const handleVerifyOtp = async () => {
+    if (!token) {
+      Alert.alert('Error', 'Please enter the verification code');
+      return;
+    }
 
-          <View style={styles.form}>
-            <Text style={styles.instructions}>
-              Click the link in the email to reset your password. If you don&apos;t see it, check
-              your spam folder.
-            </Text>
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token,
+        type: 'recovery',
+      });
 
-            <Link href={'/login' as Href} asChild>
-              <TouchableOpacity style={styles.backToLoginContainer}>
-                <Text style={styles.backToLoginText}>Back to Sign In</Text>
-              </TouchableOpacity>
-            </Link>
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    );
-  }
+      if (error) {
+        Alert.alert('Error', 'Invalid or expired code');
+      } else {
+        router.push(`/reset-password?email=${encodeURIComponent(email)}`);
+      }
+    } catch (err) {
+      Alert.alert('Error', err instanceof Error ? err.message : 'An unexpected error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -102,42 +86,80 @@ export default function ForgotPasswordScreen() {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.logo}>🔑</Text>
-          <Text style={styles.title}>Forgot Password?</Text>
+          <Text style={styles.title}>
+            {step === 1 ? 'Forgot Password?' : 'Enter Verification Code'}
+          </Text>
           <Text style={styles.subtitle}>
-            Enter your email and we&apos;ll send you a link to reset your password
+            {step === 1
+              ? "Enter your email and we'll send you a verification code to reset your password"
+              : `We sent a verification code to ${email}`}
           </Text>
         </View>
 
         {/* Form */}
         <View style={styles.form}>
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="user@example.com"
-              placeholderTextColor="#999"
-              value={email}
-              onChangeText={setEmail}
-              autoCapitalize="none"
-              autoComplete="email"
-              keyboardType="email-address"
-              editable={!loading}
-            />
-          </View>
+          {step === 1 ? (
+            <>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Email</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="user@example.com"
+                  placeholderTextColor="#999"
+                  value={email}
+                  onChangeText={setEmail}
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  keyboardType="email-address"
+                  editable={!loading}
+                />
+              </View>
+
+              <TouchableOpacity
+                style={[styles.resetButton, loading && styles.resetButtonDisabled]}
+                onPress={handleResetPassword}
+                disabled={loading}
+              >
+                <Text style={styles.resetButtonText}>
+                  {loading ? 'Sending...' : 'Send Verification Code'}
+                </Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>Verification Code</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="6-digit code"
+                  placeholderTextColor="#999"
+                  value={token}
+                  onChangeText={setToken}
+                  keyboardType="number-pad"
+                  maxLength={8}
+                  editable={!loading}
+                />
+              </View>
+
+              <TouchableOpacity
+                style={[styles.resetButton, loading && styles.resetButtonDisabled]}
+                onPress={handleVerifyOtp}
+                disabled={loading}
+              >
+                <Text style={styles.resetButtonText}>
+                  {loading ? 'Verifying...' : 'Verify Code'}
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
 
           <TouchableOpacity
-            style={[styles.resetButton, loading && styles.resetButtonDisabled]}
-            onPress={handleResetPassword}
+            style={styles.backToLoginContainer}
+            onPress={() => router.replace('/login')}
             disabled={loading}
           >
-            <Text style={styles.resetButtonText}>{loading ? 'Sending...' : 'Send Reset Link'}</Text>
+            <Text style={styles.backToLoginText}>Back to Sign In</Text>
           </TouchableOpacity>
-
-          <Link href={'/login' as Href} asChild>
-            <TouchableOpacity style={styles.backToLoginContainer}>
-              <Text style={styles.backToLoginText}>Back to Sign In</Text>
-            </TouchableOpacity>
-          </Link>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -219,6 +241,16 @@ const styles = StyleSheet.create({
   backToLoginText: {
     fontSize: 14,
     color: '#667eea',
+    fontWeight: '600',
+  },
+  backButton: {
+    alignItems: 'center',
+    padding: 12,
+    marginBottom: 20,
+  },
+  backButtonText: {
+    fontSize: 14,
+    color: '#666',
     fontWeight: '600',
   },
   instructions: {
