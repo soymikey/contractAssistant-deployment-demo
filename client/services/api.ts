@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { API_CONFIG } from '@/constants/config';
 import { getAuthToken } from './tokenHelper';
+import { supabase } from '@/lib/supabase';
 
 /**
  * API Error Response Interface
@@ -35,8 +36,9 @@ const createApiClient = (): AxiosInstance => {
 
   // Request interceptor - Add authentication token
   instance.interceptors.request.use(
-    (config: InternalAxiosRequestConfig) => {
-      const token = getAuthToken();
+    async (config: InternalAxiosRequestConfig) => {
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
 
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
@@ -47,6 +49,7 @@ const createApiClient = (): AxiosInstance => {
         console.log('[API Request]', {
           method: config.method?.toUpperCase(),
           url: config.url,
+          header: config.headers,
           // data: config.data,
         });
       }

@@ -13,6 +13,7 @@ import { useRouter } from 'expo-router';
 import { useCamera, useUpload, useContractHistory } from '@/hooks';
 import { useAnalysisStore } from '@/stores';
 import { ContractList } from '@/components';
+import { GetUserInfoButton } from '@/components/demoCode/get-userInfo-button';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -78,6 +79,8 @@ export default function HomeScreen() {
     >
       {/* Primary Action Button */}
       <View style={styles.primaryButtonContainer}>
+        <GetUserInfoButton />
+
         <TouchableOpacity
           style={styles.btnPrimary}
           activeOpacity={0.8}

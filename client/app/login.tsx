@@ -11,6 +11,7 @@ import { Link, Href } from 'expo-router';
 import GoogleSignInButton from '@/components/social-auth-buttons/google/google-sign-in-button';
 import ExpoAppleSignInButton from '@/components/social-auth-buttons/apple/expo-apple-sign-in-button';
 import EmailSignIn from '@/components/social-auth-buttons/email/email-sign-in-button';
+import { GetUserInfoButton } from '@/components/demoCode/get-userInfo-button';
 
 /**
  * Login Screen
@@ -23,6 +24,8 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
+        <GetUserInfoButton />
+
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.logo}>📄</Text>
