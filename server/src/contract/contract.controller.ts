@@ -26,13 +26,13 @@ import {
   ContractResponseDto,
   PaginatedContractResponseDto,
 } from './dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { SupabaseAuthGuard } from '../auth/guards/supabase-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { RequestUser } from '../common/types/authenticated-request.interface';
 
 @ApiTags('Contracts')
 @Controller('contracts')
-@UseGuards(JwtAuthGuard)
+@UseGuards(SupabaseAuthGuard)
 @ApiBearerAuth('JWT-auth')
 export class ContractController {
   constructor(private readonly contractService: ContractService) {}

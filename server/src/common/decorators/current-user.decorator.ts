@@ -1,7 +1,7 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
 /**
- * User data extracted from JWT token
+ * User data extracted from Supabase authentication
  */
 export interface RequestUser {
   userId: string;
@@ -13,14 +13,14 @@ export interface RequestUser {
  *
  * Usage:
  * @Get('profile')
- * @UseGuards(JwtAuthGuard)
+ * @UseGuards(SupabaseAuthGuard)
  * getProfile(@CurrentUser() user: RequestUser) {
  *   return { userId: user.userId, email: user.email };
  * }
  *
  * Or extract just the userId:
  * @Get('contracts')
- * @UseGuards(JwtAuthGuard)
+ * @UseGuards(SupabaseAuthGuard)
  * getContracts(@CurrentUser('userId') userId: string) {
  *   return this.service.getUserContracts(userId);
  * }

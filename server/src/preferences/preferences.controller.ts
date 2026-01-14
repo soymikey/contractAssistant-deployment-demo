@@ -5,14 +5,14 @@ import {
   ApiResponse,
   ApiBearerAuth,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { SupabaseAuthGuard } from '../auth/guards/supabase-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { PreferencesService } from './preferences.service';
 import { UpdatePreferencesDto, PreferencesResponseDto } from './dto';
 
 @Controller('preferences')
 @ApiTags('Preferences')
-@UseGuards(JwtAuthGuard)
+@UseGuards(SupabaseAuthGuard)
 @ApiBearerAuth('JWT-auth')
 export class PreferencesController {
   constructor(private readonly preferencesService: PreferencesService) {}

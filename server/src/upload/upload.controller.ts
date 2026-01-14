@@ -12,7 +12,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { SupabaseAuthGuard } from '../auth/guards/supabase-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { UploadService } from './upload.service';
 import { multerConfig } from './multer.config';
@@ -22,7 +22,7 @@ import { UploadResponseDto } from './dto';
  * Controller for handling file uploads
  */
 @Controller('upload')
-@UseGuards(JwtAuthGuard)
+@UseGuards(SupabaseAuthGuard)
 export class UploadController {
   private readonly logger = new Logger(UploadController.name);
 

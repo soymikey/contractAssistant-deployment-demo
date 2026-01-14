@@ -16,7 +16,7 @@ import {
   ApiBearerAuth,
   ApiParam,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { SupabaseAuthGuard } from '../auth/guards/supabase-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import type { RequestUser } from '../common/types/authenticated-request.interface';
 import { AiAnalysisService } from './ai-analysis.service';
@@ -46,7 +46,7 @@ export class AiAnalysisController {
    * Submit a contract for analysis (queue-based)
    */
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(SupabaseAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Submit contract for analysis',
@@ -80,7 +80,7 @@ export class AiAnalysisController {
    * Get analysis status
    */
   @Get('status/:analysisLogId')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(SupabaseAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Get analysis status',
@@ -106,7 +106,7 @@ export class AiAnalysisController {
    * Get analysis result by contract ID
    */
   @Get('contract/:contractId')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(SupabaseAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Get analysis result',
@@ -135,7 +135,7 @@ export class AiAnalysisController {
    * Get risks for a contract
    */
   @Get('contract/:contractId/risks')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(SupabaseAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Get contract risks',
@@ -163,7 +163,7 @@ export class AiAnalysisController {
    * Get analysis history for a contract
    */
   @Get('contract/:contractId/history')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(SupabaseAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Get analysis history',
@@ -193,7 +193,7 @@ export class AiAnalysisController {
    * This endpoint is for direct, synchronous analysis without queue
    */
   @Post('analyze')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(SupabaseAuthGuard)
   @ApiBearerAuth('JWT-auth')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({

@@ -9,7 +9,6 @@ import { validationSchema } from './config/validation.schema';
 import { HealthModule } from './health/health.module';
 import { QueuesModule } from './queues/queues.module';
 import { UserModule } from './user/user.module';
-import { AuthModule } from './auth/auth.module';
 import { UploadModule } from './upload/upload.module';
 import { DocumentModule } from './document/document.module';
 import { ContractModule } from './contract/contract.module';
@@ -64,7 +63,6 @@ import { PreferencesModule } from './preferences/preferences.module';
     HealthModule,
     QueuesModule,
     UserModule,
-    AuthModule,
     UploadModule,
     ContractModule,
     DocumentModule,

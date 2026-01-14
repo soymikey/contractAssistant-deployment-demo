@@ -16,7 +16,7 @@ import {
   ApiBearerAuth,
   ApiParam,
 } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { SupabaseAuthGuard } from '../auth/guards/supabase-auth.guard';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { FavoriteService } from './favorite.service';
 import {
@@ -27,7 +27,7 @@ import {
 
 @Controller('favorites')
 @ApiTags('Favorites')
-@UseGuards(JwtAuthGuard)
+@UseGuards(SupabaseAuthGuard)
 @ApiBearerAuth('JWT-auth')
 export class FavoriteController {
   constructor(private readonly favoriteService: FavoriteService) {}
