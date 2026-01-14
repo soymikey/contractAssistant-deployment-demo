@@ -40,7 +40,7 @@ export const useContractStore = create<ContractStore>((set, get) => ({
       set({ isLoading: false, error: errorMessage });
 
       // Don't re-throw 401 errors to avoid red screen, they are handled by interceptor alerts
-      const { isApiError } = await import('@/services/api');
+      const { isApiError } = await import('@/services/apiV2');
       if (isApiError(error) && error.response?.status === 401) {
         return;
       }

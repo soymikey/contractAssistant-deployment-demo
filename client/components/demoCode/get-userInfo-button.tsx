@@ -1,38 +1,25 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
-import { apiClient } from '@/services';
 import type { User } from '@/types/store';
+import { apiClient } from '@/services/apiV2';
 
 export type GetUserInfoButtonProps = {
   onSuccess?: (user: User) => void;
   onError?: (error: string) => void;
 };
 
-export function GetUserInfoButton({ onSuccess, onError }: GetUserInfoButtonProps = {}) {
+export function GetUserInfoButton() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleGetUserInfo = async () => {
     setIsLoading(true);
     try {
-      const response = await apiClient.post<{ success: boolean; data: User }>(`users/me`, {});
-      const userData = response.data.data;
-      console.log('response.data.data', userData);
+      const userInfo = await apiClient.post(`users/me`, {});
+      console.log('userInfo', userInfo);
+      Alert.alert('userInfo', JSON.stringify(userInfo));
 
-      if (onSuccess) {
-        onSuccess(userData);
-      } else {
-        Alert.alert('User Info', JSON.stringify(userData, null, 2));
-      }
+      setIsLoading(false);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to get user info';
-      console.error('Get user info error:', errorMessage);
-
-      if (onError) {
-        onError(errorMessage);
-      } else {
-        Alert.alert('Error', errorMessage);
-      }
-    } finally {
       setIsLoading(false);
     }
   };

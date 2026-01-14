@@ -1,4 +1,4 @@
-import { apiClient, handleApiError, type ApiResponse } from './api';
+import { apiClient, ApiResponse, handleApiError } from './apiV2';
 
 // Type definitions matching server-side interfaces
 

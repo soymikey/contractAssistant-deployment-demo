@@ -1,4 +1,4 @@
-import { apiClient, handleApiError, isApiError, type ApiResponse } from './api';
+import { apiClient, handleApiError, isApiError, type ApiResponse } from './apiV2';
 import type { User } from '@/types/store';
 
 /**

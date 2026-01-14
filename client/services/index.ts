@@ -4,8 +4,8 @@
  */
 
 // Core API client
-export { apiClient, handleApiError, isApiError } from './api';
-export type { ApiError, ApiResponse } from './api';
+export { apiClient, handleApiError, isApiError } from './apiV2';
+export type { ApiError, ApiResponse } from './apiV2';
 
 // Token Helper
 export { setAuthToken, getAuthToken } from './tokenHelper';

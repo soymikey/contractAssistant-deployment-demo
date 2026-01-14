@@ -1,4 +1,4 @@
-import { apiClient, handleApiError, type ApiResponse } from './api';
+import { apiClient, handleApiError, type ApiResponse } from './apiV2';
 import type { Contract, ContractAnalysis } from '@/types/store';
 
 /**

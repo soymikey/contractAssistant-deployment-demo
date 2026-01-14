@@ -7,7 +7,7 @@ import { useAuthContext } from '@/hooks/use-auth-context';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import AuthProvider from '@/providers/auth-provider';
 import { SplashScreenController } from '@/components/splash-screen-controller';
-
+import Toast from 'react-native-toast-message';
 // Separate RootNavigator so we can access the AuthContext
 function RootNavigator() {
   const { isLoggedIn } = useAuthContext();
@@ -30,6 +30,7 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <Toast />
       <AuthProvider>
         <SplashScreenController />
         <RootNavigator />
