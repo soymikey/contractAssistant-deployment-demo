@@ -46,28 +46,11 @@ export default function LoginScreen() {
             {Platform.OS !== 'ios' && <ExpoAppleSignInButton />}
             <GoogleSignInButton />
           </View>
-
-          <View style={styles.signupContainer}>
-            <Text style={styles.signupText}>Don&apos;t have an account? </Text>
-            <Link href={'/register' as Href} asChild>
-              <TouchableOpacity>
-                <Text style={styles.signupLink}>Sign Up</Text>
-              </TouchableOpacity>
-            </Link>
-          </View>
+          {/* 使用无密码登录, 就不需要这个功能了
           <View style={styles.signupContainer}>
             <Link href={'/forgot-password' as Href} asChild>
               <TouchableOpacity>
                 <Text style={styles.signupLink}>Forgot password</Text>
-              </TouchableOpacity>
-            </Link>
-          </View>
-          {/* 
-          忘记会发送链接到邮箱, 点击链接应该到要打开app并且到 reset-password 页面
-          <View style={styles.signupContainer}>
-            <Link href={'/reset-password' as Href} asChild>
-              <TouchableOpacity>
-                <Text style={styles.signupLink}>reset-password</Text>
               </TouchableOpacity>
             </Link>
           </View> */}
