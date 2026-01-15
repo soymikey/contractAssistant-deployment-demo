@@ -86,37 +86,27 @@ export default function GoogleSignInButton() {
     <TouchableOpacity
       onPress={onSignInButtonPress}
       style={{
+        flex: 1,
+        height: 52,
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
         backgroundColor: '#ffffff',
         borderWidth: 1,
-        borderColor: '#dbdbdb',
-        borderRadius: 4,
-        paddingVertical: 10,
-        paddingHorizontal: 15,
-        justifyContent: 'center',
+        borderColor: '#e2e8f0',
+        borderRadius: 14,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
+        shadowOpacity: 0.08,
         shadowRadius: 2,
-        elevation: 2, // For Android shadow
+        elevation: 2,
       }}
       activeOpacity={0.8}
     >
       <Image
-        source={{ uri: 'https://developers.google.com/identity/images/g-logo.png' }}
-        style={{ width: 24, height: 24, marginRight: 10 }}
+        source={{ uri: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMjIuNTYgMTIuMjVjMC0uNzgtLjA3LTEuNTMtLjItMi4yNUgxMnY0LjI2aDUuOTJjLS4yNiAxLjM3LTEuMDQgMi41My0yLjIxIDMuMzF2Mi43N2gzLjU3YzIuMDgtMS45MiAzLjI4LTQuNzQgMy4yOC04LjA5eiIgZmlsbD0iIzQyODVGNCI+PC9wYXRoPjxwYXRoIGQ9Ik0xMiAyM2MyLjk3IDAgNS40Ni0uOTggNy4yOC0yLjY2bC0zLjU3LTIuNzdjLS45OC42Ni0yLjIzIDEuMDYtMy43MSAxLjA2LTIuODYgMC01LjI5LTEuOTMtNi4xNi00LjUzSDIuMTh2Mi44NEMzLjk5IDIwLjUzIDcuNyAyMyAxMiAyM3oiIGZpbGw9IiMzNEE4NTMiPjwvcGF0aD48cGF0aCBkPSJNNS44NCAxNC4wOWMtLjIyLS42Ni0uMzUtMS4zNi0uMzUtMi4wOXMuMTMtMS40My4zNS0yLjA5VjcuMDdIMi4xOEMxLjQzIDguNTUgMSAxMC4yMiAxIDEyczAuNDMgMy40NSAxLjE4IDQuOTNsMi44NS0yLjIyLjgxLS42MnoiIGZpbGw9IiNGQkJDMDUiPjwvcGF0aD48cGF0aCBkPSJNMTIgNS4zOGMxLjYyIDAgMy4wNi41NiA0LjIxIDEuNjRsMy4xNS0zLjE1QzE3LjQ1IDIuMDkgMTQuOTcgMSAxMiAxIDcuNyAxIDMuOTkgMy40NyAyLjE4IDcuMDdsMy42NiAyLjg0Yy44Ny0yLjYgMy4zLTQuNTMgNi4xNi00LjUzeiIgZmlsbD0iI0VBNDMzNSI+PC9wYXRoPjwvc3ZnPg==' }}
+        style={{ width: 20, height: 20 }}
       />
-      <Text
-        style={{
-          fontSize: 16,
-          color: '#757575',
-          fontFamily: 'Roboto-Regular', // Assuming Roboto is available; install via expo-google-fonts or similar if needed
-          fontWeight: '500',
-        }}
-      >
-        Sign in with Google
-      </Text>
     </TouchableOpacity>
   );
 }

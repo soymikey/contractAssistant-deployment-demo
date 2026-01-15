@@ -49,8 +49,8 @@ export default function ExpoAppleSignInButton() {
   
   return <AppleAuthentication.AppleAuthenticationButton
     buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-    buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
-    cornerRadius={5}
+    buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.WHITE}
+    cornerRadius={14}
     style={styles.button}
     onPress={() => onAppleButtonPress()}
   />
@@ -64,6 +64,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   button: {
-    width: 160, height: 45
+    flex: 1,
+    height: 52,
+    borderRadius: 14,
   },
 });
