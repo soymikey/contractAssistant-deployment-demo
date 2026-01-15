@@ -1,4 +1,4 @@
-import { apiClient, handleApiError, type ApiResponse } from './apiV2';
+import { apiClient, handleApiError } from './apiV2';
 import type { Contract, ContractAnalysis } from '@/types/store';
 
 /**
@@ -50,11 +50,12 @@ class ContractService {
    */
   async getContracts(params?: ContractListParams): Promise<ContractListResponse> {
     try {
-      const response = await apiClient.get<ApiResponse<ContractListResponse>>(this.endpoint, {
+      const response = await apiClient.get<ContractListResponse>(this.endpoint, {
         params,
       });
 
-      return response.data.data;
+      console.log('response: ', response);
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -65,8 +66,8 @@ class ContractService {
    */
   async getContractById(id: string): Promise<Contract> {
     try {
-      const response = await apiClient.get<ApiResponse<Contract>>(`${this.endpoint}/${id}`);
-      return response.data.data;
+      const response = await apiClient.get<Contract>(`${this.endpoint}/${id}`);
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -82,7 +83,7 @@ class ContractService {
     onProgress?: (progress: number) => void
   ): Promise<Contract> {
     try {
-      const response = await apiClient.post<ApiResponse<Contract>>(
+      const response = await apiClient.post<Contract>(
         `${this.endpoint}/upload`,
         { name, file, type } as UploadContractRequest,
         {
@@ -97,7 +98,7 @@ class ContractService {
         }
       );
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -108,12 +109,9 @@ class ContractService {
    */
   async updateContract(id: string, updates: UpdateContractRequest): Promise<Contract> {
     try {
-      const response = await apiClient.patch<ApiResponse<Contract>>(
-        `${this.endpoint}/${id}`,
-        updates
-      );
+      const response = await apiClient.patch<Contract>(`${this.endpoint}/${id}`, updates);
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -135,11 +133,11 @@ class ContractService {
    */
   async getAnalysis(contractId: string): Promise<ContractAnalysis> {
     try {
-      const response = await apiClient.get<ApiResponse<ContractAnalysis>>(
+      const response = await apiClient.get<ContractAnalysis>(
         `${this.endpoint}/${contractId}/analysis`
       );
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -150,11 +148,11 @@ class ContractService {
    */
   async getContractContent(contractId: string): Promise<string> {
     try {
-      const response = await apiClient.get<ApiResponse<{ content: string }>>(
+      const response = await apiClient.get<{ content: string }>(
         `${this.endpoint}/${contractId}/content`
       );
 
-      return response.data.data.content;
+      return response.data.content;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -165,11 +163,9 @@ class ContractService {
    */
   async getFavorites(): Promise<Contract[]> {
     try {
-      const response = await apiClient.get<ApiResponse<{ contracts: Contract[] }>>(
-        `${this.endpoint}/favorites`
-      );
+      const response = await apiClient.get<{ contracts: Contract[] }>(`${this.endpoint}/favorites`);
 
-      return response.data.data.contracts;
+      return response.data.contracts;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -217,11 +213,11 @@ class ContractService {
    */
   async shareContract(contractId: string): Promise<string> {
     try {
-      const response = await apiClient.post<ApiResponse<{ shareUrl: string }>>(
+      const response = await apiClient.post<{ shareUrl: string }>(
         `${this.endpoint}/${contractId}/share`
       );
 
-      return response.data.data.shareUrl;
+      return response.data.shareUrl;
     } catch (error) {
       throw new Error(handleApiError(error));
     }

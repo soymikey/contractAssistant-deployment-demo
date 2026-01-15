@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import { useAuthStore } from '@/stores/authStore';
+import { useAuthContext } from '@/hooks/use-auth-context';
 import { useContractStore } from '@/stores/contractStore';
 
 /**
@@ -7,14 +7,16 @@ import { useContractStore } from '@/stores/contractStore';
  */
 export const useContractHistory = () => {
   const { contracts, isLoading, error, fetchContracts, deleteContract } = useContractStore();
-  const { isAuthenticated } = useAuthStore();
+  const { isLoggedIn } = useAuthContext();
 
   // Load contracts on mount
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchContracts();
+    if (isLoggedIn) {
+      // Call fetchContracts directly from store to avoid dependency issues
+      useContractStore.getState().fetchContracts();
     }
-  }, [isAuthenticated, fetchContracts]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoggedIn]);
 
   const refreshHistory = useCallback(async () => {
     await fetchContracts();

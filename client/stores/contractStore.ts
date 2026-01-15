@@ -190,10 +190,6 @@ export const useContractStore = create<ContractStore>((set, get) => ({
         currentContract: state.currentContract?.id === id ? null : state.currentContract,
         isLoading: false,
       }));
-
-      // Update favorites in AsyncStorage
-      const { favorites } = get();
-      await AsyncStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(favorites));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to delete contract';
       set({ isLoading: false, error: errorMessage });

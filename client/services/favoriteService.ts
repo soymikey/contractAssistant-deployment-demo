@@ -1,4 +1,4 @@
-import { apiClient, handleApiError, type ApiResponse } from './apiV2';
+import { apiClient, handleApiError } from './apiV2';
 
 /**
  * Favorite API Response Types
@@ -42,11 +42,11 @@ class FavoriteService {
    */
   async addFavorite(contractId: string): Promise<FavoriteResponse> {
     try {
-      const response = await apiClient.post<ApiResponse<FavoriteResponse>>(this.endpoint, {
+      const response = await apiClient.post<FavoriteResponse>(this.endpoint, {
         contractId,
       });
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -68,9 +68,9 @@ class FavoriteService {
    */
   async getFavorites(): Promise<FavoriteResponse[]> {
     try {
-      const response = await apiClient.get<ApiResponse<FavoriteResponse[]>>(this.endpoint);
+      const response = await apiClient.get<FavoriteResponse[]>(this.endpoint);
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -81,11 +81,9 @@ class FavoriteService {
    */
   async getFavoritesCount(): Promise<number> {
     try {
-      const response = await apiClient.get<ApiResponse<{ count: number }>>(
-        `${this.endpoint}/count`
-      );
+      const response = await apiClient.get<{ count: number }>(`${this.endpoint}/count`);
 
-      return response.data.data.count;
+      return response.data.count;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -96,11 +94,9 @@ class FavoriteService {
    */
   async checkFavorite(contractId: string): Promise<FavoriteCheckResponse> {
     try {
-      const response = await apiClient.get<ApiResponse<FavoriteCheckResponse>>(
-        `${this.endpoint}/${contractId}`
-      );
+      const response = await apiClient.get<FavoriteCheckResponse>(`${this.endpoint}/${contractId}`);
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -111,11 +107,11 @@ class FavoriteService {
    */
   async toggleFavorite(contractId: string): Promise<ToggleFavoriteResponse> {
     try {
-      const response = await apiClient.post<ApiResponse<ToggleFavoriteResponse>>(
+      const response = await apiClient.post<ToggleFavoriteResponse>(
         `${this.endpoint}/${contractId}/toggle`
       );
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }

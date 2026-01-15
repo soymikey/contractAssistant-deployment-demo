@@ -7,10 +7,10 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { createClient } from '@supabase/supabase-js';
-import { UserEntity } from 'src/user/entities';
+import { RequestUser } from 'src/common/decorators/current-user.decorator';
 
 export interface SupabaseAuthenticatedRequest extends Request {
-  user: UserEntity;
+  user: RequestUser;
 }
 
 @Injectable()
@@ -35,17 +35,23 @@ export class SupabaseAuthGuard implements CanActivate {
 
     // 2. 调用 Supabase 获取用户
     // 注意：getUser 会自动验证 JWT 的签名和过期时间
-    const {
-      data: { user },
-      error,
-    } = await this.supabase.auth.getUser(token);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+    const response = await this.supabase.auth.getUser(token);
 
-    if (error || !user) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    if (response.error || !response.data.user) {
       throw new UnauthorizedException('Invalid or expired token');
     }
 
-    // 3. 将用户信息挂载到 request，方便 Controller 使用
-    request.user = user as unknown as UserEntity;
+    // 3. 将用户信息映射为 RequestUser 格式并挂载到 request
+    // Supabase user 的 id 映射为 userId，email 保持不变
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    const supabaseUser = response.data.user;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    request.user = {
+      userId: supabaseUser.id,
+      email: supabaseUser.email || '',
+    };
     return true;
   }
 }

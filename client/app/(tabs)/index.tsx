@@ -20,6 +20,7 @@ export default function HomeScreen() {
   const { takePhoto, pickImage, pickDocument } = useCamera();
   const { handleImageAnalysis, isUploading } = useUpload();
   const { contracts, isLoading, refreshHistory, deleteHistoryItem } = useContractHistory();
+  console.log('contracts: ', contracts);
 
   /**
    * Handle taking a photo and starting analysis

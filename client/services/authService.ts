@@ -1,4 +1,4 @@
-import { apiClient, handleApiError, isApiError, type ApiResponse } from './apiV2';
+import { apiClient, handleApiError, isApiError } from './apiV2';
 import type { User } from '@/types/store';
 
 /**
@@ -62,12 +62,12 @@ class AuthService {
    */
   async login(email: string, password: string): Promise<LoginResponse> {
     try {
-      const response = await apiClient.post<ApiResponse<LoginResponse>>(`${this.endpoint}/login`, {
+      const response = await apiClient.post<LoginResponse>(`${this.endpoint}/login`, {
         email,
         password,
       } as LoginRequest);
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -78,12 +78,13 @@ class AuthService {
    */
   async register(email: string, password: string, name?: string): Promise<RegisterResponse> {
     try {
-      const response = await apiClient.post<ApiResponse<RegisterResponse>>(
-        `${this.endpoint}/register`,
-        { email, password, name } as RegisterRequest
-      );
+      const response = await apiClient.post<RegisterResponse>(`${this.endpoint}/register`, {
+        email,
+        password,
+        name,
+      } as RegisterRequest);
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -111,12 +112,11 @@ class AuthService {
    */
   async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
     try {
-      const response = await apiClient.post<ApiResponse<RefreshTokenResponse>>(
-        `${this.endpoint}/refresh`,
-        { refreshToken } as RefreshTokenRequest
-      );
+      const response = await apiClient.post<RefreshTokenResponse>(`${this.endpoint}/refresh`, {
+        refreshToken,
+      } as RefreshTokenRequest);
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -188,8 +188,8 @@ class AuthService {
    */
   async getCurrentUser(): Promise<User> {
     try {
-      const response = await apiClient.get<ApiResponse<User>>(`${this.endpoint}/me`);
-      return response.data.data;
+      const response = await apiClient.get<User>(`${this.endpoint}/me`);
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }

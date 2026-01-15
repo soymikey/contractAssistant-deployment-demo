@@ -61,7 +61,8 @@ axios.interceptors.request.use(
 // Response interceptor
 axios.interceptors.response.use(
   (response) => {
-    if (response.status === 200 || response.status === 201) {
+    // Accept successful status codes including 204 No Content
+    if (response.status >= 200 && response.status < 300) {
       return Promise.resolve(response);
     } else {
       return Promise.reject(response);
@@ -126,12 +127,14 @@ axios.interceptors.response.use(
  * @param params Request parameters
  */
 function get<T = unknown>(url: string, params?: Record<string, unknown>): Promise<ApiResponse<T>> {
+  console.log('url: ', url);
   return new Promise((resolve, reject) => {
     axios
       .get(url, {
         params: params,
       })
       .then((res) => {
+        console.log('res: ', res.data);
         resolve(res.data);
       })
       .catch((err) => {
@@ -144,17 +147,96 @@ function get<T = unknown>(url: string, params?: Record<string, unknown>): Promis
  * POST request
  * @param url Request URL
  * @param params Request body
+ * @param config Optional axios config (for upload progress, etc.)
  */
-function post<T = unknown>(url: string, params?: Record<string, unknown>): Promise<ApiResponse<T>> {
+function post<T = unknown>(
+  url: string,
+  params?: Record<string, unknown>,
+  config?: any
+): Promise<ApiResponse<T>> {
   return new Promise((resolve, reject) => {
     axios
       .post(url, params, {
         headers: {
           'Content-Type': 'application/json',
         },
+        ...config,
       })
       .then((res) => {
-        resolve(res.data.data);
+        resolve(res.data);
+      })
+      .catch((err) => {
+        reject(err.response?.data || err);
+      });
+  });
+}
+
+/**
+ * PATCH request
+ * @param url Request URL
+ * @param params Request body
+ */
+function patch<T = unknown>(
+  url: string,
+  params?: Record<string, unknown>
+): Promise<ApiResponse<T>> {
+  return new Promise((resolve, reject) => {
+    axios
+      .patch(url, params, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      .then((res) => {
+        resolve(res.data);
+      })
+      .catch((err) => {
+        reject(err.response?.data || err);
+      });
+  });
+}
+
+/**
+ * PUT request
+ * @param url Request URL
+ * @param params Request body
+ */
+function put<T = unknown>(url: string, params?: Record<string, unknown>): Promise<ApiResponse<T>> {
+  return new Promise((resolve, reject) => {
+    axios
+      .put(url, params, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      .then((res) => {
+        resolve(res.data);
+      })
+      .catch((err) => {
+        reject(err.response?.data || err);
+      });
+  });
+}
+
+/**
+ * DELETE request
+ * @param url Request URL
+ */
+function del<T = unknown>(url: string): Promise<ApiResponse<T>> {
+  return new Promise((resolve, reject) => {
+    axios
+      .delete(url)
+      .then((res) => {
+        // Handle 204 No Content responses (no response body)
+        if (res.status === 204 || !res.data) {
+          resolve({
+            success: true,
+            data: null as any,
+            message: 'Success',
+          });
+        } else {
+          resolve(res.data);
+        }
       })
       .catch((err) => {
         reject(err.response?.data || err);
@@ -165,6 +247,9 @@ function post<T = unknown>(url: string, params?: Record<string, unknown>): Promi
 export const apiClient = {
   get,
   post,
+  patch,
+  put,
+  delete: del,
 };
 /**
  * Type guard to check if error is an API error

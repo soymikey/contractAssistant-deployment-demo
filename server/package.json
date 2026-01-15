@@ -41,6 +41,7 @@
     "@nestjs/swagger": "^11.2.3",
     "@nestjs/terminus": "^11.0.0",
     "@prisma/client": "^5.22.0",
+    "@supabase/supabase-js": "^2.90.1",
     "bcryptjs": "^3.0.3",
     "bull": "^4.16.5",
     "class-transformer": "^0.5.1",

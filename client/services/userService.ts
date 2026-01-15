@@ -1,4 +1,4 @@
-import { apiClient, handleApiError, type ApiResponse } from './apiV2';
+import { apiClient, handleApiError } from './apiV2';
 import type { User } from '@/types/store';
 
 /**
@@ -48,8 +48,8 @@ class UserService {
    */
   async getUserProfile(): Promise<User> {
     try {
-      const response = await apiClient.get<ApiResponse<User>>(`${this.endpoint}/me`);
-      return response.data.data;
+      const response = await apiClient.get<User>(`${this.endpoint}/me`);
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -60,9 +60,9 @@ class UserService {
    */
   async updateProfile(updates: UpdateUserRequest): Promise<User> {
     try {
-      const response = await apiClient.patch<ApiResponse<User>>(`${this.endpoint}/me`, updates);
+      const response = await apiClient.patch<User>(`${this.endpoint}/me`, updates);
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -73,7 +73,7 @@ class UserService {
    */
   async uploadAvatar(avatarFile: string, onProgress?: (progress: number) => void): Promise<string> {
     try {
-      const response = await apiClient.post<ApiResponse<UploadAvatarResponse>>(
+      const response = await apiClient.post<UploadAvatarResponse>(
         `${this.endpoint}/me/avatar`,
         { avatar: avatarFile },
         {
@@ -88,7 +88,7 @@ class UserService {
         }
       );
 
-      return response.data.data.avatarUrl;
+      return response.data.avatarUrl;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -99,11 +99,9 @@ class UserService {
    */
   async getUserStats(): Promise<UserStatsResponse> {
     try {
-      const response = await apiClient.get<ApiResponse<UserStatsResponse>>(
-        `${this.endpoint}/me/stats`
-      );
+      const response = await apiClient.get<UserStatsResponse>(`${this.endpoint}/me/stats`);
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -114,11 +112,9 @@ class UserService {
    */
   async getPreferences(): Promise<UserPreferences> {
     try {
-      const response = await apiClient.get<ApiResponse<UserPreferences>>(
-        `${this.endpoint}/me/preferences`
-      );
+      const response = await apiClient.get<UserPreferences>(`${this.endpoint}/me/preferences`);
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -129,12 +125,12 @@ class UserService {
    */
   async updatePreferences(preferences: Partial<UserPreferences>): Promise<UserPreferences> {
     try {
-      const response = await apiClient.patch<ApiResponse<UserPreferences>>(
+      const response = await apiClient.patch<UserPreferences>(
         `${this.endpoint}/me/preferences`,
         preferences
       );
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -181,18 +177,16 @@ class UserService {
     }[]
   > {
     try {
-      const response = await apiClient.get<
-        ApiResponse<{
-          activities: {
-            id: string;
-            type: string;
-            description: string;
-            timestamp: string;
-          }[];
-        }>
-      >(`${this.endpoint}/me/activity`, { params: { limit } });
+      const response = await apiClient.get<{
+        activities: {
+          id: string;
+          type: string;
+          description: string;
+          timestamp: string;
+        }[];
+      }>(`${this.endpoint}/me/activity`, { params: { limit } });
 
-      return response.data.data.activities;
+      return response.data.activities;
     } catch (error) {
       throw new Error(handleApiError(error));
     }

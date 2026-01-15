@@ -1,4 +1,4 @@
-import { apiClient, ApiResponse, handleApiError } from './apiV2';
+import { apiClient, handleApiError } from './apiV2';
 
 // Type definitions matching server-side interfaces
 
@@ -99,11 +99,11 @@ class AiService {
 
   async submitAnalysis(contractId: string): Promise<SubmitAnalysisResponse> {
     try {
-      const response = await apiClient.post<ApiResponse<SubmitAnalysisResponse>>(this.endpoint, {
+      const response = await apiClient.post<SubmitAnalysisResponse>(this.endpoint, {
         contractId,
       });
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -111,11 +111,11 @@ class AiService {
 
   async getAnalysisStatus(analysisLogId: string): Promise<AnalysisStatus> {
     try {
-      const response = await apiClient.get<ApiResponse<AnalysisStatus>>(
+      const response = await apiClient.get<AnalysisStatus>(
         `${this.endpoint}/status/${analysisLogId}`
       );
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -123,11 +123,11 @@ class AiService {
 
   async getAnalysisResult(contractId: string): Promise<AnalysisResultDto | null> {
     try {
-      const response = await apiClient.get<ApiResponse<AnalysisResultDto>>(
+      const response = await apiClient.get<AnalysisResultDto>(
         `${this.endpoint}/contract/${contractId}`
       );
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -135,11 +135,11 @@ class AiService {
 
   async getRisks(contractId: string): Promise<RiskItem[]> {
     try {
-      const response = await apiClient.get<ApiResponse<RiskItem[]>>(
+      const response = await apiClient.get<RiskItem[]>(
         `${this.endpoint}/contract/${contractId}/risks`
       );
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -147,11 +147,11 @@ class AiService {
 
   async getAnalysisHistory(contractId: string): Promise<AnalysisHistoryItem[]> {
     try {
-      const response = await apiClient.get<ApiResponse<AnalysisHistoryItem[]>>(
+      const response = await apiClient.get<AnalysisHistoryItem[]>(
         `${this.endpoint}/contract/${contractId}/history`
       );
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -162,17 +162,20 @@ class AiService {
       // Convert image to base64
       const base64Image = await this.convertImageToBase64(imageUri);
 
-      // Call backend API
-      const response = await apiClient.post<ApiResponse<AnalysisResult>>(
+      // Call backend API with extended timeout for AI analysis (3 minutes)
+      const response = await apiClient.post<AnalysisResult>(
         `${this.endpoint}/analyze`,
         {
           image: base64Image,
           mimeType: 'image/jpeg',
           fileName, // Include fileName if provided
+        },
+        {
+          timeout: 10 * 60 * 1000, // 3 minutes for AI analysis
         }
       );
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       throw new Error(handleApiError(error));
     }
@@ -206,10 +209,8 @@ class AiService {
 
   async healthCheck(): Promise<boolean> {
     try {
-      const response = await apiClient.post<ApiResponse<{ status: string }>>(
-        `${this.endpoint}/health`
-      );
-      return response.data.data.status === 'ok';
+      const response = await apiClient.post<{ status: string }>(`${this.endpoint}/health`);
+      return response.data.status === 'ok';
     } catch {
       return false;
     }
