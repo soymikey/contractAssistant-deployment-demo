@@ -10,15 +10,17 @@ import {
   Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
 import { useAnalysisStore } from '@/stores';
 import type { RiskItem, KeyTerm } from '@/services';
 
 /**
- * Analysis Tab Screen
+ * Analysis Screen (Standalone)
  * Displays contract analysis loading state, progress, and results
  * Supports both direct image analysis and queue-based contract analysis
  */
 export default function AnalysisScreen() {
+  const router = useRouter();
   const {
     currentImage,
     analysisResult,
@@ -87,7 +89,7 @@ export default function AnalysisScreen() {
               <Text style={styles.spinnerIcon}>📄</Text>
             </View>
           </View>
-          
+
           <Text style={styles.loadingText}>{statusText}</Text>
           <Text style={styles.loadingSubtext}>Please wait...</Text>
 
@@ -170,221 +172,271 @@ export default function AnalysisScreen() {
     };
 
     return (
-      <ScrollView style={styles.container}>
-        <View style={styles.content}>
-          {/* View Source Indicator */}
-          {viewSource === 'history' && (
-            <View style={styles.sourceBadgeContainer}>
-              <View style={styles.sourceBadge}>
-                <Text style={styles.sourceBadgeIcon}>📜</Text>
-                <Text style={styles.sourceBadgeText}>Historical Analysis</Text>
+      <View style={styles.containerWithHeader}>
+        <ScrollView style={styles.scrollView}>
+          <View style={styles.content}>
+            {/* View Source Indicator */}
+            {viewSource === 'history' && (
+              <View style={styles.sourceBadgeContainer}>
+                <View style={styles.sourceBadge}>
+                  <Text style={styles.sourceBadgeIcon}>📜</Text>
+                  <Text style={styles.sourceBadgeText}>Historical Analysis</Text>
+                </View>
               </View>
-            </View>
-          )}
+            )}
 
-          {/* Contract Info Overview Card */}
-          {displayResult.contractInfo && (
-            <View style={styles.overviewCard}>
-              <View style={styles.cardHeader}>
-                <Text style={styles.cardTitle}>Contract Overview</Text>
-                <View style={styles.overviewBadge}>
-                  <Text style={styles.overviewBadgeText}>Overview</Text>
+            {/* Contract Info Overview Card */}
+            {displayResult.contractInfo && (
+              <View style={styles.overviewCard}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardTitle}>Contract Overview</Text>
+                  <View style={styles.overviewBadge}>
+                    <Text style={styles.overviewBadgeText}>Overview</Text>
+                  </View>
                 </View>
-              </View>
-              {displayResult.contractInfo.type && (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Type:</Text>
-                  <Text style={styles.infoValue}>{displayResult.contractInfo.type}</Text>
-                </View>
-              )}
-              {displayResult.contractInfo.parties &&
-                displayResult.contractInfo.parties.length > 0 && (
+                {displayResult.contractInfo.type && (
                   <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Parties:</Text>
+                    <Text style={styles.infoLabel}>Type:</Text>
+                    <Text style={styles.infoValue}>{displayResult.contractInfo.type}</Text>
+                  </View>
+                )}
+                {displayResult.contractInfo.parties &&
+                  displayResult.contractInfo.parties.length > 0 && (
+                    <View style={styles.infoRow}>
+                      <Text style={styles.infoLabel}>Parties:</Text>
+                      <Text style={styles.infoValue}>
+                        {displayResult.contractInfo.parties.join(', ')}
+                      </Text>
+                    </View>
+                  )}
+                {displayResult.contractInfo.effectiveDate && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Term:</Text>
                     <Text style={styles.infoValue}>
-                      {displayResult.contractInfo.parties.join(', ')}
+                      {displayResult.contractInfo.effectiveDate}
+                      {displayResult.contractInfo.expirationDate &&
+                        ` - ${displayResult.contractInfo.expirationDate}`}
                     </Text>
                   </View>
                 )}
-              {displayResult.contractInfo.effectiveDate && (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Term:</Text>
-                  <Text style={styles.infoValue}>
-                    {displayResult.contractInfo.effectiveDate}
-                    {displayResult.contractInfo.expirationDate &&
-                      ` - ${displayResult.contractInfo.expirationDate}`}
+                {displayResult.contractInfo.totalValue && (
+                  <View style={styles.infoRow}>
+                    <Text style={styles.infoLabel}>Pages:</Text>
+                    <Text style={styles.infoValue}>{displayResult.contractInfo.totalValue}</Text>
+                  </View>
+                )}
+              </View>
+            )}
+
+            {/* Overall Risk Level */}
+            <View style={styles.riskLevelCard}>
+              <View style={styles.riskLevelContent}>
+                <Text style={styles.riskLevelLabel}>Overall Risk Level</Text>
+                <View
+                  style={[
+                    styles.riskLevelBadge,
+                    { backgroundColor: getRiskLevelColor(displayResult.riskLevel) },
+                  ]}
+                >
+                  <Text style={styles.riskLevelBadgeText}>
+                    {getRiskLevelText(displayResult.riskLevel)}
                   </Text>
                 </View>
-              )}
-              {displayResult.contractInfo.totalValue && (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Pages:</Text>
-                  <Text style={styles.infoValue}>{displayResult.contractInfo.totalValue}</Text>
-                </View>
-              )}
-            </View>
-          )}
-
-          {/* Overall Risk Level */}
-          <View style={styles.riskLevelCard}>
-            <View style={styles.riskLevelContent}>
-              <Text style={styles.riskLevelLabel}>Overall Risk Level</Text>
-              <View
-                style={[
-                  styles.riskLevelBadge,
-                  { backgroundColor: getRiskLevelColor(displayResult.riskLevel) },
-                ]}
-              >
-                <Text style={styles.riskLevelBadgeText}>
-                  {getRiskLevelText(displayResult.riskLevel)}
-                </Text>
               </View>
             </View>
-          </View>
 
-          {/* Summary */}
-          <View style={styles.summaryCard}>
-            <View style={styles.cardHeader}>
-              <Text style={styles.cardTitle}>Summary</Text>
-            </View>
-            <Text style={styles.summaryText}>{displayResult.summary}</Text>
-          </View>
-
-          {/* Risk Items */}
-          {displayResult.risks.length > 0 && (
-            <View style={styles.riskCard}>
+            {/* Summary */}
+            <View style={styles.summaryCard}>
               <View style={styles.cardHeader}>
-                <Text style={styles.cardTitle}>Potential Risks</Text>
-                <View style={styles.riskCountBadge}>
-                  <Text style={styles.riskCountBadgeText}>{displayResult.risks.length} Items</Text>
-                </View>
+                <Text style={styles.cardTitle}>Summary</Text>
               </View>
-              {displayResult.risks.map((risk: RiskItem, index: number) => (
-                <View key={risk.id || index} style={styles.riskItem}>
-                  <View style={styles.riskIconWrapper}>
-                    <View
-                      style={[
-                        styles.riskIcon,
-                        { backgroundColor: getSeverityColor(risk.severity || 'medium') },
-                      ]}
-                    >
-                      <Text style={styles.riskIconText}>!</Text>
+              <Text style={styles.summaryText}>{displayResult.summary}</Text>
+            </View>
+
+            {/* Risk Items */}
+            {displayResult.risks.length > 0 && (
+              <View style={styles.riskCard}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardTitle}>Potential Risks</Text>
+                  <View style={styles.riskCountBadge}>
+                    <Text style={styles.riskCountBadgeText}>
+                      {displayResult.risks.length} Items
+                    </Text>
+                  </View>
+                </View>
+                {displayResult.risks.map((risk: RiskItem, index: number) => (
+                  <View key={risk.id || index} style={styles.riskItem}>
+                    <View style={styles.riskIconWrapper}>
+                      <View
+                        style={[
+                          styles.riskIcon,
+                          { backgroundColor: getSeverityColor(risk.severity || 'medium') },
+                        ]}
+                      >
+                        <Text style={styles.riskIconText}>!</Text>
+                      </View>
+                    </View>
+                    <View style={styles.riskContent}>
+                      <View style={styles.riskTitleRow}>
+                        <Text style={styles.riskTitle}>{risk.title}</Text>
+                        {risk.severity && (
+                          <View
+                            style={[
+                              styles.severityBadge,
+                              { backgroundColor: getSeverityColor(risk.severity) },
+                            ]}
+                          >
+                            <Text style={styles.severityBadgeText}>
+                              {risk.severity.toUpperCase()}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                      <Text style={styles.riskDescription}>{risk.description}</Text>
+                      {risk.category && (
+                        <Text style={styles.riskCategory}>Category: {risk.category}</Text>
+                      )}
+                      {risk.suggestion && (
+                        <Text style={styles.riskSuggestion}>💡 {risk.suggestion}</Text>
+                      )}
                     </View>
                   </View>
-                  <View style={styles.riskContent}>
-                    <View style={styles.riskTitleRow}>
-                      <Text style={styles.riskTitle}>{risk.title}</Text>
-                      {risk.severity && (
-                        <View
-                          style={[
-                            styles.severityBadge,
-                            { backgroundColor: getSeverityColor(risk.severity) },
-                          ]}
-                        >
-                          <Text style={styles.severityBadgeText}>
-                            {risk.severity.toUpperCase()}
-                          </Text>
+                ))}
+              </View>
+            )}
+
+            {/* Key Terms */}
+            {displayResult.keyTerms.length > 0 && (
+              <View style={styles.keyTermsCard}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardTitle}>Key Terms</Text>
+                  <View style={styles.keyTermsCountBadge}>
+                    <Text style={styles.keyTermsCountBadgeText}>
+                      {displayResult.keyTerms.length} Items
+                    </Text>
+                  </View>
+                </View>
+                {displayResult.keyTerms.map((term: KeyTerm, index: number) => (
+                  <View key={index} style={styles.termItem}>
+                    <View style={styles.termHeader}>
+                      <Text style={styles.termTitle}>{term.title}</Text>
+                      {term.importance && (
+                        <View style={styles.importanceBadge}>
+                          <Text style={styles.importanceBadgeText}>{term.importance}</Text>
                         </View>
                       )}
                     </View>
-                    <Text style={styles.riskDescription}>{risk.description}</Text>
-                    {risk.category && (
-                      <Text style={styles.riskCategory}>Category: {risk.category}</Text>
-                    )}
-                    {risk.suggestion && (
-                      <Text style={styles.riskSuggestion}>💡 {risk.suggestion}</Text>
-                    )}
+                    <Text style={styles.termContent}>{term.content}</Text>
                   </View>
-                </View>
-              ))}
-            </View>
-          )}
+                ))}
+              </View>
+            )}
 
-          {/* Key Terms */}
-          {displayResult.keyTerms.length > 0 && (
-            <View style={styles.keyTermsCard}>
-              <View style={styles.cardHeader}>
-                <Text style={styles.cardTitle}>Key Terms</Text>
-                <View style={styles.keyTermsCountBadge}>
-                  <Text style={styles.keyTermsCountBadgeText}>
-                    {displayResult.keyTerms.length} Items
+            {/* Recommendations */}
+            {displayResult.recommendations.length > 0 && (
+              <View style={styles.recommendationsCard}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardTitle}>Recommendations</Text>
+                </View>
+                {displayResult.recommendations.map((recommendation: string, index: number) => (
+                  <View key={index} style={styles.recommendationItem}>
+                    <View style={styles.recommendationBullet}>
+                      <Text style={styles.recommendationBulletText}>•</Text>
+                    </View>
+                    <Text style={styles.recommendationText}>{recommendation}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            {/* Action Buttons */}
+            <View style={styles.actionButtons}>
+              <TouchableOpacity style={styles.actionButton} onPress={clearAnalysis}>
+                <LinearGradient
+                  colors={['#1e293b', '#334155']}
+                  style={styles.actionButtonGradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <Text style={styles.actionButtonText}>
+                    {viewSource === 'history' ? 'Re-analyze' : 'Analyze Again'}
                   </Text>
-                </View>
-              </View>
-              {displayResult.keyTerms.map((term: KeyTerm, index: number) => (
-                <View key={index} style={styles.termItem}>
-                  <View style={styles.termHeader}>
-                    <Text style={styles.termTitle}>{term.title}</Text>
-                    {term.importance && (
-                      <View style={styles.importanceBadge}>
-                        <Text style={styles.importanceBadgeText}>{term.importance}</Text>
-                      </View>
-                    )}
-                  </View>
-                  <Text style={styles.termContent}>{term.content}</Text>
-                </View>
-              ))}
+                </LinearGradient>
+              </TouchableOpacity>
             </View>
-          )}
 
-          {/* Recommendations */}
-          {displayResult.recommendations.length > 0 && (
-            <View style={styles.recommendationsCard}>
-              <View style={styles.cardHeader}>
-                <Text style={styles.cardTitle}>Recommendations</Text>
-              </View>
-              {displayResult.recommendations.map((recommendation: string, index: number) => (
-                <View key={index} style={styles.recommendationItem}>
-                  <View style={styles.recommendationBullet}>
-                    <Text style={styles.recommendationBulletText}>•</Text>
-                  </View>
-                  <Text style={styles.recommendationText}>{recommendation}</Text>
-                </View>
-              ))}
-            </View>
-          )}
-
-          {/* Action Buttons */}
-          <View style={styles.actionButtons}>
-            <TouchableOpacity style={styles.actionButton} onPress={clearAnalysis}>
-              <LinearGradient
-                colors={['#1e293b', '#334155']}
-                style={styles.actionButtonGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <Text style={styles.actionButtonText}>
-                  {viewSource === 'history' ? 'Re-analyze' : 'Analyze Again'}
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
+            {/* Timestamp */}
+            <Text style={styles.timestamp}>
+              {viewSource === 'history' ? 'Analyzed' : 'Completed'} at:{' '}
+              {new Date(displayResult.analyzedAt).toLocaleString('en-US')}
+            </Text>
           </View>
-
-          {/* Timestamp */}
-          <Text style={styles.timestamp}>
-            {viewSource === 'history' ? 'Analyzed' : 'Completed'} at:{' '}
-            {new Date(displayResult.analyzedAt).toLocaleString('en-US')}
-          </Text>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
     );
   }
 
   // Empty state
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.placeholder}>
-          <Text style={styles.placeholderIcon}>📊</Text>
-          <Text style={styles.placeholderText}>No Analysis Yet</Text>
-          <Text style={styles.placeholderSubtext}>Take a photo or upload a contract from home</Text>
+    <View style={styles.containerWithHeader}>
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.content}>
+          <View style={styles.placeholder}>
+            <Text style={styles.placeholderIcon}>📊</Text>
+            <Text style={styles.placeholderText}>No Analysis Yet</Text>
+            <Text style={styles.placeholderSubtext}>
+              Take a photo or upload a contract from home
+            </Text>
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  // Container with header
+  containerWithHeader: {
+    flex: 1,
+    backgroundColor: '#f1f5f9', // Cool slate background
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingTop: Platform.OS === 'ios' ? 60 : 16,
+    paddingBottom: 12,
+    backgroundColor: '#f1f5f9',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(226, 232, 240, 0.8)',
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderWidth: 1,
+    borderColor: 'rgba(226, 232, 240, 0.8)',
+  },
+  backButtonText: {
+    fontSize: 24,
+    color: '#1e293b',
+    fontWeight: '600',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#000000',
+  },
+  headerSpacer: {
+    width: 40, // Same as back button for centering
+  },
+  scrollView: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: '#f1f5f9', // Cool slate background

@@ -8,7 +8,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 
 /**
  * Tab Layout
- * Bottom navigation with 4 tabs: Home, Analysis, History, Profile
+ * Bottom navigation with 3 tabs: Home, History, Profile
  * Aligned with Contract Assistant UI design
  */
 export default function TabLayout() {
@@ -49,16 +49,6 @@ export default function TabLayout() {
           title: 'Home',
           headerTitle: 'Contract Assistant',
           tabBarIcon: ({ color }) => <IconSymbol size={24} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="analysis"
-        options={{
-          title: 'Analysis',
-          headerTitle: 'Contract Analysis',
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={24} name="doc.text.magnifyingglass" color={color} />
-          ),
         }}
       />
       <Tabs.Screen
