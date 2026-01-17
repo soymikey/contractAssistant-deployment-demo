@@ -8,11 +8,7 @@
     "scheme": "contractassistant",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
@@ -21,15 +17,11 @@
         "backgroundColor": "#000000"
       }
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.contractassistant.app",
-      "associatedDomains": [
-        "applinks:contractassistant.app"
-      ],
+      "bundleIdentifier": "com.contractanalyzer.app",
+      "associatedDomains": ["applinks:contractanalyzer.app"],
       "infoPlist": {
         "NSCameraUsageDescription": "This app needs access to the camera to scan contracts.",
         "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to select contract images.",
@@ -43,13 +35,8 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "package": "com.contractassistant.app",
-      "permissions": [
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE",
-        "INTERNET"
-      ],
+      "package": "com.contractanalyzer.app",
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "INTERNET"],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "intentFilters": [
@@ -59,14 +46,11 @@
           "data": [
             {
               "scheme": "https",
-              "host": "contractassistant.app",
+              "host": "contractanalyzer.app",
               "pathPrefix": "/"
             }
           ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
+          "category": ["BROWSABLE", "DEFAULT"]
         }
       ]
     },
