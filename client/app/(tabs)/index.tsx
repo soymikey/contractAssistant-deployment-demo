@@ -13,7 +13,6 @@ import { useRouter } from 'expo-router';
 import { useCamera, useUpload, useContractHistory } from '@/hooks';
 import { useAnalysisStore } from '@/stores';
 import { ContractList } from '@/components';
-import { GetUserInfoButton } from '@/components/demoCode/get-userInfo-button';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -73,15 +72,13 @@ export default function HomeScreen() {
   );
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-      refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refreshHistory} />}
-    >
-      {/* Primary Action Button */}
-      <View style={styles.primaryButtonContainer}>
-        <GetUserInfoButton />
-
+    <View style={styles.container}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={styles.contentContainer}
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refreshHistory} />}
+      >
+        {/* Primary Action Button - Take Photo */}
         <TouchableOpacity
           style={styles.btnPrimary}
           activeOpacity={0.8}
@@ -89,7 +86,7 @@ export default function HomeScreen() {
           disabled={isUploading}
         >
           <LinearGradient
-            colors={['#667eea', '#764ba2']}
+            colors={['#1e293b', '#334155']}
             style={styles.btnGradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -100,118 +97,153 @@ export default function HomeScreen() {
             </Text>
           </LinearGradient>
         </TouchableOpacity>
-      </View>
 
-      {/* Secondary Action Buttons */}
-      <View style={styles.actionButtons}>
-        <TouchableOpacity
-          style={styles.btnSecondary}
-          activeOpacity={0.8}
-          onPress={onChoosePhoto}
-          disabled={isUploading}
-        >
-          <Text style={styles.btnIcon}>🖼️</Text>
-          <Text style={styles.btnTextSecondary}>Choose Photo</Text>
-        </TouchableOpacity>
+        {/* Secondary Action Buttons */}
+        <View style={styles.actionButtons}>
+          <TouchableOpacity
+            style={styles.btnSecondary}
+            activeOpacity={0.8}
+            onPress={onChoosePhoto}
+            disabled={isUploading}
+          >
+            <Text style={styles.btnIcon}>🖼️</Text>
+            <Text style={styles.btnTextSecondary}>Photo</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.btnSecondary}
-          activeOpacity={0.8}
-          onPress={onChooseDocument}
-          disabled={isUploading}
-        >
-          <Text style={styles.btnIcon}>📁</Text>
-          <Text style={styles.btnTextSecondary}>Choose Document</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={styles.btnSecondary}
+            activeOpacity={0.8}
+            onPress={onChooseDocument}
+            disabled={isUploading}
+          >
+            <Text style={styles.btnIcon}>📁</Text>
+            <Text style={styles.btnTextSecondary}>Document</Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* Recent Analysis Section */}
-      <Text style={styles.sectionLabel}>RECENT ANALYSIS</Text>
+        {/* Recent Analysis Section */}
+        <Text style={styles.sectionLabel}>RECENT ANALYSIS</Text>
 
-      {/* Contract Items */}
-      <ContractList
-        contracts={contracts}
-        onContractPress={onContractPress}
-        onDeleteContract={deleteHistoryItem}
-        isLoading={isLoading}
-      />
-    </ScrollView>
+        {/* Contract Items */}
+        <ContractList
+          contracts={contracts}
+          onContractPress={onContractPress}
+          onDeleteContract={deleteHistoryItem}
+          isLoading={isLoading}
+        />
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f1f5f9', // Cool slate background
+  },
+  header: {
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+    paddingBottom: 20,
+    paddingHorizontal: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+  headerButton: {
+    width: 40,
+    height: 40,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerButtonText: {
+    fontSize: 20,
+  },
+  scrollView: {
+    flex: 1,
   },
   contentContainer: {
-    padding: 20,
-  },
-  primaryButtonContainer: {
-    marginBottom: 10,
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: 15,
+    padding: 16,
+    paddingBottom: 24,
   },
   btnPrimary: {
-    flex: 1,
-    borderRadius: 8,
+    width: '100%',
+    height: 60,
+    borderRadius: 16,
     overflow: 'hidden',
+    marginBottom: 12,
     ...Platform.select({
       ios: {
-        shadowColor: '#667eea',
+        shadowColor: '#1e293b',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
       },
       android: {
-        elevation: 4,
+        elevation: 6,
       },
     }),
   },
   btnGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    gap: 8,
-  },
-  btnSecondary: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    backgroundColor: '#fff',
-    borderWidth: 2,
-    borderColor: '#667eea',
-    borderRadius: 8,
+    gap: 12,
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 24,
+  },
+  btnSecondary: {
+    flex: 1,
+    height: 52,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderWidth: 1,
+    borderColor: 'rgba(226, 232, 240, 0.8)',
+    borderRadius: 14,
     gap: 8,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.05,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   btnIcon: {
-    fontSize: 18,
+    fontSize: 20,
   },
   btnTextPrimary: {
-    color: '#fff',
-    fontSize: 14,
+    color: '#ffffff',
+    fontSize: 15,
     fontWeight: '600',
   },
   btnTextSecondary: {
-    color: '#667eea',
-    fontSize: 14,
+    color: '#475569', // Slate 600
+    fontSize: 13,
     fontWeight: '600',
   },
   sectionLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#999',
+    color: '#94a3b8', // Slate 400
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginTop: 16,
-    marginBottom: 8,
+    letterSpacing: 1,
+    marginBottom: 12,
   },
 });

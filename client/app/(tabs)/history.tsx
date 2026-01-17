@@ -130,7 +130,7 @@ export default function HistoryScreen() {
         <TextInput
           style={styles.searchInput}
           placeholder="Search contracts..."
-          placeholderTextColor="#999"
+          placeholderTextColor="#94a3b8"
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
@@ -228,7 +228,7 @@ export default function HistoryScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f1f5f9', // Cool Slate background
   },
   contentContainer: {
     padding: 20,
@@ -236,85 +236,18 @@ const styles = StyleSheet.create({
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginBottom: 15,
-  },
-  searchIcon: {
-    fontSize: 16,
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
-    color: '#333',
-    paddingVertical: 4,
-  },
-  clearIcon: {
-    fontSize: 14,
-    color: '#999',
-    padding: 4,
-  },
-  filterTabs: {
-    flexDirection: 'row',
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-    padding: 4,
-    marginBottom: 15,
-  },
-  filterTab: {
-    flex: 1,
-    paddingVertical: 8,
-    alignItems: 'center',
-    borderRadius: 6,
-  },
-  filterTabActive: {
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)', // Glass effect
+    borderWidth: 1,
+    borderColor: 'rgba(226, 232, 240, 0.8)', // Slate border
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginBottom: 16,
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
+        shadowColor: '#1e293b',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
-  },
-  filterTabText: {
-    fontSize: 13,
-    fontWeight: '500',
-    color: '#666',
-  },
-  filterTabTextActive: {
-    fontWeight: '600',
-    color: '#333',
-  },
-  sectionLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#999',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginTop: 16,
-    marginBottom: 8,
-  },
-  contractItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 10,
-    gap: 12,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
+        shadowOpacity: 0.06,
         shadowRadius: 8,
       },
       android: {
@@ -322,58 +255,143 @@ const styles = StyleSheet.create({
       },
     }),
   },
+  searchIcon: {
+    fontSize: 18,
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 15,
+    color: '#000000',
+    paddingVertical: 4,
+  },
+  clearIcon: {
+    fontSize: 16,
+    color: '#64748b',
+    padding: 4,
+  },
+  filterTabs: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Lighter glass
+    borderRadius: 14,
+    padding: 4,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(226, 232, 240, 0.8)',
+  },
+  filterTab: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  filterTabActive: {
+    backgroundColor: 'rgba(30, 41, 59, 0.95)', // Slate gradient color
+    ...Platform.select({
+      ios: {
+        shadowColor: '#1e293b',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  filterTabText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#64748b', // Slate-500
+  },
+  filterTabTextActive: {
+    fontWeight: '700',
+    color: '#ffffff', // White for active
+  },
+  sectionLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#94a3b8', // Slate-400
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginTop: 16,
+    marginBottom: 10,
+  },
+  contractItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)', // Glass effect
+    borderWidth: 1,
+    borderColor: 'rgba(226, 232, 240, 0.8)',
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 12,
+    gap: 14,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#1e293b',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
   contractIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    backgroundColor: '#f0f0f0',
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    backgroundColor: 'rgba(226, 232, 240, 0.5)', // Lighter slate
     alignItems: 'center',
     justifyContent: 'center',
   },
   contractIconText: {
-    fontSize: 20,
+    fontSize: 22,
   },
   contractInfo: {
     flex: 1,
   },
   contractName: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#333',
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#000000', // Black for titles
     marginBottom: 4,
   },
   contractMeta: {
-    fontSize: 11,
-    color: '#999',
+    fontSize: 12,
+    color: '#64748b', // Slate-500
   },
   starButton: {
     padding: 8,
   },
   starIcon: {
-    fontSize: 20,
-    color: '#ccc',
+    fontSize: 22,
+    color: '#cbd5e1', // Slate-300 for inactive
   },
   starActive: {
-    color: '#ffc107',
+    color: '#f59e0b', // Amber for active favorites
   },
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 60,
+    paddingVertical: 80,
   },
   emptyIcon: {
-    fontSize: 48,
-    marginBottom: 16,
+    fontSize: 56,
+    marginBottom: 20,
   },
   emptyText: {
-    fontSize: 16,
-    color: '#999',
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#64748b',
     marginBottom: 8,
     textAlign: 'center',
   },
   emptySubtext: {
     fontSize: 14,
-    color: '#bbb',
+    color: '#94a3b8',
     textAlign: 'center',
   },
 });

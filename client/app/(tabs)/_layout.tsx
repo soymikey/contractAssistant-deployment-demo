@@ -17,22 +17,22 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#667eea',
-        tabBarInactiveTintColor: '#999',
+        tabBarActiveTintColor: '#1e293b', // Cool Slate dark
+        tabBarInactiveTintColor: '#94a3b8', // Slate-400
         headerShown: true,
         headerStyle: {
-          backgroundColor: '#fff',
+          backgroundColor: '#f1f5f9', // Cool Slate background
         },
-        headerTintColor: '#333',
+        headerTintColor: '#000000', // Black for header text
         headerTitleStyle: {
           fontWeight: '700',
           fontSize: 18,
         },
         tabBarButton: HapticTab,
         tabBarStyle: {
-          backgroundColor: '#fff',
+          backgroundColor: 'rgba(255, 255, 255, 0.95)', // Glass effect
           borderTopWidth: 1,
-          borderTopColor: '#e0e0e0',
+          borderTopColor: 'rgba(226, 232, 240, 0.8)', // Slate border
           height: 60 + insets.bottom,
           paddingBottom: Platform.OS === 'ios' ? insets.bottom : 8,
           paddingTop: 8,

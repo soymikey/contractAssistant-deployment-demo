@@ -78,22 +78,30 @@ export default function AnalysisScreen() {
     return (
       <View style={styles.container}>
         <View style={styles.loadingContainer}>
-          {currentImage && (
-            <View style={styles.imagePreview}>
-              <Image source={{ uri: currentImage }} style={styles.previewImage} />
+          {/* Loading Spinner */}
+          <View style={styles.spinnerWrapper}>
+            <View style={styles.spinnerOuter}>
+              <ActivityIndicator size="large" color="#1e293b" />
             </View>
-          )}
-          <ActivityIndicator size="large" color="#667eea" style={styles.loader} />
+            <View style={styles.spinnerInner}>
+              <Text style={styles.spinnerIcon}>📄</Text>
+            </View>
+          </View>
+          
           <Text style={styles.loadingText}>{statusText}</Text>
-          <Text style={styles.loadingSubtext}>AI is analyzing contract content</Text>
+          <Text style={styles.loadingSubtext}>Please wait...</Text>
 
           {/* Progress bar for queue-based analysis */}
           {mode === 'queue' && (
             <View style={styles.progressContainer}>
               <View style={styles.progressBar}>
-                <View style={[styles.progressFill, { width: `${progress}%` }]} />
+                <LinearGradient
+                  colors={['#1e293b', '#334155']}
+                  style={[styles.progressFill, { width: `${progress}%` }]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                />
               </View>
-              <Text style={styles.progressText}>{progress}%</Text>
             </View>
           )}
 
@@ -174,17 +182,15 @@ export default function AnalysisScreen() {
             </View>
           )}
 
-          {/* Image Preview */}
-          {currentImage && (
-            <View style={styles.resultImagePreview}>
-              <Image source={{ uri: currentImage }} style={styles.resultImage} />
-            </View>
-          )}
-
-          {/* Contract Info (if available) */}
+          {/* Contract Info Overview Card */}
           {displayResult.contractInfo && (
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>📄 Contract Information</Text>
+            <View style={styles.overviewCard}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardTitle}>Contract Overview</Text>
+                <View style={styles.overviewBadge}>
+                  <Text style={styles.overviewBadgeText}>Overview</Text>
+                </View>
+              </View>
               {displayResult.contractInfo.type && (
                 <View style={styles.infoRow}>
                   <Text style={styles.infoLabel}>Type:</Text>
@@ -202,19 +208,17 @@ export default function AnalysisScreen() {
                 )}
               {displayResult.contractInfo.effectiveDate && (
                 <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Effective Date:</Text>
-                  <Text style={styles.infoValue}>{displayResult.contractInfo.effectiveDate}</Text>
-                </View>
-              )}
-              {displayResult.contractInfo.expirationDate && (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Expiration Date:</Text>
-                  <Text style={styles.infoValue}>{displayResult.contractInfo.expirationDate}</Text>
+                  <Text style={styles.infoLabel}>Term:</Text>
+                  <Text style={styles.infoValue}>
+                    {displayResult.contractInfo.effectiveDate}
+                    {displayResult.contractInfo.expirationDate &&
+                      ` - ${displayResult.contractInfo.expirationDate}`}
+                  </Text>
                 </View>
               )}
               {displayResult.contractInfo.totalValue && (
                 <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Total Value:</Text>
+                  <Text style={styles.infoLabel}>Pages:</Text>
                   <Text style={styles.infoValue}>{displayResult.contractInfo.totalValue}</Text>
                 </View>
               )}
@@ -223,59 +227,74 @@ export default function AnalysisScreen() {
 
           {/* Overall Risk Level */}
           <View style={styles.riskLevelCard}>
-            <LinearGradient
-              colors={[
-                getRiskLevelColor(displayResult.riskLevel) + '20',
-                getRiskLevelColor(displayResult.riskLevel) + '10',
-              ]}
-              style={styles.riskLevelGradient}
-            >
+            <View style={styles.riskLevelContent}>
               <Text style={styles.riskLevelLabel}>Overall Risk Level</Text>
               <View
                 style={[
-                  styles.riskBadge,
+                  styles.riskLevelBadge,
                   { backgroundColor: getRiskLevelColor(displayResult.riskLevel) },
                 ]}
               >
-                <Text style={styles.riskBadgeText}>
+                <Text style={styles.riskLevelBadgeText}>
                   {getRiskLevelText(displayResult.riskLevel)}
                 </Text>
               </View>
-            </LinearGradient>
+            </View>
           </View>
 
           {/* Summary */}
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>📋 Summary</Text>
+          <View style={styles.summaryCard}>
+            <View style={styles.cardHeader}>
+              <Text style={styles.cardTitle}>Summary</Text>
+            </View>
             <Text style={styles.summaryText}>{displayResult.summary}</Text>
           </View>
 
           {/* Risk Items */}
           {displayResult.risks.length > 0 && (
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>
-                ⚠️ Risk Identification ({displayResult.risks.length})
-              </Text>
+            <View style={styles.riskCard}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardTitle}>Potential Risks</Text>
+                <View style={styles.riskCountBadge}>
+                  <Text style={styles.riskCountBadgeText}>{displayResult.risks.length} Items</Text>
+                </View>
+              </View>
               {displayResult.risks.map((risk: RiskItem, index: number) => (
                 <View key={risk.id || index} style={styles.riskItem}>
-                  <View style={styles.riskHeader}>
-                    <Text style={styles.riskTitle}>{risk.title}</Text>
+                  <View style={styles.riskIconWrapper}>
                     <View
                       style={[
-                        styles.severityBadge,
-                        { backgroundColor: getSeverityColor(risk.severity) },
+                        styles.riskIcon,
+                        { backgroundColor: getSeverityColor(risk.severity || 'medium') },
                       ]}
                     >
-                      <Text style={styles.severityBadgeText}>{risk.severity}</Text>
+                      <Text style={styles.riskIconText}>!</Text>
                     </View>
                   </View>
-                  <Text style={styles.riskDescription}>{risk.description}</Text>
-                  {risk.category && (
-                    <Text style={styles.riskCategory}>Category: {risk.category}</Text>
-                  )}
-                  {risk.suggestion && (
-                    <Text style={styles.riskSuggestion}>💡 {risk.suggestion}</Text>
-                  )}
+                  <View style={styles.riskContent}>
+                    <View style={styles.riskTitleRow}>
+                      <Text style={styles.riskTitle}>{risk.title}</Text>
+                      {risk.severity && (
+                        <View
+                          style={[
+                            styles.severityBadge,
+                            { backgroundColor: getSeverityColor(risk.severity) },
+                          ]}
+                        >
+                          <Text style={styles.severityBadgeText}>
+                            {risk.severity.toUpperCase()}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
+                    <Text style={styles.riskDescription}>{risk.description}</Text>
+                    {risk.category && (
+                      <Text style={styles.riskCategory}>Category: {risk.category}</Text>
+                    )}
+                    {risk.suggestion && (
+                      <Text style={styles.riskSuggestion}>💡 {risk.suggestion}</Text>
+                    )}
+                  </View>
                 </View>
               ))}
             </View>
@@ -283,13 +302,24 @@ export default function AnalysisScreen() {
 
           {/* Key Terms */}
           {displayResult.keyTerms.length > 0 && (
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>📝 Key Terms ({displayResult.keyTerms.length})</Text>
+            <View style={styles.keyTermsCard}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardTitle}>Key Terms</Text>
+                <View style={styles.keyTermsCountBadge}>
+                  <Text style={styles.keyTermsCountBadgeText}>
+                    {displayResult.keyTerms.length} Items
+                  </Text>
+                </View>
+              </View>
               {displayResult.keyTerms.map((term: KeyTerm, index: number) => (
                 <View key={index} style={styles.termItem}>
                   <View style={styles.termHeader}>
                     <Text style={styles.termTitle}>{term.title}</Text>
-                    <Text style={styles.termImportance}>{term.importance}</Text>
+                    {term.importance && (
+                      <View style={styles.importanceBadge}>
+                        <Text style={styles.importanceBadgeText}>{term.importance}</Text>
+                      </View>
+                    )}
                   </View>
                   <Text style={styles.termContent}>{term.content}</Text>
                 </View>
@@ -299,11 +329,15 @@ export default function AnalysisScreen() {
 
           {/* Recommendations */}
           {displayResult.recommendations.length > 0 && (
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>💡 Recommendations</Text>
+            <View style={styles.recommendationsCard}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardTitle}>Recommendations</Text>
+              </View>
               {displayResult.recommendations.map((recommendation: string, index: number) => (
                 <View key={index} style={styles.recommendationItem}>
-                  <Text style={styles.recommendationBullet}>•</Text>
+                  <View style={styles.recommendationBullet}>
+                    <Text style={styles.recommendationBulletText}>•</Text>
+                  </View>
                   <Text style={styles.recommendationText}>{recommendation}</Text>
                 </View>
               ))}
@@ -313,9 +347,16 @@ export default function AnalysisScreen() {
           {/* Action Buttons */}
           <View style={styles.actionButtons}>
             <TouchableOpacity style={styles.actionButton} onPress={clearAnalysis}>
-              <Text style={styles.actionButtonText}>
-                {viewSource === 'history' ? 'Re-analyze' : 'Analyze Again'}
-              </Text>
+              <LinearGradient
+                colors={['#1e293b', '#334155']}
+                style={styles.actionButtonGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <Text style={styles.actionButtonText}>
+                  {viewSource === 'history' ? 'Re-analyze' : 'Analyze Again'}
+                </Text>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
 
@@ -346,82 +387,78 @@ export default function AnalysisScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#f1f5f9', // Cool slate background
   },
   content: {
-    padding: 20,
+    padding: 16,
+    paddingBottom: 24,
   },
   // Loading styles
   loadingContainer: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    padding: 24,
   },
-  imagePreview: {
-    width: 200,
-    height: 200,
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginBottom: 24,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.15,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 4,
-      },
-    }),
+  spinnerWrapper: {
+    position: 'relative',
+    width: 80,
+    height: 80,
+    marginBottom: 32,
   },
-  previewImage: {
-    width: '100%',
-    height: '100%',
+  spinnerOuter: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: 80,
+    height: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  loader: {
-    marginBottom: 16,
+  spinnerInner: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    width: 40,
+    height: 40,
+    backgroundColor: '#f1f5f9',
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  spinnerIcon: {
+    fontSize: 20,
   },
   loadingText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#000000',
     marginBottom: 8,
   },
   loadingSubtext: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 16,
+    fontSize: 13,
+    color: '#94a3b8', // Slate 400
   },
   // Progress styles
   progressContainer: {
-    width: '80%',
-    alignItems: 'center',
-    marginTop: 16,
+    width: 200,
+    marginTop: 32,
   },
   progressBar: {
     width: '100%',
-    height: 8,
-    backgroundColor: '#e0e0e0',
-    borderRadius: 4,
+    height: 4,
+    backgroundColor: '#e2e8f0', // Slate 200
+    borderRadius: 2,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#667eea',
-    borderRadius: 4,
-  },
-  progressText: {
-    marginTop: 8,
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#667eea',
+    borderRadius: 2,
   },
   statusText: {
     marginTop: 12,
     fontSize: 12,
-    color: '#999',
+    color: '#94a3b8',
     textTransform: 'capitalize',
   },
   // Error styles
@@ -429,7 +466,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    padding: 24,
   },
   errorIcon: {
     fontSize: 48,
@@ -438,211 +475,381 @@ const styles = StyleSheet.create({
   errorTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#333',
+    color: '#000000',
     marginBottom: 8,
   },
   errorMessage: {
     fontSize: 14,
-    color: '#666',
+    color: '#64748b', // Slate 500
     textAlign: 'center',
     marginBottom: 24,
   },
   retryButton: {
-    backgroundColor: '#667eea',
     paddingVertical: 12,
     paddingHorizontal: 24,
-    borderRadius: 8,
+    borderRadius: 14,
+    overflow: 'hidden',
   },
   retryButtonText: {
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
   },
-  // Result styles
-  resultImagePreview: {
-    width: '100%',
-    height: 200,
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginBottom: 16,
-  },
-  resultImage: {
-    width: '100%',
-    height: '100%',
-  },
-  riskLevelCard: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginBottom: 16,
-  },
-  riskLevelGradient: {
+  // Card styles - Glass effect
+  overviewCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 20,
     padding: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(226, 232, 240, 0.8)',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#1e293b',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  summaryCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(226, 232, 240, 0.8)',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#1e293b',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  riskCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(226, 232, 240, 0.8)',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#1e293b',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  keyTermsCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(226, 232, 240, 0.8)',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#1e293b',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  recommendationsCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(226, 232, 240, 0.8)',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#1e293b',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  cardTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#000000',
+  },
+  overviewBadge: {
+    backgroundColor: '#1e293b',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+  },
+  overviewBadgeText: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#ffffff',
+  },
+  riskCountBadge: {
+    backgroundColor: '#1e293b',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+  },
+  riskCountBadgeText: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#ffffff',
+  },
+  keyTermsCountBadge: {
+    backgroundColor: '#1e293b',
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+  },
+  keyTermsCountBadgeText: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#ffffff',
+  },
+  // Risk Level Card
+  riskLevelCard: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(226, 232, 240, 0.8)',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#1e293b',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
+  },
+  riskLevelContent: {
     alignItems: 'center',
   },
   riskLevelLabel: {
     fontSize: 14,
-    color: '#666',
-    marginBottom: 8,
+    fontWeight: '500',
+    color: '#64748b',
+    marginBottom: 12,
   },
-  riskBadge: {
-    paddingVertical: 8,
-    paddingHorizontal: 20,
+  riskLevelBadge: {
+    paddingVertical: 10,
+    paddingHorizontal: 24,
     borderRadius: 20,
   },
-  riskBadgeText: {
-    color: '#fff',
+  riskLevelBadgeText: {
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '700',
   },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 8,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 12,
-  },
   // Contract info styles
+  summaryText: {
+    fontSize: 13,
+    color: '#64748b', // Slate 500
+    lineHeight: 22,
+  },
   infoRow: {
     flexDirection: 'row',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   infoLabel: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#666',
+    color: '#000000',
     width: 100,
   },
   infoValue: {
     fontSize: 13,
-    color: '#333',
+    color: '#000000',
     flex: 1,
-  },
-  summaryText: {
-    fontSize: 14,
-    color: '#666',
     lineHeight: 20,
   },
+  // Risk item styles
   riskItem: {
-    marginBottom: 12,
-    paddingBottom: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 20,
   },
-  riskHeader: {
+  riskIconWrapper: {
+    paddingTop: 2,
+  },
+  riskIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#1e293b',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  riskIconText: {
+    fontSize: 14,
+    color: '#ffffff',
+    fontWeight: '600',
+  },
+  riskContent: {
+    flex: 1,
+  },
+  riskTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   riskTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: '#000000',
     flex: 1,
+    marginRight: 8,
   },
   severityBadge: {
-    paddingVertical: 2,
+    paddingVertical: 4,
     paddingHorizontal: 8,
-    borderRadius: 4,
+    borderRadius: 6,
   },
   severityBadgeText: {
-    color: '#fff',
-    fontSize: 11,
-    fontWeight: '600',
+    color: '#ffffff',
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.5,
   },
   riskDescription: {
-    fontSize: 13,
-    color: '#666',
-    lineHeight: 18,
+    fontSize: 12,
+    color: '#64748b', // Slate 500
+    lineHeight: 20,
+    marginBottom: 4,
   },
   riskCategory: {
-    fontSize: 12,
-    color: '#999',
+    fontSize: 11,
+    color: '#94a3b8',
     marginTop: 4,
+    fontStyle: 'italic',
   },
   riskSuggestion: {
     fontSize: 12,
-    color: '#667eea',
-    marginTop: 6,
-    fontStyle: 'italic',
+    color: '#1e293b',
+    marginTop: 8,
+    lineHeight: 18,
   },
+  // Key Terms styles
   termItem: {
-    marginBottom: 12,
-    paddingBottom: 12,
+    marginBottom: 16,
+    paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: '#e2e8f0',
   },
   termHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 6,
+    marginBottom: 8,
   },
   termTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: '#000000',
     flex: 1,
   },
-  termImportance: {
+  importanceBadge: {
+    backgroundColor: '#f1f5f9',
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 6,
+  },
+  importanceBadgeText: {
     fontSize: 11,
-    color: '#667eea',
+    color: '#475569',
     fontWeight: '600',
   },
   termContent: {
     fontSize: 13,
-    color: '#666',
-    lineHeight: 18,
+    color: '#64748b',
+    lineHeight: 20,
   },
+  // Recommendations styles
   recommendationItem: {
     flexDirection: 'row',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   recommendationBullet: {
-    fontSize: 14,
-    color: '#667eea',
-    marginRight: 8,
+    width: 20,
+    paddingTop: 2,
+  },
+  recommendationBulletText: {
+    fontSize: 16,
+    color: '#1e293b',
     fontWeight: '700',
   },
   recommendationText: {
     fontSize: 13,
-    color: '#666',
-    lineHeight: 18,
+    color: '#64748b',
+    lineHeight: 20,
     flex: 1,
   },
+  // Action button styles
   actionButtons: {
     marginVertical: 16,
   },
   actionButton: {
-    backgroundColor: '#667eea',
+    borderRadius: 14,
+    overflow: 'hidden',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#1e293b',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 6,
+      },
+    }),
+  },
+  actionButtonGradient: {
     paddingVertical: 14,
-    borderRadius: 8,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   actionButtonText: {
-    color: '#fff',
+    color: '#ffffff',
     fontSize: 14,
     fontWeight: '600',
   },
   timestamp: {
     fontSize: 12,
-    color: '#999',
+    color: '#94a3b8', // Slate 400
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -650,7 +857,7 @@ const styles = StyleSheet.create({
   placeholder: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 60,
+    paddingVertical: 80,
   },
   placeholderIcon: {
     fontSize: 64,
@@ -659,12 +866,12 @@ const styles = StyleSheet.create({
   placeholderText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#333',
+    color: '#000000',
     marginBottom: 8,
   },
   placeholderSubtext: {
     fontSize: 14,
-    color: '#999',
+    color: '#94a3b8', // Slate 400
   },
   // Source badge styles
   sourceBadgeContainer: {
@@ -674,12 +881,12 @@ const styles = StyleSheet.create({
   sourceBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f0f4ff',
+    backgroundColor: 'rgba(30, 41, 59, 0.1)',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#667eea',
+    borderColor: '#1e293b',
   },
   sourceBadgeIcon: {
     fontSize: 16,
@@ -688,6 +895,6 @@ const styles = StyleSheet.create({
   sourceBadgeText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#667eea',
+    color: '#1e293b',
   },
 });

@@ -817,8 +817,44 @@
                   </div>
                 </div>
 
+                <!-- Overall Risk Level Card -->
+                <div
+                  class="glass-card rounded-[20px] p-[20px] mb-[16px] shadow-sm text-center"
+                >
+                  <p class="text-[14px] font-medium text-slate-500 mb-[12px]">
+                    Overall Risk Level
+                  </p>
+                  <div
+                    class="inline-block px-[24px] py-[10px] bg-orange-500 rounded-[20px]"
+                  >
+                    <span class="text-[16px] font-bold text-white"
+                      >Medium Risk</span
+                    >
+                  </div>
+                </div>
+
+                <!-- Summary Card -->
+                <div
+                  class="glass-card rounded-[20px] p-[20px] mb-[16px] shadow-sm"
+                >
+                  <div class="flex items-center justify-between mb-[16px]">
+                    <h3 class="text-[15px] font-semibold text-black">
+                      Summary
+                    </h3>
+                  </div>
+                  <p class="text-[13px] text-slate-500 leading-[22px]">
+                    This employment contract establishes a standard employment
+                    relationship between the company and employee with a
+                    three-year term. The contract includes typical provisions
+                    for compensation, benefits, and termination procedures.
+                    However, there are some areas that require attention,
+                    particularly regarding termination clauses and
+                    confidentiality obligations.
+                  </p>
+                </div>
+
                 <!-- Risk Card -->
-                <div class="glass-card rounded-[20px] p-[20px] shadow-sm">
+                <div class="glass-card rounded-[20px] p-[20px] mb-[16px] shadow-sm">
                   <div class="flex items-center justify-between mb-[20px]">
                     <h3 class="text-[15px] font-semibold text-black">
                       Potential Risks
@@ -832,38 +868,238 @@
                   <div class="space-y-[20px]">
                     <div class="flex gap-[16px]">
                       <div
-                        class="w-[28px] h-[28px] rounded-full bg-slate-800 flex items-center justify-center flex-shrink-0 mt-[2px]"
+                        class="w-[28px] h-[28px] rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0 mt-[2px]"
                       >
-                        <span class="text-[14px] text-white">!</span>
+                        <span class="text-[14px] text-white font-bold">!</span>
                       </div>
-                      <div>
-                        <p
-                          class="text-[14px] font-semibold text-black mb-[4px]"
-                        >
-                          Vague Termination Compensation
-                        </p>
-                        <p class="text-[12px] text-slate-500 leading-[20px]">
+                      <div class="flex-1">
+                        <div class="flex items-center justify-between mb-[4px]">
+                          <p class="text-[14px] font-semibold text-black">
+                            Vague Termination Compensation
+                          </p>
+                          <span
+                            class="text-[10px] px-[8px] py-[4px] bg-orange-500 text-white rounded-[6px] font-bold tracking-wide"
+                            >MEDIUM</span
+                          >
+                        </div>
+                        <p class="text-[12px] text-slate-500 leading-[20px] mb-[4px]">
                           Termination compensation standards not clearly defined
+                        </p>
+                        <p class="text-[11px] text-slate-400 italic">
+                          Category: Termination
+                        </p>
+                        <p class="text-[12px] text-slate-800 mt-[8px] leading-[18px]">
+                          💡 Request specific compensation calculation formulas
+                          and payment timelines to be added to the contract
                         </p>
                       </div>
                     </div>
 
                     <div class="flex gap-[16px]">
                       <div
-                        class="w-[28px] h-[28px] rounded-full bg-slate-800 flex items-center justify-center flex-shrink-0 mt-[2px]"
+                        class="w-[28px] h-[28px] rounded-full bg-red-500 flex items-center justify-center flex-shrink-0 mt-[2px]"
                       >
-                        <span class="text-[14px] text-white">!</span>
+                        <span class="text-[14px] text-white font-bold">!</span>
                       </div>
-                      <div>
-                        <p
-                          class="text-[14px] font-semibold text-black mb-[4px]"
+                      <div class="flex-1">
+                        <div class="flex items-center justify-between mb-[4px]">
+                          <p class="text-[14px] font-semibold text-black">
+                            Excessive Confidentiality Period
+                          </p>
+                          <span
+                            class="text-[10px] px-[8px] py-[4px] bg-red-500 text-white rounded-[6px] font-bold tracking-wide"
+                            >HIGH</span
+                          >
+                        </div>
+                        <p class="text-[12px] text-slate-500 leading-[20px] mb-[4px]">
+                          10-year period exceeds legal requirements and industry
+                          standards
+                        </p>
+                        <p class="text-[11px] text-slate-400 italic">
+                          Category: Confidentiality
+                        </p>
+                        <p class="text-[12px] text-slate-800 mt-[8px] leading-[18px]">
+                          💡 Negotiate to reduce confidentiality period to 2-3
+                          years, which is standard for this industry
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="flex gap-[16px]">
+                      <div
+                        class="w-[28px] h-[28px] rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-[2px]"
+                      >
+                        <span class="text-[14px] text-white font-bold">!</span>
+                      </div>
+                      <div class="flex-1">
+                        <div class="flex items-center justify-between mb-[4px]">
+                          <p class="text-[14px] font-semibold text-black">
+                            Missing Work-from-Home Policy
+                          </p>
+                          <span
+                            class="text-[10px] px-[8px] py-[4px] bg-green-500 text-white rounded-[6px] font-bold tracking-wide"
+                            >LOW</span
+                          >
+                        </div>
+                        <p class="text-[12px] text-slate-500 leading-[20px] mb-[4px]">
+                          No clear policy regarding remote work arrangements
+                        </p>
+                        <p class="text-[11px] text-slate-400 italic">
+                          Category: Work Arrangements
+                        </p>
+                        <p class="text-[12px] text-slate-800 mt-[8px] leading-[18px]">
+                          💡 Request addition of remote work policy if applicable
+                          to your position
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Key Terms Card -->
+                <div
+                  class="glass-card rounded-[20px] p-[20px] mb-[16px] shadow-sm"
+                >
+                  <div class="flex items-center justify-between mb-[20px]">
+                    <h3 class="text-[15px] font-semibold text-black">
+                      Key Terms
+                    </h3>
+                    <span
+                      class="text-[11px] px-[10px] py-[6px] gradient-header text-white rounded-[8px] font-medium"
+                      >4 Items</span
+                    >
+                  </div>
+
+                  <div class="space-y-[16px]">
+                    <div class="pb-[16px] border-b border-slate-200">
+                      <div class="flex items-center justify-between mb-[8px]">
+                        <p class="text-[14px] font-semibold text-black">
+                          Base Salary & Benefits
+                        </p>
+                        <span
+                          class="text-[11px] px-[8px] py-[4px] bg-slate-100 text-slate-600 rounded-[6px] font-semibold"
+                          >Critical</span
                         >
-                          Excessive Confidentiality Period
-                        </p>
-                        <p class="text-[12px] text-slate-500 leading-[20px]">
-                          10-year period exceeds legal requirements
-                        </p>
                       </div>
+                      <p class="text-[13px] text-slate-500 leading-[20px]">
+                        Annual salary of $85,000 with standard health insurance,
+                        401(k) matching up to 4%, and 15 days paid vacation per
+                        year.
+                      </p>
+                    </div>
+
+                    <div class="pb-[16px] border-b border-slate-200">
+                      <div class="flex items-center justify-between mb-[8px]">
+                        <p class="text-[14px] font-semibold text-black">
+                          Termination Notice Period
+                        </p>
+                        <span
+                          class="text-[11px] px-[8px] py-[4px] bg-slate-100 text-slate-600 rounded-[6px] font-semibold"
+                          >Important</span
+                        >
+                      </div>
+                      <p class="text-[13px] text-slate-500 leading-[20px]">
+                        Either party must provide 30 days written notice before
+                        termination. Termination for cause does not require
+                        notice.
+                      </p>
+                    </div>
+
+                    <div class="pb-[16px] border-b border-slate-200">
+                      <div class="flex items-center justify-between mb-[8px]">
+                        <p class="text-[14px] font-semibold text-black">
+                          Non-Compete Clause
+                        </p>
+                        <span
+                          class="text-[11px] px-[8px] py-[4px] bg-slate-100 text-slate-600 rounded-[6px] font-semibold"
+                          >Important</span
+                        >
+                      </div>
+                      <p class="text-[13px] text-slate-500 leading-[20px]">
+                        Employee agrees not to work for direct competitors within
+                        a 50-mile radius for 12 months after employment ends.
+                      </p>
+                    </div>
+
+                    <div>
+                      <div class="flex items-center justify-between mb-[8px]">
+                        <p class="text-[14px] font-semibold text-black">
+                          Intellectual Property Rights
+                        </p>
+                        <span
+                          class="text-[11px] px-[8px] py-[4px] bg-slate-100 text-slate-600 rounded-[6px] font-semibold"
+                          >Critical</span
+                        >
+                      </div>
+                      <p class="text-[13px] text-slate-500 leading-[20px]">
+                        All work product, inventions, and intellectual property
+                        created during employment belong to the company.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Recommendations Card -->
+                <div
+                  class="glass-card rounded-[20px] p-[20px] mb-[16px] shadow-sm"
+                >
+                  <div class="flex items-center justify-between mb-[20px]">
+                    <h3 class="text-[15px] font-semibold text-black">
+                      Recommendations
+                    </h3>
+                  </div>
+
+                  <div class="space-y-[12px]">
+                    <div class="flex gap-[8px]">
+                      <span
+                        class="text-[16px] text-slate-800 font-bold flex-shrink-0"
+                        >•</span
+                      >
+                      <p class="text-[13px] text-slate-500 leading-[20px]">
+                        Request clarification on severance pay calculation and
+                        payment timeline in termination clause
+                      </p>
+                    </div>
+                    <div class="flex gap-[8px]">
+                      <span
+                        class="text-[16px] text-slate-800 font-bold flex-shrink-0"
+                        >•</span
+                      >
+                      <p class="text-[13px] text-slate-500 leading-[20px]">
+                        Negotiate to reduce the confidentiality period from 10
+                        years to 2-3 years to match industry standards
+                      </p>
+                    </div>
+                    <div class="flex gap-[8px]">
+                      <span
+                        class="text-[16px] text-slate-800 font-bold flex-shrink-0"
+                        >•</span
+                      >
+                      <p class="text-[13px] text-slate-500 leading-[20px]">
+                        Consider adding a remote work policy section if work from
+                        home is expected for your role
+                      </p>
+                    </div>
+                    <div class="flex gap-[8px]">
+                      <span
+                        class="text-[16px] text-slate-800 font-bold flex-shrink-0"
+                        >•</span
+                      >
+                      <p class="text-[13px] text-slate-500 leading-[20px]">
+                        Review the non-compete clause carefully and ensure the
+                        50-mile radius and 12-month duration are reasonable for
+                        your situation
+                      </p>
+                    </div>
+                    <div class="flex gap-[8px]">
+                      <span
+                        class="text-[16px] text-slate-800 font-bold flex-shrink-0"
+                        >•</span
+                      >
+                      <p class="text-[13px] text-slate-500 leading-[20px]">
+                        Consult with an employment lawyer before signing if you
+                        have concerns about any clauses
+                      </p>
                     </div>
                   </div>
                 </div>
