@@ -16,32 +16,29 @@ import { ContractList } from '@/components';
 
 export default function HomeScreen() {
   const router = useRouter();
-  const { takePhoto, pickImage, pickDocument } = useCamera();
+  const { pickImage, pickDocument } = useCamera();
   const { handleImageAnalysis, isUploading } = useUpload();
   const { contracts, isLoading, refreshHistory, deleteHistoryItem } = useContractHistory();
   console.log('contracts: ', contracts);
 
   /**
-   * Handle taking a photo and starting analysis
+   * Handle taking multiple photos and starting analysis
    */
-  const onTakePhoto = useCallback(async () => {
-    const uri = await takePhoto();
-    if (uri) {
-      // Navigate to analysis page first for immediate feedback
-      router.push('/analysis');
-      await handleImageAnalysis(uri);
-    }
-  }, [takePhoto, handleImageAnalysis, router]);
+  const onTakePhoto = useCallback(() => {
+    // Navigate to custom camera page for multi-photo capture
+    router.push('/camera');
+  }, [router]);
 
   /**
    * Handle choosing a photo from gallery and starting analysis
    */
   const onChoosePhoto = useCallback(async () => {
-    const uri = await pickImage();
-    if (uri) {
+    // Allow selecting up to 5 images
+    const uris = await pickImage(5);
+    if (uris.length > 0) {
       // Navigate to analysis page first for immediate feedback
       router.push('/analysis');
-      await handleImageAnalysis(uri);
+      await handleImageAnalysis(uris);
     }
   }, [pickImage, handleImageAnalysis, router]);
 

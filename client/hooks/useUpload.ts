@@ -16,16 +16,25 @@ export const useUpload = () => {
 
   /**
    * Handle image analysis flow (direct analysis for quick feedback)
+   * Supports both single and multiple images
    */
   const handleImageAnalysis = useCallback(
-    async (uri: string, fileName?: string) => {
+    async (uriOrUris: string | string[], fileName?: string) => {
       try {
         // Clear previous states
         clearAnalysis();
         clearUploads();
 
-        // Start direct analysis
-        await analyzeImage(uri, fileName);
+        // Normalize to array
+        const uris = Array.isArray(uriOrUris) ? uriOrUris : [uriOrUris];
+
+        if (uris.length === 0) {
+          return false;
+        }
+
+        // For now, analyze the first image
+        // TODO: Support batch analysis or multi-page contract analysis
+        await analyzeImage(uris[0], fileName);
         return true;
       } catch (error) {
         console.error('handleImageAnalysis error:', error);
