@@ -95,8 +95,8 @@ jobs:
                   - "3000:3000"
                 environment:
                   - NODE_ENV=development
-                  - DATABASE_URL=postgresql://postgres.svsfknesniyjtoylrjsi:WtQpJZHkYGdYcxPi@aws-1-us-east-2.pooler.supabase.com:6543/postgres?pgbouncer=true
-                  - DIRECT_URL=postgresql://postgres.svsfknesniyjtoylrjsi:WtQpJZHkYGdYcxPi@aws-1-us-east-2.pooler.supabase.com:5432/postgres
+                  - DATABASE_URL=${{ secrets.DATABASE_URL }}
+                  - DIRECT_URL=${{ secrets.DIRECT_URL }}
                   - DATABASE_CONNECTION_LIMIT=10
                   - DATABASE_POOL_TIMEOUT=20
                   - JWT_SECRET=your-secret-key-change-this-in-production
@@ -122,7 +122,7 @@ jobs:
                   - AI_SERVICE=gemini
                   - OPENAI_API_KEY=
                   - ANTHROPIC_API_KEY=
-                  - GEMINI_API_KEY=AIzaSyAjb9d83IiQnEt_PmWElQ7VCJGhAsBDvaE
+                  - GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}
 
                     # Email Configuration
                   - MAIL_HOST=smtp.gmail.com
@@ -140,8 +140,8 @@ jobs:
                   - APP_URL=http://localhost:3000
 
                     # 第三方登录
-                  - SUPABASE_URL=https://svsfknesniyjtoylrjsi.supabase.co
-                  - SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2c2ZrbmVzbml5anRveWxyanNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc5MTE5NTEsImV4cCI6MjA4MzQ4Nzk1MX0.ks3bZG7wPaysvMGkPDb48pKoWHNT606cCMdbMfoW-js
+                  - SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+                  - SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
 
 
 
