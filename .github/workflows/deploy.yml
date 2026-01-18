@@ -148,16 +148,6 @@ jobs:
                 networks:
                   - ${{ env.APP_NAME }}-network
 
-              client:
-                image: ghcr.io/${{ env.DOCKER_REGISTRY_USERNAME }}/${{ env.CLIENT_APP_NAME }}:${{ github.sha }}
-                restart: unless-stopped
-                ports:
-                  - "3002:8043"
-                depends_on:
-                  - server
-                networks:
-                  - ${{ env.APP_NAME }}-network
-
             networks:
               ${{ env.APP_NAME }}-network:
                 driver: bridge
