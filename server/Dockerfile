@@ -1,32 +1,32 @@
-# syntax=docker/dockerfile:1.4
-
-FROM node:lts-buster-slim AS base
-WORKDIR /usr/src/app
+# ... 前面 base 阶段保持不变 ...
 
 # --- 依赖阶段 ---
 FROM base AS dependencies
 COPY package*.json ./
-# 只安装依赖，这层会被缓存
+# 1. 先安装所有依赖
 RUN npm install
 
 # --- 构建阶段 ---
 FROM base AS builder
+# 2. 从上个阶段拷贝 node_modules
 COPY --from=dependencies /usr/src/app/node_modules ./node_modules
+# 3. 拷贝源码（包含 prisma 目录和 schema 文件）
 COPY . .
-# 在构建镜像时就完成编译！
+# 4. 调用你的自定义脚本生成 Prisma Client
+RUN npm run db:generate
+# 5. 执行 NestJS 构建
 RUN npm run build
 
-# --- 生产运行阶段 ---
+# --- 运行阶段 ---
 FROM base AS production
 ENV NODE_ENV=production
 
-# 从前面的阶段拷贝必要文件，不拷贝源码
+# 拷贝运行所需的最简文件
 COPY --from=dependencies /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/dist ./dist
+# 关键：生产环境也需要这个，否则 node_modules 里的类型映射会失效
+COPY --from=builder /usr/src/app/node_modules/.prisma ./node_modules/.prisma
 COPY package.json ./
 
-# 暴露端口
 EXPOSE 3000
-
-# 此时 dist/main 已经确定存在于镜像中了
 CMD ["node", "dist/main"]
