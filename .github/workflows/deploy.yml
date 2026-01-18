@@ -1,0 +1,179 @@
+name: "Deploy"
+
+on:
+  push:
+    branches:
+      - "main"
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to deploy"
+        required: true
+        default: "main"
+
+# This will make sure that only one deployment is running at a time
+concurrency:
+  group: deployment
+  cancel-in-progress: true
+
+env:
+  APP_NAME: "contractassistant"
+  # Put your server app name here
+  SERVER_APP_NAME: "contractassistant-server"
+  # # After you know the server URL, put the URL here
+  # SERVER_APP_URL: "https://api-wasp.migaox.com"
+  # Put your client app name here
+  CLIENT_APP_NAME: "pokemon-client"
+  DOCKER_REGISTRY: "ghcr.io"
+  DOCKER_REGISTRY_USERNAME: ${{ github.repository_owner }}
+  # This secret is provided by GitHub by default and is used to authenticate with the Container registry
+  DOCKER_REGISTRY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  build-and-push-images:
+    permissions:
+      contents: read
+      packages: write
+
+    runs-on: ubuntu-latest
+
+    # REMOVE this whole block if your app is not in the `app` folder
+    defaults:
+      run:
+        working-directory: ./server
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ env.DOCKER_REGISTRY_USERNAME }}
+          password: ${{ env.DOCKER_REGISTRY_PASSWORD }}
+
+      - name: (server) Extract metadata for Docker
+        id: meta-server
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_REGISTRY }}/${{ env.DOCKER_REGISTRY_USERNAME }}/${{ env.SERVER_APP_NAME }}
+          tags: |
+            type=sha,prefix=,suffix=,format=long
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: (server) Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          # REMOVE the `app` bit from the path if your app is not in the `app` folder
+          context: ./server
+          # REMOVE the `app` bit from the path if your app is not in the `app` folder
+          file: ./server/Dockerfile
+          push: true
+          tags: ${{ steps.meta-server.outputs.tags }}
+          labels: ${{ steps.meta-server.outputs.labels }}
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            # 登录到 GitHub Container Registry
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ env.DOCKER_REGISTRY_USERNAME }} --password-stdin
+
+            # 创建部署目录
+            mkdir -p ~/deployments/${{env.SERVER_APP_NAME}}
+
+            # 创建 docker-compose.yml 文件
+            cat > ~/deployments/${{env.SERVER_APP_NAME}}/docker-compose.yml << 'EOF'
+            services:
+              server:
+                image: ghcr.io/${{ env.DOCKER_REGISTRY_USERNAME }}/${{ env.SERVER_APP_NAME }}:${{ github.sha }}
+                restart: unless-stopped
+                ports:
+                  - "3000:3000"
+                environment:
+                  - NODE_ENV=development
+                  - DATABASE_URL=postgresql://postgres.svsfknesniyjtoylrjsi:WtQpJZHkYGdYcxPi@aws-1-us-east-2.pooler.supabase.com:6543/postgres?pgbouncer=true
+                  - DIRECT_URL=postgresql://postgres.svsfknesniyjtoylrjsi:WtQpJZHkYGdYcxPi@aws-1-us-east-2.pooler.supabase.com:5432/postgres
+                  - DATABASE_CONNECTION_LIMIT=10
+                  - DATABASE_POOL_TIMEOUT=20
+                  - JWT_SECRET=your-secret-key-change-this-in-production
+                  - JWT_EXPIRES_IN=24h
+                  - PORT=3000
+                  - ALLOWED_ORIGINS=http://localhost:3000,http://localhost:19006
+                  - MAX_FILE_SIZE=52428800
+                  - UPLOAD_DIR=./uploads
+
+                    # Storage Configuration (S3 or Local)
+                  - STORAGE_TYPE=local
+                  - AWS_ACCESS_KEY_ID=
+                  - AWS_SECRET_ACCESS_KEY=
+                  - AWS_REGION=
+                  - AWS_S3_BUCKET=
+
+                    # Redis Configuration
+                  - REDIS_HOST=localhost
+                  - REDIS_PORT=6379
+                  - REDIS_PASSWORD=
+
+                    # AI Service Configuration (OpenAI/Claude/Gemini)
+                  - AI_SERVICE=gemini
+                  - OPENAI_API_KEY=
+                  - ANTHROPIC_API_KEY=
+                  - GEMINI_API_KEY=AIzaSyAjb9d83IiQnEt_PmWElQ7VCJGhAsBDvaE
+
+                    # Email Configuration
+                  - MAIL_HOST=smtp.gmail.com
+                  - MAIL_PORT=587
+                  - MAIL_USER=
+                  - MAIL_PASSWORD=
+                  - MAIL_FROM=noreply@contract-assistant.com
+
+                    # Monitoring and Logging
+                  - SENTRY_DSN=
+                  - LOG_LEVEL=info
+
+                    # Application Settings
+                  - APP_NAME=Contract Assistant
+                  - APP_URL=http://localhost:3000
+
+                    # 第三方登录
+                  - SUPABASE_URL=https://svsfknesniyjtoylrjsi.supabase.co
+                  - SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN2c2ZrbmVzbml5anRveWxyanNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc5MTE5NTEsImV4cCI6MjA4MzQ4Nzk1MX0.ks3bZG7wPaysvMGkPDb48pKoWHNT606cCMdbMfoW-js
+
+
+
+                networks:
+                  - ${{ env.APP_NAME }}-network
+
+              client:
+                image: ghcr.io/${{ env.DOCKER_REGISTRY_USERNAME }}/${{ env.CLIENT_APP_NAME }}:${{ github.sha }}
+                restart: unless-stopped
+                ports:
+                  - "3002:8043"
+                depends_on:
+                  - server
+                networks:
+                  - ${{ env.APP_NAME }}-network
+
+            networks:
+              ${{ env.APP_NAME }}-network:
+                driver: bridge
+            EOF
+
+            # 进入部署目录
+            cd ~/deployments/${{env.SERVER_APP_NAME}}
+
+            # 拉取最新镜像
+            docker compose pull
+
+            # 停止并删除旧容器
+            docker compose down
+
+            # 启动新容器
+            docker compose up -d
+
+            # 清理未使用的镜像
+            docker image prune -f
