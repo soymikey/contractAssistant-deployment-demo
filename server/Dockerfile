@@ -19,10 +19,10 @@ RUN npm i
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npm run nest build && npm run start"]
+CMD ["sh", "-c", "npm run build && npm run start"]
 
 FROM development as production
-CMD ["sh", "-c", "npm run nest build && npm run start:prod"]
+CMD ["sh", "-c", "npm run build && npm run start:prod"]
 
 # FROM development as dev-envs
 # RUN <<EOF
