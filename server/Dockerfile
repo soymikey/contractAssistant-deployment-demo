@@ -1,40 +1,32 @@
 # syntax=docker/dockerfile:1.4
 
-FROM node:lts-buster-slim AS development
-
-# 连接数据库 如果是https 需要安装
-# RUN apt-get update -y \
-#     && apt-get install -y openssl libssl1.1 \
-#     && apt-get clean \
-#     && rm -rf /var/lib/apt/lists/*
-
-# Create app directory
+FROM node:lts-buster-slim AS base
 WORKDIR /usr/src/app
 
-COPY package.json  ./
+# --- 依赖阶段 ---
+FROM base AS dependencies
+COPY package*.json ./
+# 只安装依赖，这层会被缓存
+RUN npm install
 
+# --- 构建阶段 ---
+FROM base AS builder
+COPY --from=dependencies /usr/src/app/node_modules ./node_modules
 COPY . .
+# 在构建镜像时就完成编译！
+RUN npm run build
 
-RUN npm i
+# --- 生产运行阶段 ---
+FROM base AS production
+ENV NODE_ENV=production
 
+# 从前面的阶段拷贝必要文件，不拷贝源码
+COPY --from=dependencies /usr/src/app/node_modules ./node_modules
+COPY --from=builder /usr/src/app/dist ./dist
+COPY package.json ./
+
+# 暴露端口
 EXPOSE 3000
 
-CMD ["sh", "-c", "npm run build && npm run start"]
-
-FROM development as production
-CMD ["sh", "-c", "npm run build && npm run start:prod"]
-
-# FROM development as dev-envs
-# RUN <<EOF
-# apt-get update
-# apt-get install -y --no-install-recommends git
-# EOF
-
-# RUN <<EOF
-# useradd -s /bin/bash -m vscode
-# groupadd docker
-# usermod -aG docker vscode
-# EOF
-# # install Docker tools (cli, buildx, compose)
-# COPY --from=gloursdocker/docker / /
-# CMD [ "npm", "run", "dev" ]
+# 此时 dist/main 已经确定存在于镜像中了
+CMD ["node", "dist/main"]
