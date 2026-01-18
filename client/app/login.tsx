@@ -81,19 +81,14 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
-
         {/* Header - Logo and Title */}
         <View style={styles.headerContainer}>
           <View style={styles.logoBox}>
             <Text style={styles.logo}>📄</Text>
           </View>
-          <Text style={styles.title}>
-            {step === 'email' ? 'Welcome Back' : 'Verify Email'}
-          </Text>
+          <Text style={styles.title}>{step === 'email' ? 'Welcome Back' : 'Verify Email'}</Text>
           <Text style={styles.subtitle}>
-            {step === 'email'
-              ? 'Enter your email to sign in'
-              : `Enter the code sent to\n${email}`}
+            {step === 'email' ? 'Enter your email to sign in' : `Enter the code sent to\n${email}`}
           </Text>
         </View>
 
@@ -136,7 +131,7 @@ export default function LoginScreen() {
             {/* Social Auth Buttons */}
             <View style={styles.socialButtonsContainer}>
               <GoogleSignInButton />
-              {Platform.OS !== 'ios' && <ExpoAppleSignInButton />}
+              {Platform.OS === 'ios' && <ExpoAppleSignInButton />}
             </View>
           </View>
         )}

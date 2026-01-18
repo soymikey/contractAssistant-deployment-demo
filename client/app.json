@@ -8,7 +8,11 @@
     "scheme": "contractassistant",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
@@ -17,11 +21,16 @@
         "backgroundColor": "#000000"
       }
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.contractanalyzer.app",
-      "associatedDomains": ["applinks:contractanalyzer.app"],
+      "usesAppleSignIn": true,
+      "associatedDomains": [
+        "applinks:contractassistant.app"
+      ],
       "infoPlist": {
         "NSCameraUsageDescription": "This app needs access to the camera to scan contracts.",
         "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to select contract images.",
@@ -36,7 +45,12 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "package": "com.contractanalyzer.app",
-      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "INTERNET"],
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "INTERNET"
+      ],
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "intentFilters": [
@@ -50,7 +64,10 @@
               "pathPrefix": "/"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
